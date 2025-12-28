@@ -1,9 +1,9 @@
 const CACHE_NAME = "worktime-pwa-v1";
 const ASSETS = [
-  "/",
-  "/index.html",
-  "/manifest.webmanifest",
-  "/sw.js"
+  "./",
+  "./index.html",
+  "./manifest.webmanifest",
+  "./sw.js"
 ];
 
 self.addEventListener("install", (event) => {
