@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Licznik godzin pracy</title>
+  <meta name="theme-color" content="#111111" />
+  <link rel="manifest" href="/manifest.webmanifest">
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    body{margin:0;background:#f6f7fb;color:#111}
+    .wrap{max-width:980px;margin:24px auto;padding:0 14px}
+    .card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+    .grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
+    .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
+    @media(max-width:820px){.col-3,.col-4,.col-6{grid-column:span 12}}
+    label{display:block;font-size:12px;color:#444;margin-bottom:6px}
+    input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d7dbe7;background:#fff;font-size:14px;box-sizing:border-box}
+    button{cursor:pointer;border:none;background:#111;color:#fff}
+    button.secondary{background:#eef1f8;color:#111;border:1px solid #d7dbe7}
+    button.danger{background:#d92d20}
+    h1{font-size:20px;margin:0 0 10px}
+    h2{font-size:16px;margin:0 0 10px}
+    .muted{color:#666;font-size:12px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #eef1f8;text-align:left;font-size:14px}
+    th{font-size:12px;color:#555}
+    .right{text-align:right}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row > *{flex:1;min-width:160px}
+    .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#eef1f8;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" style="margin-bottom:14px;">
+      <h1>⏱️ Licznik godzin pracy (PWA)</h1>
+      <div class="muted" id="pwaHint"></div>
+    </div>
+
+    <div class="grid" style="margin-bottom:14px;">
+      <div class="card col-12">
+        <h2>Ustawienia</h2>
+        <div class="grid">
+          <div class="col-4">
+            <label>Stawka godzinowa (PLN)</label>
+            <input id="rate" type="number" step="0.01" min="0" value="40" />
+          </div>
+          <div class="col-4">
+            <label>Przerwa (min)</label>
+            <input id="breakMin" type="number" step="1" min="0" value="0" />
+          </div>
+          <div class="col-4">
+            <label>Zaokrąglanie</label>
+            <select id="rounding">
+              <option value="none">bez</option>
+              <option value="5">do 5 min</option>
+              <option value="10">do 10 min</option>
+              <option value="15">do 15 min</option>
+            </select>
+          </div>
+        </div>
+        <div class="muted" style="margin-top:8px;">Dane zapisywane lokalnie w pamięci aplikacji (offline).</div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-bottom:14px;">
+      <div class="card col-12">
+        <h2>Dodaj dzień</h2>
+        <div class="grid">
+          <div class="col-3">
+            <label>Data</label>
+            <input id="date" type="date" />
+          </div>
+          <div class="col-3">
+            <label>Wejście</label>
+            <input id="start" type="time" />
+          </div>
+          <div class="col-3">
+            <label>Wyjście</label>
+            <input id="end" type="time" />
+          </div>
+          <div class="col-3">
+            <label>&nbsp;</label>
+            <button id="addBtn">Dodaj / aktualizuj</button>
+          </div>
+          <div class="col-12">
+            <div class="row">
+              <button class="secondary" id="nowStart">Wejście = teraz</button>
+              <button class="secondary" id="nowEnd">Wyjście = teraz</button>
+              <button class="secondary" id="exportCsv">Eksport CSV</button>
+            </div>
+            <div class="muted" style="margin-top:8px;" id="status"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card col-12">
+        <div class="row" style="align-items:center;">
+          <h2 style="margin:0;">Podsumowanie miesiąca</h2>
+          <span class="pill" id="monthLabel"></span>
+        </div>
+
+        <div class="grid" style="margin-top:10px;">
+          <div class="col-4">
+            <div class="muted">Suma godzin</div>
+            <div style="font-size:22px;font-weight:700" id="sumHours">0:00</div>
+          </div>
+          <div class="col-4">
+            <div class="muted">Suma minut</div>
+            <div style="font-size:22px;font-weight:700" id="sumMinutes">0</div>
+          </div>
+          <div class="col-4">
+            <div class="muted">Wypłata</div>
+            <div style="font-size:22px;font-weight:700" id="sumPay">0,00 zł</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px; overflow:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th><th>Wejście</th><th>Wyjście</th>
+                <th class="right">Czas</th><th class="right">Wypłata</th><th class="right">Akcje</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button class="danger" id="clearMonth">Usuń wpisy z tego miesiąca</button>
+          <button class="secondary" id="backupJson">Backup JSON</button>
+          <input id="restoreJson" type="file" accept="application/json" style="display:none" />
+          <button class="secondary" id="restoreBtn">Przywróć z JSON</button>
+        </div>
+
+        <div class="muted" style="margin-top:8px;">
+          Backup/restore działa lokalnie (plik JSON), przydatne gdy zmieniasz telefon.
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // PWA
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js");
+  }
+
+  const $ = (id) => document.getElementById(id);
+  const pad2 = (n) => String(n).padStart(2,"0");
+  const todayISO = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  };
+  const nowHHMM = () => {
+    const d = new Date();
+    return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  };
+  const ym = (dateISO) => dateISO.slice(0,7);
+
+  const STORAGE_KEY = "worktime_pwa_v1";
+
+  let db = load() || { settings:{ rate:40, breakMin:0, rounding:"none" }, entries:[] };
+
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+  function load(){
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; }
+  }
+  function normalize(){
+    db.settings = db.settings || {};
+    db.settings.rate = Number(db.settings.rate ?? 40);
+    db.settings.breakMin = Number(db.settings.breakMin ?? 0);
+    db.settings.rounding = db.settings.rounding ?? "none";
+    db.entries = Array.isArray(db.entries) ? db.entries : [];
+  }
+  function setStatus(t){ $("status").textContent = t || ""; }
+
+  function minutesBetween(dateISO, start, end) {
+    const [y,m,d] = dateISO.split("-").map(Number);
+    const [sh,sm] = start.split(":").map(Number);
+    const [eh,em] = end.split(":").map(Number);
+    const a = new Date(y,m-1,d,sh,sm,0,0);
+    let b = new Date(y,m-1,d,eh,em,0,0);
+    if (b < a) b = new Date(y,m-1,d+1,eh,em,0,0);
+    return Math.round((b-a)/60000);
+  }
+  function applyRounding(mins, rounding){
+    if (rounding==="none") return mins;
+    const step = Number(rounding);
+    return Math.round(mins/step)*step;
+  }
+  function fmtHM(mins){
+    const h = Math.floor(mins/60);
+    const m = mins%60;
+    return `${h}:${pad2(m)}`;
+  }
+  function pln(x){ return x.toLocaleString("pl-PL",{style:"currency",currency:"PLN"}); }
+
+  function readSettingsFromUI(){
+    db.settings.rate = Number($("rate").value || 0);
+    db.settings.breakMin = Number($("breakMin").value || 0);
+    db.settings.rounding = $("rounding").value || "none";
+  }
+  function hydrateSettingsUI(){
+    $("rate").value = db.settings.rate;
+    $("breakMin").value = db.settings.breakMin;
+    $("rounding").value = db.settings.rounding;
+  }
+
+  function upsertEntry(entry){
+    const i = db.entries.findIndex(e => e.date === entry.date);
+    if (i >= 0) db.entries[i] = entry; else db.entries.push(entry);
+    db.entries.sort((a,b)=>a.date.localeCompare(b.date));
+  }
+  function deleteEntry(dateISO){ db.entries = db.entries.filter(e => e.date !== dateISO); }
+
+  function computeEntryMinutes(e){
+    if (!e.start || !e.end) return 0;
+    let mins = minutesBetween(e.date, e.start, e.end);
+    mins = Math.max(0, mins - (db.settings.breakMin||0));
+    mins = applyRounding(mins, db.settings.rounding);
+    return Math.max(0, mins);
+  }
+
+  function currentMonth(){
+    return ym($("date").value || todayISO());
+  }
+
+  function render(){
+    normalize();
+    readSettingsFromUI();
+
+    const month = currentMonth();
+    $("monthLabel").textContent = month;
+
+    const monthEntries = db.entries.filter(e => ym(e.date)===month);
+
+    let sumMin = 0;
+    const rowsHtml = monthEntries.map(e=>{
+      const mins = computeEntryMinutes(e);
+      sumMin += mins;
+      const pay = (mins/60)*(db.settings.rate||0);
+      return `
+        <tr>
+          <td>${e.date}</td>
+          <td>${e.start||"-"}</td>
+          <td>${e.end||"-"}</td>
+          <td class="right">${mins?fmtHM(mins):"-"}</td>
+          <td class="right">${mins?pln(pay):"-"}</td>
+          <td class="right">
+            <button class="secondary" data-edit="${e.date}" style="max-width:110px;">Edytuj</button>
+            <button class="secondary" data-del="${e.date}" style="max-width:110px;">Usuń</button>
+          </td>
+        </tr>`;
+    }).join("");
+
+    $("rows").innerHTML = rowsHtml || `<tr><td colspan="6" class="muted">Brak wpisów w tym miesiącu.</td></tr>`;
+    $("sumHours").textContent = fmtHM(sumMin);
+    $("sumMinutes").textContent = String(sumMin);
+    $("sumPay").textContent = pln((sumMin/60)*(db.settings.rate||0));
+
+    // row actions
+    document.querySelectorAll("[data-edit]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const d = btn.getAttribute("data-edit");
+        const e = db.entries.find(x=>x.date===d);
+        $("date").value = e.date;
+        $("start").value = e.start||"";
+        $("end").value = e.end||"";
+        setStatus("Wczytano wpis do edycji.");
+        render();
+      };
+    });
+    document.querySelectorAll("[data-del]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const d = btn.getAttribute("data-del");
+        if (confirm("Usunąć wpis z dnia "+d+"?")) {
+          deleteEntry(d); save(); render();
+        }
+      };
+    });
+
+    save();
+  }
+
+  // backup/restore
+  $("backupJson").onclick = ()=>{
+    const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  $("restoreBtn").onclick = ()=> $("restoreJson").click();
+  $("restoreJson").onchange = async (ev)=>{
+    const f = ev.target.files?.[0];
+    if (!f) return;
+    try{
+      const txt = await f.text();
+      const obj = JSON.parse(txt);
+      db = obj;
+      normalize();
+      save();
+      hydrateSettingsUI();
+      render();
+      setStatus("Przywrócono dane z pliku JSON.");
+    }catch{
+      alert("Nie udało się wczytać pliku JSON.");
+    }
+  };
+
+  // events
+  $("addBtn").onclick = ()=>{
+    const date = $("date").value;
+    const start = $("start").value;
+    const end = $("end").value;
+    if (!date) return alert("Wybierz datę.");
+    if (!start || !end) return alert("Uzupełnij wejście i wyjście.");
+    readSettingsFromUI();
+    upsertEntry({date,start,end});
+    setStatus("Dodano / zaktualizowano.");
+    save();
+    render();
+  };
+
+  $("nowStart").onclick = ()=> $("start").value = nowHHMM();
+  $("nowEnd").onclick = ()=> $("end").value = nowHHMM();
+
+  $("clearMonth").onclick = ()=>{
+    const month = currentMonth();
+    if (!confirm("Usunąć wszystkie wpisy z miesiąca "+month+"?")) return;
+    db.entries = db.entries.filter(e => ym(e.date)!==month);
+    save(); render();
+  };
+
+  $("exportCsv").onclick = ()=>{
+    readSettingsFromUI();
+    const month = currentMonth();
+    const monthEntries = db.entries.filter(e => ym(e.date)===month);
+    const header = ["date","start","end","minutes","hours","rate_pln","pay_pln"].join(",");
+    const lines = monthEntries.map(e=>{
+      const mins = computeEntryMinutes(e);
+      const hours = (mins/60).toFixed(2);
+      const pay = ((mins/60)*(db.settings.rate||0)).toFixed(2);
+      return [e.date,e.start||"",e.end||"",mins,hours,db.settings.rate||0,pay].join(",");
+    });
+    const csv = [header,...lines].join("\n");
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `czas-pracy_${month}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  ["rate","breakMin","rounding","date"].forEach(id=>{
+    $(id).addEventListener("input", render);
+    $(id).addEventListener("change", render);
+  });
+
+  // init
+  $("date").value = todayISO();
+  normalize();
+  hydrateSettingsUI();
+  render();
+
+  // hint
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+  $("pwaHint").textContent = standalone
+    ? "Uruchomione jako aplikacja. Działa offline."
+    : "Aby zainstalować: Chrome → menu ⋮ → „Dodaj do ekranu głównego”.";
+})();
+</script>
+</body>
+</html>
