@@ -1,7 +1,7 @@
 {
   "name": "Licznik godzin pracy",
   "short_name": "Czas pracy",
-  "start_url": "/",
+  "start_url": "/czas-pracy-pwa/"
   "display": "standalone",
   "background_color": "#f6f7fb",
   "theme_color": "#111111",
