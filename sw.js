@@ -1,9 +1,11 @@
-const CACHE_NAME = "worktime-pwa-gh-v3";
+const CACHE_NAME = "worktime-pwa-gh-v4";
 const BASE = "/czas-pracy-pwa/";
 
 const ASSETS = [
   BASE,
   BASE + "index.html",
+  BASE + "style.css",
+  BASE + "app.js",
   BASE + "manifest.webmanifest",
   BASE + "sw.js",
   BASE + "icon-192.png",
@@ -11,7 +13,9 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+  );
   self.skipWaiting();
 });
 
@@ -25,7 +29,18 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  const req = event.request;
+
+  // nawigacja (odświeżenie/otwarcie) -> offline fallback do index.html
+  if (req.mode === "navigate") {
+    event.respondWith(
+      fetch(req).catch(() => caches.match(BASE + "index.html"))
+    );
+    return;
+  }
+
+  // reszta plików: cache-first
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    caches.match(req).then((cached) => cached || fetch(req))
   );
 });
