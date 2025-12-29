@@ -62,7 +62,6 @@
       display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
       margin-bottom:10px;
     }
-    .calHead .left{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .calMonth{
       display:flex;gap:8px;align-items:center;
       background:#eef1f8;border:1px solid #d7dbe7;border-radius:12px;padding:8px 10px;
@@ -126,7 +125,6 @@
       box-shadow:0 18px 60px rgba(0,0,0,.25);
     }
     dialog::backdrop{background:rgba(17,17,17,.45)}
-    .modalCard{padding:14px}
     .modalHead{
       display:flex;align-items:center;justify-content:space-between;gap:10px;
       padding:14px;border-bottom:1px solid #eef1f8;
@@ -148,7 +146,6 @@
 
     .divider{height:1px;background:#eef1f8;margin:14px 0}
 
-    /* druk / PDF */
     @media print{
       body{background:#fff}
       .wrap{margin:0;padding:0;max-width:none}
@@ -165,7 +162,6 @@
       <div class="muted" id="status"></div>
     </div>
 
-    <!-- Dodaj / dopisz zakres (szybkie) -->
     <div class="grid" style="margin-bottom:14px;">
       <div class="card col-12">
         <h2>Dodaj zakres</h2>
@@ -197,7 +193,6 @@
       </div>
     </div>
 
-    <!-- Ustawienia pracy -->
     <div class="grid" style="margin-bottom:14px;">
       <div class="card col-12">
         <details id="extrasPanel">
@@ -217,7 +212,6 @@
       </div>
     </div>
 
-    <!-- PODSUMOWANIE MIESIĄCA: KALENDARZ -->
     <div class="grid">
       <div class="card col-12">
         <div class="calHead">
@@ -257,7 +251,6 @@
       </div>
     </div>
 
-    <!-- Narzędzia -->
     <div class="grid" style="margin-top:14px;">
       <div class="card col-12">
         <details id="toolsPanel">
@@ -281,7 +274,6 @@
     </div>
   </div>
 
-  <!-- MODAL DNIA -->
   <dialog id="dayDialog">
     <div class="modalHead">
       <h3 id="dlgTitle">Dzień</h3>
@@ -325,20 +317,19 @@
   </dialog>
 
 <script>
-(() => // === DEBUG: pokazuj błędy w aplikacji (na telefonie nie masz konsoli) ===
+(() => {
+  // === DEBUG: pokazuj błędy w aplikacji (na telefonie nie masz konsoli) ===
   const showErr = (msg) => {
     const el = document.getElementById("status");
     if (el) el.textContent = "BŁĄD: " + msg;
   };
-
   window.addEventListener("error", (e) => {
     showErr(e.message || "Nieznany błąd JS");
   });
-
   window.addEventListener("unhandledrejection", (e) => {
     showErr((e.reason && e.reason.message) ? e.reason.message : String(e.reason || "Promise error"));
   });
-  {
+
   // PWA SW (GitHub Pages path)
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/czas-pracy-pwa/sw.js", { scope: "/czas-pracy-pwa/" });
@@ -360,8 +351,6 @@
     return `${d}-${m}-${y}`;
   };
 
-  const fmtMonthLabel = (y, m) => `${pad2(m)}-${y}`; // MM-YYYY
-
   const STORAGE_KEY = "worktime_pwa_v1";
   let db = load() || { settings:{ rate:40 }, entries:[] };
 
@@ -371,7 +360,6 @@
   }
 
   function migrateIfNeeded(){
-    // Stare wpisy: {date,start,end,note} -> {date, shifts:[{start,end}], note}
     let changed = false;
     db.entries = (Array.isArray(db.entries) ? db.entries : []).map(e=>{
       if (!e) return e;
@@ -399,7 +387,7 @@
     }
   }
 
-  function setStatus(t){ $("status").textContent = t || ""; }
+  function setStatus(t){ const el=$("status"); if(el) el.textContent = t || ""; }
 
   function minutesBetween(dateISO, start, end) {
     const [y,m,d] = dateISO.split("-").map(Number);
@@ -455,32 +443,20 @@
     return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
   }
 
-  function safeText(s){
-    return (s || "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;");
-  }
-
   // ===== KALENDARZ RENDER =====
   const DOW = ["Pn","Wt","Śr","Czw","Pt","Sb","Nd"];
 
-  function mondayIndex(jsDay){ // JS: 0=Sun..6=Sat -> 0=Mon..6=Sun
-    return (jsDay + 6) % 7;
-  }
-
-  function daysInMonth(year, month1){ // month1: 1..12
-    return new Date(year, month1, 0).getDate();
-  }
+  function mondayIndex(jsDay){ return (jsDay + 6) % 7; }
+  function daysInMonth(year, month1){ return new Date(year, month1, 0).getDate(); }
 
   function renderDow(){
     $("dowRow").innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
   }
 
   function renderCalendar(monthYM){
-    const [Y, M] = monthYM.split("-").map(Number); // M: 1..12
+    const [Y, M] = monthYM.split("-").map(Number);
     const first = new Date(Y, M-1, 1);
-    const firstIdx = mondayIndex(first.getDay()); // 0..6
+    const firstIdx = mondayIndex(first.getDay());
     const dim = daysInMonth(Y, M);
 
     const prevMonth = new Date(Y, M-2, 1);
@@ -488,7 +464,6 @@
     const prevM = prevMonth.getMonth()+1;
     const prevDim = daysInMonth(prevY, prevM);
 
-    // 42 pól (6 tygodni) – wygląda najczyściej
     const totalCells = 42;
     const cells = [];
 
@@ -506,15 +481,14 @@
       }
 
       const dateISO = `${cellY}-${pad2(cellM)}-${pad2(cellD)}`;
-      const jsDow = new Date(cellY, cellM-1, cellD).getDay(); // 0..6 (Sun..Sat)
+      const jsDow = new Date(cellY, cellM-1, cellD).getDay();
       const isWeekend = (jsDow === 0 || jsDow === 6);
 
       const day = getDay(dateISO);
       const has = !!(day && day.shifts && day.shifts.length);
 
-      // linie jak w screenie: "od 06:00 do 14:00"
       let lines = "";
-      if (day && (day.shifts?.length || day.note)){
+      if (day && (day.shifts?.length || (day.note && day.note.trim()))){
         const maxLines = 2;
         const shiftLines = (day.shifts || []).slice(0, maxLines).map(s => {
           const a = s.start || "-";
@@ -526,7 +500,6 @@
         if ((day.shifts || []).length > maxLines) extra = `<br><span class="plus">+${(day.shifts.length - maxLines)}</span>`;
         if (shiftLines) lines += shiftLines + extra;
 
-        // ikona “notatka” jeśli jest notatka
         if (day.note && day.note.trim()){
           lines += (lines ? "<br>" : "") + "📝";
         }
@@ -552,7 +525,6 @@
 
     $("calGrid").innerHTML = cells.join("");
 
-    // click handlers
     document.querySelectorAll(".dayCell[data-date]").forEach(el=>{
       el.onclick = ()=>{
         const date = el.getAttribute("data-date");
@@ -567,8 +539,6 @@
 
   function openDay(dateISO){
     dlgDate = dateISO;
-
-    // zsynchronizuj górny formularz
     $("date").value = dateISO;
 
     const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[] };
@@ -580,14 +550,15 @@
 
     renderDayDialog();
 
-    if (typeof dlg.showModal === "function") dlg.showModal();
-    else dlg.setAttribute("open",""); // fallback
+    // Niektóre WebView mogą nie wspierać showModal()
+    if (dlg && typeof dlg.showModal === "function") dlg.showModal();
+    else if (dlg) dlg.setAttribute("open","");
   }
 
   function closeDay(){
     dlgDate = null;
-    if (typeof dlg.close === "function") dlg.close();
-    else dlg.removeAttribute("open");
+    if (dlg && typeof dlg.close === "function") dlg.close();
+    else if (dlg) dlg.removeAttribute("open");
   }
 
   function renderDayDialog(){
@@ -612,4 +583,188 @@
 
     $("dlgShifts").innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
 
-    document.querySelectorAll("[data-delshift
+    document.querySelectorAll("[data-delshift]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const idx = Number(btn.getAttribute("data-delshift"));
+        if (!confirm("Usunąć ten zakres?")) return;
+        const d = getDay(dlgDate);
+        if (!d) return;
+        d.shifts.splice(idx, 1);
+        save();
+        renderAll();
+        renderDayDialog();
+      };
+    });
+  }
+
+  // ===== PODSUMOWANIE + TOTALS =====
+  function renderTotals(monthYM){
+    const sumMin = computeMonthMinutes(monthYM);
+    $("sumHours").textContent = fmtHM(sumMin);
+    $("sumPay").textContent = pln((sumMin/60) * (db.settings.rate||0));
+  }
+
+  function renderAll(){
+    normalize();
+    readSettingsFromUI();
+    save();
+
+    const monthYM = $("monthPick").value || ym(todayISO());
+    renderDow();
+    renderCalendar(monthYM);
+    renderTotals(monthYM);
+  }
+
+  // ===== EVENTY UI =====
+  $("addShiftBtn").onclick = ()=>{
+    const date = $("date").value;
+    const start = $("start").value;
+    const end = $("end").value;
+    const note = ($("note").value || "").trim();
+
+    if (!date) return alert("Wybierz datę.");
+    if ((start && !end) || (!start && end)) return alert("Uzupełnij wejście i wyjście (albo zostaw oba puste).");
+    if (!start && !end && !note) return alert("Wpisz godziny lub notatkę.");
+
+    const day = getDay(date) || { date, note:"", shifts:[] };
+
+    let msg = [];
+    if (start && end){
+      day.shifts.push({ start, end });
+      msg.push("Dodano zakres.");
+      $("start").value = "";
+      $("end").value = "";
+    }
+    if (note){
+      day.note = note;
+      msg.push("Zapisano notatkę.");
+    }
+
+    upsertDay(date, day);
+    setStatus(msg.join(" ") || "Zapisano.");
+    save();
+    renderAll();
+  };
+
+  $("openDayBtn").onclick = ()=>{
+    const date = $("date").value;
+    if (!date) return alert("Wybierz datę.");
+    openDay(date);
+  };
+
+  $("dlgClose").onclick = closeDay;
+  if (dlg) dlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeDay(); });
+
+  $("dlgAddShift").onclick = ()=>{
+    if (!dlgDate) return;
+    const start = $("dlgStart").value;
+    const end = $("dlgEnd").value;
+
+    if (!start || !end) return alert("Uzupełnij wejście i wyjście.");
+    const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
+    day.shifts.push({ start, end });
+    upsertDay(dlgDate, day);
+
+    $("dlgStart").value = "";
+    $("dlgEnd").value = "";
+    save();
+    renderAll();
+    renderDayDialog();
+  };
+
+  $("dlgSaveNote").onclick = ()=>{
+    if (!dlgDate) return;
+    const note = ($("dlgNote").value || "").trim();
+    const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
+    day.note = note;
+    upsertDay(dlgDate, day);
+    save();
+    renderAll();
+    renderDayDialog();
+    setStatus("Zapisano notatkę.");
+  };
+
+  $("dlgDeleteDay").onclick = ()=>{
+    if (!dlgDate) return;
+    if (!confirm("Usunąć cały dzień (wszystkie zakresy i notatkę)?")) return;
+    deleteDay(dlgDate);
+    save();
+    closeDay();
+    renderAll();
+  };
+
+  // miesiąc: nawigacja
+  function shiftMonth(delta){
+    const v = $("monthPick").value || ym(todayISO());
+    const [Y, M] = v.split("-").map(Number);
+    const d = new Date(Y, M-1 + delta, 1);
+    $("monthPick").value = `${d.getFullYear()}-${pad2(d.getMonth()+1)}`;
+    renderAll();
+  }
+  $("prevMonth").onclick = ()=> shiftMonth(-1);
+  $("nextMonth").onclick = ()=> shiftMonth(1);
+  $("monthPick").addEventListener("change", renderAll);
+
+  // narzędzia
+  $("printPdfBtn").onclick = ()=> window.print();
+
+  $("backupJson").onclick = ()=>{
+    const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  $("restoreBtn").onclick = ()=> $("restoreJson").click();
+  $("restoreJson").onchange = async (ev)=>{
+    const f = ev.target.files?.[0];
+    if (!f) return;
+    try{
+      const txt = await f.text();
+      const obj = JSON.parse(txt);
+      db = obj;
+      normalize();
+      migrateIfNeeded();
+      save();
+      hydrateSettingsUI();
+      renderAll();
+      setStatus("Przywrócono dane z pliku JSON.");
+    }catch{
+      alert("Nie udało się wczytać pliku JSON.");
+    }
+  };
+
+  $("clearMonth").onclick = ()=>{
+    const monthYM = $("monthPick").value || ym(todayISO());
+    const [Y,M] = monthYM.split("-");
+    if (!confirm("Usunąć wszystkie wpisy z miesiąca " + `${M}-${Y}` + "?")) return;
+    db.entries = db.entries.filter(e => ym(e.date) !== monthYM);
+    save();
+    renderAll();
+  };
+
+  ["rate"].forEach(id=>{
+    $(id).addEventListener("input", renderAll);
+    $(id).addEventListener("change", renderAll);
+  });
+
+  // === INIT (tu był fragment, którego nie mogłeś znaleźć) ===
+  try{
+    normalize();
+    migrateIfNeeded();
+    hydrateSettingsUI();
+    $("date").value = todayISO();
+    $("monthPick").value = ym(todayISO());
+    renderAll();
+  } catch(err){
+    const msg = (err && err.message) ? err.message : String(err);
+    const el = document.getElementById("status");
+    if (el) el.textContent = "BŁĄD INIT: " + msg;
+  }
+})();
+</script>
+</body>
+</html>
