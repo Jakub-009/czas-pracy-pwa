@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Licznik godzin pracy</title>
   <meta name="theme-color" content="#111111" />
-<link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
+  <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
+
   <style>
     :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
     body{margin:0;background:#f6f7fb;color:#111}
@@ -15,58 +16,71 @@
     .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
     @media(max-width:820px){.col-3,.col-4,.col-6{grid-column:span 12}}
     label{display:block;font-size:12px;color:#444;margin-bottom:6px}
-    input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d7dbe7;background:#fff;font-size:14px;box-sizing:border-box}
+    input,button,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d7dbe7;background:#fff;font-size:14px;box-sizing:border-box}
+    textarea{min-height:44px;resize:vertical}
     button{cursor:pointer;border:none;background:#111;color:#fff}
     button.secondary{background:#eef1f8;color:#111;border:1px solid #d7dbe7}
     button.danger{background:#d92d20}
     h1{font-size:20px;margin:0 0 10px}
     h2{font-size:16px;margin:0 0 10px}
     .muted{color:#666;font-size:12px}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid #eef1f8;text-align:left;font-size:14px}
-    th{font-size:12px;color:#555}
-    .right{text-align:right}
     .row{display:flex;gap:10px;flex-wrap:wrap}
     .row > *{flex:1;min-width:160px}
     .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#eef1f8;font-size:12px}
+
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #eef1f8;text-align:left;font-size:14px;vertical-align:top}
+    th{font-size:12px;color:#555}
+    .right{text-align:right}
+
+    /* mobilnie: mniej przewijania w bok */
+    @media (max-width:520px){
+      th:nth-child(3), td:nth-child(3){display:none;} /* ukryj "Wyjście" */
+      th:nth-child(5), td:nth-child(5){display:none;} /* ukryj "Wypłata" (mniej istotne na małym ekranie) */
+    }
+
+    /* druk / PDF */
+    @media print{
+      body{background:#fff}
+      .wrap{margin:0;padding:0;max-width:none}
+      .card{box-shadow:none;border-radius:0;padding:0}
+      button, input, textarea, #status, details{display:none !important}
+      table{font-size:12px}
+      th,td{padding:6px}
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="card" style="margin-bottom:14px;">
-      <h1>⏱️ Licznik godzin pracy (PWA)</h1>
-      <div class="muted" id="pwaHint"></div>
+      <h1>⏱️ Licznik godzin pracy</h1>
+      <div class="muted">Dane zapisują się lokalnie w telefonie (offline). Backup JSON = kopia do pliku.</div>
     </div>
 
+    <!-- Ustawienia jako zwijany panel -->
     <div class="grid" style="margin-bottom:14px;">
       <div class="card col-12">
-        <h2>Ustawienia</h2>
-        <div class="grid">
-          <div class="col-4">
-            <label>Stawka godzinowa (PLN)</label>
-            <input id="rate" type="number" step="0.01" min="0" value="40" />
+        <details id="settingsPanel">
+          <summary style="cursor:pointer; font-weight:700; user-select:none;">Ustawienia</summary>
+          <div class="grid" style="margin-top:12px;">
+            <div class="col-4">
+              <label>Stawka godzinowa (PLN)</label>
+              <input id="rate" type="number" step="0.01" min="0" value="40" />
+            </div>
+            <div class="col-8">
+              <div class="muted" style="margin-top:26px;">Na razie tylko stawka. Tu będziemy dodawać kolejne opcje, jak rozwiniesz projekt.</div>
+            </div>
           </div>
-          <div class="col-4">
-            <label>Przerwa (min)</label>
-            <input id="breakMin" type="number" step="1" min="0" value="0" />
-          </div>
-          <div class="col-4">
-            <label>Zaokrąglanie</label>
-            <select id="rounding">
-              <option value="none">bez</option>
-              <option value="5">do 5 min</option>
-              <option value="10">do 10 min</option>
-              <option value="15">do 15 min</option>
-            </select>
-          </div>
-        </div>
-        <div class="muted" style="margin-top:8px;">Dane zapisywane lokalnie w pamięci aplikacji (offline).</div>
+        </details>
       </div>
     </div>
 
+    <!-- Dodaj dzień -->
     <div class="grid" style="margin-bottom:14px;">
       <div class="card col-12">
         <h2>Dodaj dzień</h2>
+
         <div class="grid">
           <div class="col-3">
             <label>Data</label>
@@ -82,13 +96,18 @@
           </div>
           <div class="col-3">
             <label>&nbsp;</label>
-            <button id="addBtn">Dodaj / aktualizuj</button>
+            <button id="addHoursBtn">Dodaj godziny</button>
           </div>
+
+          <div class="col-12">
+            <label>Notatka do dnia (np. „zaliczka -100 zł”, „delegacja”, „urlop”)</label>
+            <textarea id="note" placeholder="Opcjonalnie..."></textarea>
+          </div>
+
           <div class="col-12">
             <div class="row">
-              <button class="secondary" id="nowStart">Wejście = teraz</button>
-              <button class="secondary" id="nowEnd">Wyjście = teraz</button>
-              <button class="secondary" id="exportCsv">Eksport CSV</button>
+              <button class="secondary" id="addNoteBtn">Dodaj notatkę</button>
+              <button class="secondary" id="printPdfBtn">Druk / PDF</button>
             </div>
             <div class="muted" style="margin-top:8px;" id="status"></div>
           </div>
@@ -96,6 +115,7 @@
       </div>
     </div>
 
+    <!-- Podsumowanie -->
     <div class="grid">
       <div class="card col-12">
         <div class="row" style="align-items:center;">
@@ -104,15 +124,11 @@
         </div>
 
         <div class="grid" style="margin-top:10px;">
-          <div class="col-4">
+          <div class="col-6">
             <div class="muted">Suma godzin</div>
             <div style="font-size:22px;font-weight:700" id="sumHours">0:00</div>
           </div>
-          <div class="col-4">
-            <div class="muted">Suma minut</div>
-            <div style="font-size:22px;font-weight:700" id="sumMinutes">0</div>
-          </div>
-          <div class="col-4">
+          <div class="col-6">
             <div class="muted">Wypłata</div>
             <div style="font-size:22px;font-weight:700" id="sumPay">0,00 zł</div>
           </div>
@@ -122,8 +138,13 @@
           <table>
             <thead>
               <tr>
-                <th>Data</th><th>Wejście</th><th>Wyjście</th>
-                <th class="right">Czas</th><th class="right">Wypłata</th><th class="right">Akcje</th>
+                <th>Data</th>
+                <th>Wejście</th>
+                <th>Wyjście</th>
+                <th>Notatka</th>
+                <th class="right">Czas</th>
+                <th class="right">Wypłata</th>
+                <th class="right">Akcje</th>
               </tr>
             </thead>
             <tbody id="rows"></tbody>
@@ -138,7 +159,7 @@
         </div>
 
         <div class="muted" style="margin-top:8px;">
-          Backup/restore działa lokalnie (plik JSON), przydatne gdy zmieniasz telefon.
+          Tip: rób backup raz na jakiś czas (Google Drive / mail) i masz spokój.
         </div>
       </div>
     </div>
@@ -146,26 +167,31 @@
 
 <script>
 (() => {
-  // PWA
+  // PWA SW (GitHub Pages path)
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/czas-pracy-pwa/sw.js", { scope: "/czas-pracy-pwa/" });
   }
 
   const $ = (id) => document.getElementById(id);
   const pad2 = (n) => String(n).padStart(2,"0");
+
   const todayISO = () => {
     const d = new Date();
     return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
   };
-  const nowHHMM = () => {
-    const d = new Date();
-    return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-  };
+
   const ym = (dateISO) => dateISO.slice(0,7);
 
-  const STORAGE_KEY = "worktime_pwa_v1";
+  // europejski format: DD-MM-YYYY
+  const fmtDMY = (dateISO) => {
+    if (!dateISO) return "";
+    const [y,m,d] = dateISO.split("-");
+    return `${d}-${m}-${y}`;
+  };
 
-  let db = load() || { settings:{ rate:40, breakMin:0, rounding:"none" }, entries:[] };
+  const STORAGE_KEY = "worktime_pwa_simple_v2";
+
+  let db = load() || { settings:{ rate:40 }, entries:[] };
 
   function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
   function load(){
@@ -174,8 +200,6 @@
   function normalize(){
     db.settings = db.settings || {};
     db.settings.rate = Number(db.settings.rate ?? 40);
-    db.settings.breakMin = Number(db.settings.breakMin ?? 0);
-    db.settings.rounding = db.settings.rounding ?? "none";
     db.entries = Array.isArray(db.entries) ? db.entries : [];
   }
   function setStatus(t){ $("status").textContent = t || ""; }
@@ -189,41 +213,34 @@
     if (b < a) b = new Date(y,m-1,d+1,eh,em,0,0);
     return Math.round((b-a)/60000);
   }
-  function applyRounding(mins, rounding){
-    if (rounding==="none") return mins;
-    const step = Number(rounding);
-    return Math.round(mins/step)*step;
-  }
+
   function fmtHM(mins){
     const h = Math.floor(mins/60);
     const m = mins%60;
     return `${h}:${pad2(m)}`;
   }
+
   function pln(x){ return x.toLocaleString("pl-PL",{style:"currency",currency:"PLN"}); }
 
   function readSettingsFromUI(){
     db.settings.rate = Number($("rate").value || 0);
-    db.settings.breakMin = Number($("breakMin").value || 0);
-    db.settings.rounding = $("rounding").value || "none";
   }
   function hydrateSettingsUI(){
     $("rate").value = db.settings.rate;
-    $("breakMin").value = db.settings.breakMin;
-    $("rounding").value = db.settings.rounding;
   }
 
   function upsertEntry(entry){
     const i = db.entries.findIndex(e => e.date === entry.date);
-    if (i >= 0) db.entries[i] = entry; else db.entries.push(entry);
+    if (i >= 0) db.entries[i] = { ...db.entries[i], ...entry };
+    else db.entries.push(entry);
     db.entries.sort((a,b)=>a.date.localeCompare(b.date));
   }
+
   function deleteEntry(dateISO){ db.entries = db.entries.filter(e => e.date !== dateISO); }
 
   function computeEntryMinutes(e){
     if (!e.start || !e.end) return 0;
     let mins = minutesBetween(e.date, e.start, e.end);
-    mins = Math.max(0, mins - (db.settings.breakMin||0));
-    mins = applyRounding(mins, db.settings.rounding);
     return Math.max(0, mins);
   }
 
@@ -236,7 +253,10 @@
     readSettingsFromUI();
 
     const month = currentMonth();
-    $("monthLabel").textContent = month;
+    $("monthLabel").textContent = month.split("-").reverse().join("-"); // MM-YYYY -> YYYY-MM? wolimy 12-2025
+    // wolisz „12-2025”, więc:
+    const [Y,M] = month.split("-");
+    $("monthLabel").textContent = `${M}-${Y}`;
 
     const monthEntries = db.entries.filter(e => ym(e.date)===month);
 
@@ -245,11 +265,18 @@
       const mins = computeEntryMinutes(e);
       sumMin += mins;
       const pay = (mins/60)*(db.settings.rate||0);
+
+      const safeNote = (e.note || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+
       return `
         <tr>
-          <td>${e.date}</td>
+          <td>${fmtDMY(e.date)}</td>
           <td>${e.start||"-"}</td>
           <td>${e.end||"-"}</td>
+          <td>${safeNote || "-"}</td>
           <td class="right">${mins?fmtHM(mins):"-"}</td>
           <td class="right">${mins?pln(pay):"-"}</td>
           <td class="right">
@@ -259,12 +286,11 @@
         </tr>`;
     }).join("");
 
-    $("rows").innerHTML = rowsHtml || `<tr><td colspan="6" class="muted">Brak wpisów w tym miesiącu.</td></tr>`;
+    $("rows").innerHTML = rowsHtml || `<tr><td colspan="7" class="muted">Brak wpisów w tym miesiącu.</td></tr>`;
     $("sumHours").textContent = fmtHM(sumMin);
-    $("sumMinutes").textContent = String(sumMin);
     $("sumPay").textContent = pln((sumMin/60)*(db.settings.rate||0));
 
-    // row actions
+    // actions
     document.querySelectorAll("[data-edit]").forEach(btn=>{
       btn.onclick = ()=>{
         const d = btn.getAttribute("data-edit");
@@ -272,15 +298,19 @@
         $("date").value = e.date;
         $("start").value = e.start||"";
         $("end").value = e.end||"";
-        setStatus("Wczytano wpis do edycji.");
+        $("note").value = e.note||"";
+        setStatus("Wczytano dzień do edycji.");
         render();
       };
     });
+
     document.querySelectorAll("[data-del]").forEach(btn=>{
       btn.onclick = ()=>{
         const d = btn.getAttribute("data-del");
-        if (confirm("Usunąć wpis z dnia "+d+"?")) {
-          deleteEntry(d); save(); render();
+        if (confirm("Usunąć wpis z dnia " + fmtDMY(d) + "?")) {
+          deleteEntry(d);
+          save();
+          render();
         }
       };
     });
@@ -298,7 +328,9 @@
     a.click();
     URL.revokeObjectURL(url);
   };
+
   $("restoreBtn").onclick = ()=> $("restoreJson").click();
+
   $("restoreJson").onchange = async (ev)=>{
     const f = ev.target.files?.[0];
     if (!f) return;
@@ -316,50 +348,51 @@
     }
   };
 
-  // events
-  $("addBtn").onclick = ()=>{
+  // add hours
+  $("addHoursBtn").onclick = ()=>{
     const date = $("date").value;
     const start = $("start").value;
     const end = $("end").value;
+
     if (!date) return alert("Wybierz datę.");
     if (!start || !end) return alert("Uzupełnij wejście i wyjście.");
+
     readSettingsFromUI();
-    upsertEntry({date,start,end});
-    setStatus("Dodano / zaktualizowano.");
+    upsertEntry({ date, start, end });
+    setStatus("Zapisano godziny.");
     save();
     render();
   };
 
-  $("nowStart").onclick = ()=> $("start").value = nowHHMM();
-  $("nowEnd").onclick = ()=> $("end").value = nowHHMM();
+  // add note (can be without hours)
+  $("addNoteBtn").onclick = ()=>{
+    const date = $("date").value;
+    const note = ($("note").value || "").trim();
 
+    if (!date) return alert("Wybierz datę.");
+    if (!note) return alert("Wpisz notatkę (albo zostaw puste i nie zapisuj).");
+
+    upsertEntry({ date, note });
+    setStatus("Zapisano notatkę.");
+    save();
+    render();
+  };
+
+  // print / PDF
+  $("printPdfBtn").onclick = ()=> window.print();
+
+  // clear month
   $("clearMonth").onclick = ()=>{
     const month = currentMonth();
-    if (!confirm("Usunąć wszystkie wpisy z miesiąca "+month+"?")) return;
+    const [Y,M] = month.split("-");
+    if (!confirm("Usunąć wszystkie wpisy z miesiąca " + `${M}-${Y}` + "?")) return;
     db.entries = db.entries.filter(e => ym(e.date)!==month);
-    save(); render();
+    save();
+    render();
   };
 
-  $("exportCsv").onclick = ()=>{
-    readSettingsFromUI();
-    const month = currentMonth();
-    const monthEntries = db.entries.filter(e => ym(e.date)===month);
-    const header = ["date","start","end","minutes","hours","rate_pln","pay_pln"].join(",");
-    const lines = monthEntries.map(e=>{
-      const mins = computeEntryMinutes(e);
-      const hours = (mins/60).toFixed(2);
-      const pay = ((mins/60)*(db.settings.rate||0)).toFixed(2);
-      return [e.date,e.start||"",e.end||"",mins,hours,db.settings.rate||0,pay].join(",");
-    });
-    const csv = [header,...lines].join("\n");
-    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `czas-pracy_${month}.csv`; a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  ["rate","breakMin","rounding","date"].forEach(id=>{
+  // rerender on settings/date change
+  ["rate","date"].forEach(id=>{
     $(id).addEventListener("input", render);
     $(id).addEventListener("change", render);
   });
@@ -369,12 +402,6 @@
   normalize();
   hydrateSettingsUI();
   render();
-
-  // hint
-  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
-  $("pwaHint").textContent = standalone
-    ? "Uruchomione jako aplikacja. Działa offline."
-    : "Aby zainstalować: Chrome → menu ⋮ → „Dodaj do ekranu głównego”.";
 })();
 </script>
 </body>
