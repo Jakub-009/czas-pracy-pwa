@@ -8,248 +8,227 @@
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
 
-  <style>
-    *{box-sizing:border-box}
-    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    body{margin:0;background:#f6f7fb;color:#111}
-    .wrap{max-width:980px;margin:24px auto;padding:0 14px}
-    .card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
-    .grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
-    .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
-    @media(max-width:820px){.col-3,.col-4,.col-6{grid-column:span 12}}
-    label{display:block;font-size:12px;color:#444;margin-bottom:6px}
-    input,button,textarea,select{
-      width:100%;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid #d7dbe7;
-      background:#fff;
-      font-size:14px;
-    }
-    textarea{min-height:44px;resize:vertical}
-    button{cursor:pointer;border:none;background:#111;color:#fff}
-    button.secondary{background:#eef1f8;color:#111;border:1px solid #d7dbe7}
-    button.danger{background:#d92d20}
-    h1{font-size:20px;margin:0 0 10px}
-    h2{font-size:16px;margin:0 0 10px}
-    .muted{color:#666;font-size:12px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .row > *{flex:1;min-width:160px}
+<style>
+  *{box-sizing:border-box}
+  :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  body{margin:0;background:#f6f7fb;color:#111}
+  .wrap{max-width:980px;margin:24px auto;padding:0 14px}
+  .card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+  .grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr)}
+  .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
+  @media(max-width:820px){.col-3,.col-4,.col-6{grid-column:span 12}}
+  label{display:block;font-size:12px;color:#444;margin-bottom:6px}
+  input,button,textarea,select{
+    width:100%;
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid #d7dbe7;
+    background:#fff;
+    font-size:14px;
+  }
+  textarea{min-height:44px;resize:vertical}
+  button{cursor:pointer;border:none;background:#111;color:#fff}
+  button.secondary{background:#eef1f8;color:#111;border:1px solid #d7dbe7}
+  button.danger{background:#d92d20}
+  h1{font-size:20px;margin:0 0 10px}
+  h2{font-size:16px;margin:0 0 10px}
+  .muted{color:#666;font-size:12px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .row > *{flex:1;min-width:160px}
 
-    /* ===== mały chevron bez tła (Opcja B) ===== */
-    .chev{
-      width:18px;height:18px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      flex:0 0 auto;
-      margin-left:10px;
-      transition:transform .18s ease;
-      opacity:.65;
-    }
-    .chev::before{
-      content:"";
-      width:8px;height:8px;
-      border-right:2px solid #111;
-      border-bottom:2px solid #111;
-      transform:rotate(45deg);
-      display:block;
-      margin-top:-1px;
-    }
-    details[open] .chev{transform:rotate(180deg)}
-    details[open] .chev::before{margin-top:1px}
+  /* ===== mały chevron bez tła (Opcja B) ===== */
+  .chev{
+    width:18px;height:18px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 auto;
+    margin-left:10px;
+    transition:transform .18s ease;
+    opacity:.65;
+  }
+  .chev::before{
+    content:"";
+    width:8px;height:8px;
+    border-right:2px solid #111;
+    border-bottom:2px solid #111;
+    transform:rotate(45deg);
+    display:block;
+    margin-top:-1px;
+  }
+  details[open] .chev{transform:rotate(180deg)}
+  details[open] .chev::before{margin-top:1px}
 
-    /* details */
-    details{border-radius:12px}
-    details summary{
-      cursor:pointer;
-      font-weight:800;
-      user-select:none;
-      list-style:none;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:2px 0;
-    }
-    details summary::-webkit-details-marker{display:none;}
-    .panel{overflow:hidden;animation:panelIn .18s ease;}
-    @keyframes panelIn{
-      from{opacity:.4; transform:translateY(-4px)}
-      to{opacity:1; transform:translateY(0)}
-    }
+  /* details */
+  details{border-radius:12px}
+  details summary{
+    cursor:pointer;
+    font-weight:800;
+    user-select:none;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:2px 0;
+  }
+  details summary::-webkit-details-marker{display:none;}
+  .panel{overflow:hidden;animation:panelIn .18s ease;}
+  @keyframes panelIn{
+    from{opacity:.4; transform:translateY(-4px)}
+    to{opacity:1; transform:translateY(0)}
+  }
 
-    /* ===== KALENDARZ ===== */
-    .calWrap{width:100%;}
-    .calHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+  /* ===== KALENDARZ (JEDNA, CZYSTA SEKCJA) ===== */
+  .calWrap{width:100%;}
+  .calHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
 
-    .monthBar{
-      width:100%;
-      max-width:100%;
-      background:#fff;
-      border:1px solid #eef1f8;
-      border-radius:14px;
-      box-shadow:0 6px 18px rgba(0,0,0,.04);
-      padding:12px 12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      position:relative;
-      cursor:pointer;
-      user-select:none;
-      overflow:hidden;
-    }
-    .monthBar .txt{font-weight:900;font-size:15px;color:#1b2a3a;line-height:1.2}
-    .monthBar .sub{font-size:12px;color:#666;margin-top:3px}
-    #monthPick{
-      position:absolute;
-      inset:0;
-      opacity:0;
-      cursor:pointer;
-    }
+  .monthBar{
+    width:100%;
+    background:#fff;
+    border:1px solid #eef1f8;
+    border-radius:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,.04);
+    padding:12px 12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    position:relative;
+    cursor:pointer;
+    user-select:none;
+    overflow:hidden;
+  }
+  .monthBar .txt{font-weight:900;font-size:15px;color:#1b2a3a;line-height:1.2}
+  .monthBar .sub{font-size:12px;color:#666;margin-top:2px}
+  #monthPick{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    cursor:pointer;
+  }
 
-   /* ===== KALENDARZ ===== */
-.calGrid{
-  display:grid;
-  grid-template-columns:repeat(7, minmax(0, 1fr));
-  gap:10px;
-  width:100%;
-}
+  .calGrid{
+    display:grid;
+    grid-template-columns:repeat(7, minmax(0, 1fr));
+    gap:10px;
+    width:100%;
+  }
+  .calDow{
+    font-size:12px;
+    color:#666;
+    text-align:center;
+    padding:6px 0;
+  }
 
-/* Mobile: zmniejszamy “szerokość” układu przez mniejszy gap + padding */
-@media(max-width:640px){
-  .calGrid{gap:6px;}                /* było 8px */
   .dayCell{
-    padding:6px;                    /* było 8px */
-    border-radius:16px;
-    aspect-ratio:1 / 1.10;          /* odrobinę “wyższe” niż szerokie */
-    min-height:54px;
-    box-shadow:0 2px 6px rgba(0,0,0,.04);
+    background:#fff;
+    border:1px solid #eef1f8;
+    border-radius:14px;
+    padding:10px;
+    min-height:76px; /* desktop/tablet OK */
+    box-shadow:0 6px 18px rgba(0,0,0,.04);
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    gap:6px;
+    position:relative;
+    overflow:hidden;
   }
+  .dayCell:hover{border-color:#d7dbe7}
+
+  .dayTop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .dayNum{font-size:18px;font-weight:750;color:#1b2a3a;line-height:1}
+  .dayNum.has{font-weight:900}
+  .dayNum.mutedNum{color:#9aa6b2;font-weight:700}
+  .dayNum.weekend{color:#c53030}
+
+  /* kropki statusu (Wariant 5) */
+  .indRow{
+    display:flex;
+    gap:6px;
+    align-items:center;
+    margin-top:2px;
+    min-height:10px;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:999px;
+    display:inline-block;
+    box-shadow:0 2px 8px rgba(0,0,0,.10);
+  }
+  .dot.hidden{visibility:hidden}
+  .dot.shift{background:#50827C;}  /* zielona: godziny */
+  .dot.note{background:#E5A823;}   /* żółta: notatka */
+
   .blankCell{
-    aspect-ratio:1 / 1.10;
-    min-height:54px;
+    border:none;
+    background:transparent;
+    box-shadow:none;
+    pointer-events:none;
+    min-height:76px;
   }
-}
 
-/* EXTRA: jeśli nadal się zdarzy na niektórych DPI, jeszcze ciaśniej dla bardzo wąskich ekranów */
-@media(max-width:380px){
-  .calGrid{gap:5px;}
-  .dayCell{padding:5px; min-height:52px;}
-  .blankCell{min-height:52px;}
-}
-
-    /* Kafelek dnia: stabilny rozmiar + delikatny cień */
+  /* Android/mobile-safe: tu jest KLUCZ (kafelki nie nachodzą) */
+  @media(max-width:640px){
+    .calGrid{gap:8px}
     .dayCell{
-      background:#fff;
-      border:1px solid #eef1f8;
+      padding:8px;
       border-radius:16px;
-      box-shadow:0 4px 10px rgba(0,0,0,.05);
-      padding:10px;
-      cursor:pointer;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-start;
-      aspect-ratio:1 / 1.05;
-      min-height:64px;
-      overflow:hidden; /* ważne: mniej “wizualnego nachodzenia” */
+      min-height:auto;        /* zdejmujemy min-height */
+      aspect-ratio: 1 / 1;    /* wymuszamy kwadrat */
+      box-shadow:0 3px 10px rgba(0,0,0,.06);
     }
-    .dayCell:hover{border-color:#d7dbe7}
-
-    .dayTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:flex-start;
-      gap:8px;
-    }
-    .dayNum{font-size:16px;font-weight:700;color:#1b2a3a}
-    .dayNum.has{font-weight:900}
-    .dayNum.weekend{color:#c53030}
-    .dayNum.mutedNum{color:#9aa6b2;font-weight:650}
-
-    /* Wariant 5: kropki pod numerem dnia */
-    .indRow{
-      margin-top:10px;
-      display:flex;
-      align-items:center;
-      gap:6px;
-      min-height:10px; /* żeby kafelki równe nawet bez kropek */
-    }
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      box-shadow:0 2px 8px rgba(0,0,0,.10);
-      flex:0 0 auto;
-    }
-    .dot.hidden{visibility:hidden}
-    .dot.shift{background:#50827C;} /* zielona: godziny */
-    .dot.note{background:#E5A823;}  /* żółta: notatka */
-
-    /* placeholdery — utrzymują siatkę */
     .blankCell{
-      border:none;
-      background:transparent;
-      box-shadow:none;
-      pointer-events:none;
-      aspect-ratio:1 / 1.05;
-      min-height:64px;
+      min-height:auto;
+      aspect-ratio: 1 / 1;
     }
+    .dayNum{font-size:16px}
+    .dot{width:7px;height:7px}
+  }
+  @media(max-width:420px){
+    .calGrid{gap:6px}
+  }
 
-    /* Mobile: bezpieczne odstępy + jeszcze delikatniejszy cień (S23 fix) */
-    @media(max-width:640px){
-      .calGrid{gap:8px}
-      .dayCell{
-        padding:8px;
-        border-radius:16px;
-        aspect-ratio:1 / 1.08;
-        min-height:56px;
-        box-shadow:0 2px 6px rgba(0,0,0,.04);
-      }
-      .dayNum{font-size:15px}
-      .indRow{margin-top:8px}
-      .blankCell{min-height:56px}
-      .monthBar{box-shadow:0 4px 12px rgba(0,0,0,.035)}
-    }
+  /* ===== MODAL (dialog) ===== */
+  dialog{
+    border:none;border-radius:16px;padding:0;
+    width:min(720px, calc(100vw - 22px));
+    box-shadow:0 18px 60px rgba(0,0,0,.25);
+  }
+  dialog::backdrop{background:rgba(17,17,17,.45)}
+  .modalHead{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:14px;border-bottom:1px solid #eef1f8;
+    background:#fff;
+    border-top-left-radius:16px;border-top-right-radius:16px;
+  }
+  .modalHead h3{margin:0;font-size:16px}
+  .modalBody{padding:14px;background:#fff;border-bottom-left-radius:16px;border-bottom-right-radius:16px}
 
-    /* ===== MODAL (dialog) ===== */
-    dialog{
-      border:none;border-radius:16px;padding:0;
-      width:min(720px, calc(100vw - 22px));
-      box-shadow:0 18px 60px rgba(0,0,0,.25);
-    }
-    dialog::backdrop{background:rgba(17,17,17,.45)}
-    .modalHead{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:14px;border-bottom:1px solid #eef1f8;
-      background:#fff;
-      border-top-left-radius:16px;border-top-right-radius:16px;
-    }
-    .modalHead h3{margin:0;font-size:16px}
-    .modalBody{padding:14px;background:#fff;border-bottom-left-radius:16px;border-bottom-right-radius:16px}
+  .shiftList{display:grid;gap:10px;margin-top:10px}
+  .shiftItem{
+    border:1px solid #eef1f8;border-radius:14px;padding:10px;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    background:#fff;
+    box-shadow:0 6px 18px rgba(0,0,0,.04);
+  }
+  .shiftItem .times{font-weight:900}
+  .shiftItem .mins{color:#666;font-size:12px;margin-top:2px}
+  .miniBtn{
+    width:auto;padding:8px 10px;border-radius:12px;border:1px solid #d7dbe7;background:#eef1f8;color:#111;
+  }
+  .miniBtn.danger{background:#ffe6e3;border-color:#ffb4ab;color:#7a1410}
+  .divider{height:1px;background:#eef1f8;margin:14px 0}
+  #status:empty{display:none;}
 
-    .shiftList{display:grid;gap:10px;margin-top:10px}
-    .shiftItem{
-      border:1px solid #eef1f8;border-radius:14px;padding:10px;
-      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
-      background:#fff;
-      box-shadow:0 6px 18px rgba(0,0,0,.04);
-    }
-    .shiftItem .times{font-weight:900}
-    .shiftItem .mins{color:#666;font-size:12px;margin-top:2px}
-    .miniBtn{
-      width:auto;padding:8px 10px;border-radius:12px;border:1px solid #d7dbe7;background:#eef1f8;color:#111;
-    }
-    .miniBtn.danger{background:#ffe6e3;border-color:#ffb4ab;color:#7a1410}
-    .divider{height:1px;background:#eef1f8;margin:14px 0}
-    #status:empty{display:none;}
-
-    @media print{
-      body{background:#fff}
-      .wrap{margin:0;padding:0;max-width:none}
-      .card{box-shadow:none;border-radius:0;padding:0}
-      button, input, textarea, details, dialog{display:none !important}
-    }
-  </style>
+  @media print{
+    body{background:#fff}
+    .wrap{margin:0;padding:0;max-width:none}
+    .card{box-shadow:none;border-radius:0;padding:0}
+    button, input, textarea, details, dialog{display:none !important}
+  }
+</style>
 </head>
 
 <body>
