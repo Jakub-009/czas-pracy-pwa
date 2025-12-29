@@ -144,22 +144,34 @@
   .dayNum.mutedNum{color:#9aa6b2;font-weight:700}
   .dayNum.weekend{color:#c53030}
 
-  /* kropki statusu (Wariant 5) */
-  .indRow{
-    display:flex;
-    gap:6px;
-    align-items:center;
-    margin-top:2px;
-    min-height:10px;
-  }
-  .dot{
-    width:8px;height:8px;border-radius:999px;
-    display:inline-block;
-    box-shadow:0 2px 8px rgba(0,0,0,.10);
-  }
-  .dot.hidden{visibility:hidden}
-  .dot.shift{background:#50827C;}  /* zielona: godziny */
-  .dot.note{background:#E5A823;}   /* żółta: notatka */
+/* kropki statusu (Wariant 5) — poprawka: wyżej i bliżej cyfry */
+.indRow{
+  position:absolute;
+  top:30px;               /* 👈 wysokość kropek względem górnej krawędzi kafelka */
+  left:12px;              /* 👈 wyrównanie do numeru dnia */
+  display:flex;
+  gap:6px;
+  align-items:center;
+  min-height:10px;
+  z-index:3;
+  pointer-events:none;    /* klik w dzień działa normalnie */
+}
+
+.dot{
+  width:8px;height:8px;border-radius:999px;
+  display:inline-block;
+  box-shadow:0 2px 8px rgba(0,0,0,.10);
+}
+
+.dot.hidden{visibility:hidden}
+.dot.shift{background:#50827C;}  /* zielona: godziny */
+.dot.note{background:#E5A823;}   /* żółta: notatka */
+
+/* mobile: lekko wyżej, żeby nie ucięło */
+@media(max-width:420px){
+  .indRow{ top:28px; left:10px; }
+  .dot{ width:7px; height:7px; }
+}
 
   .blankCell{
     border:none;
