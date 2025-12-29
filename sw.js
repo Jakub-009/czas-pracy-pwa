@@ -4,8 +4,6 @@ const BASE = "/czas-pracy-pwa/";
 const ASSETS = [
   BASE,
   BASE + "index.html",
-  BASE + "style.css",
-  BASE + "app.js",
   BASE + "manifest.webmanifest",
   BASE + "sw.js",
   BASE + "icon-192.png",
