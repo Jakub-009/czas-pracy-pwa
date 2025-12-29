@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Godziny pracy</title>
   <meta name="theme-color" content="#f6f7fb" />
-<meta name="color-scheme" content="light">
+  <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
 
   <style>
@@ -35,9 +35,17 @@
     .right{text-align:right}
 
     .timesCell{line-height:1.25}
-    .timesCell .lbl{display:block;font-size:11px;color:#666;margin-top:2px}
-    .timesCell .val{display:block;font-weight:700}
-    .timesCell .sep{height:6px}
+    .shiftRow{padding:6px 0;border-bottom:1px dashed #e7ebf6}
+    .shiftRow:last-child{border-bottom:none}
+    .shiftRow .lbl{display:block;font-size:11px;color:#666;margin-top:2px}
+    .shiftRow .val{display:block;font-weight:700}
+    .shiftRow .miniRow{display:flex;gap:8px;align-items:center;justify-content:space-between}
+    .shiftRow .miniBtns{display:flex;gap:6px;flex:0 0 auto}
+    .miniBtn{
+      padding:6px 8px;border-radius:10px;border:1px solid #d7dbe7;background:#eef1f8;color:#111;
+      font-size:12px;cursor:pointer
+    }
+    .miniBtn.danger{background:#ffe6e3;border-color:#ffb4ab;color:#7a1410}
 
     /* mobilnie: nie pokazuj wypłaty w tabeli (jest na górze w podsumowaniu) */
     @media (max-width:520px){
@@ -67,10 +75,7 @@
       margin-left:10px;
     }
     details[open] .chev{transform:rotate(180deg);}
-    .panel{
-      overflow:hidden;
-      animation:panelIn .18s ease;
-    }
+    .panel{overflow:hidden;animation:panelIn .18s ease;}
     @keyframes panelIn{
       from{opacity:.4; transform:translateY(-4px)}
       to{opacity:1; transform:translateY(0)}
@@ -81,19 +86,20 @@
       body{background:#fff}
       .wrap{margin:0;padding:0;max-width:none}
       .card{box-shadow:none;border-radius:0;padding:0}
-      button, input, textarea, #status, details{display:none !important}
+      button, input, textarea, #status, details, .miniBtn{display:none !important}
       table{font-size:12px}
       th,td{padding:6px}
       th.payCol, td.payCol{display:table-cell !important;}
+      .shiftRow{border-bottom:1px solid #eee}
     }
   </style>
 </head>
 
 <body>
-    <div class="wrap">
-  <div class="card" style="margin-bottom:14px;">
-  <h1>Godziny pracy ⏱️</h1>
-  </div>
+  <div class="wrap">
+    <div class="card" style="margin-bottom:14px;">
+      <h1>Godziny pracy ⏱️</h1>
+    </div>
 
     <!-- Dodaj dzień -->
     <div class="grid" style="margin-bottom:14px;">
@@ -113,14 +119,15 @@
             <label>Wyjście</label>
             <input id="end" type="time" />
           </div>
-          <!-- Notatka przeniesiona POD wyjście (czyli pod rząd z godzinami) -->
+
           <div class="col-12">
             <label>Notatka do dnia</label>
             <textarea id="note" placeholder="Opcjonalnie..."></textarea>
           </div>
+
           <div class="col-3">
             <label>&nbsp;</label>
-            <button id="addHoursBtn">Dodaj godziny</button>
+            <button id="addHoursBtn">Dodaj (kolejny) zakres</button>
           </div>
 
           <div class="col-12">
@@ -130,7 +137,7 @@
       </div>
     </div>
 
-    <!-- Dodatkowe (osobny kafelek + trójkąt) -->
+    <!-- Ustawienia pracy -->
     <div class="grid" style="margin-bottom:14px;">
       <div class="card col-12">
         <details id="extrasPanel">
@@ -185,14 +192,13 @@
           </table>
         </div>
 
-        <!-- Akcje pod tabelą -->
         <div class="row" style="margin-top:12px;">
           <button class="secondary" id="printPdfBtn">Raport PDF / Wydrukuj</button>
         </div>
       </div>
     </div>
 
-    <!-- Narzędzia (osobny kafelek + trójkąt) -->
+    <!-- Narzędzia -->
     <div class="grid" style="margin-top:14px;">
       <div class="card col-12">
         <details id="toolsPanel">
@@ -218,7 +224,6 @@
 
 <script>
 (() => {
-  // PWA SW (GitHub Pages path)
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/czas-pracy-pwa/sw.js", { scope: "/czas-pracy-pwa/" });
   }
@@ -233,14 +238,12 @@
 
   const ym = (dateISO) => dateISO.slice(0,7);
 
-  // europejski format: DD-MM-YYYY
   const fmtDMY = (dateISO) => {
     if (!dateISO) return "";
     const [y,m,d] = dateISO.split("-");
     return `${d}-${m}-${y}`;
   };
 
-  // Klucz – stary, żeby nie znikały wpisy
   const STORAGE_KEY = "worktime_pwa_v1";
 
   let db = load() || { settings:{ rate:40 }, entries:[] };
@@ -249,11 +252,36 @@
   function load(){
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; }
   }
+
+  function migrateIfNeeded(){
+    // Jeśli mamy stare wpisy {date,start,end,note} -> przerób na {date, shifts:[{start,end}], note}
+    let changed = false;
+    db.entries = (Array.isArray(db.entries) ? db.entries : []).map(e=>{
+      if (!e) return e;
+      if (Array.isArray(e.shifts)) return e;
+
+      const shifts = [];
+      if (e.start && e.end) shifts.push({ start:e.start, end:e.end });
+
+      const ne = { date:e.date, note:e.note || "", shifts };
+      changed = true;
+      return ne;
+    });
+
+    if (changed) save();
+  }
+
   function normalize(){
     db.settings = db.settings || {};
     db.settings.rate = Number(db.settings.rate ?? 40);
     db.entries = Array.isArray(db.entries) ? db.entries : [];
+    // upewnij się, że każdy dzień ma shifts[]
+    for (const e of db.entries){
+      e.shifts = Array.isArray(e.shifts) ? e.shifts : [];
+      e.note = e.note || "";
+    }
   }
+
   function setStatus(t){ $("status").textContent = t || ""; }
 
   function minutesBetween(dateISO, start, end) {
@@ -281,18 +309,35 @@
     $("rate").value = db.settings.rate;
   }
 
-  function upsertEntry(entry){
-    const i = db.entries.findIndex(e => e.date === entry.date);
-    if (i >= 0) db.entries[i] = { ...db.entries[i], ...entry };
-    else db.entries.push(entry);
+  function getDay(date){
+    return db.entries.find(e => e.date === date) || null;
+  }
+
+  function upsertDay(date, patch){
+    const i = db.entries.findIndex(e => e.date === date);
+    if (i >= 0) db.entries[i] = { ...db.entries[i], ...patch };
+    else db.entries.push({ date, note:"", shifts:[], ...patch });
     db.entries.sort((a,b)=>a.date.localeCompare(b.date));
   }
 
-  function deleteEntry(dateISO){ db.entries = db.entries.filter(e => e.date !== dateISO); }
+  function deleteDay(dateISO){
+    db.entries = db.entries.filter(e => e.date !== dateISO);
+  }
 
-  function computeEntryMinutes(e){
-    if (!e.start || !e.end) return 0;
-    return Math.max(0, minutesBetween(e.date, e.start, e.end));
+  function deleteShift(dateISO, idx){
+    const d = getDay(dateISO);
+    if (!d) return;
+    d.shifts.splice(idx, 1);
+    save(); render();
+  }
+
+  function computeDayMinutes(day){
+    let total = 0;
+    for (const s of day.shifts){
+      if (!s?.start || !s?.end) continue;
+      total += Math.max(0, minutesBetween(day.date, s.start, s.end));
+    }
+    return total;
   }
 
   function currentMonth(){
@@ -307,39 +352,50 @@
     const [Y,M] = month.split("-");
     $("monthLabel").textContent = `${M}-${Y}`;
 
-    const monthEntries = db.entries.filter(e => ym(e.date)===month);
+    const monthDays = db.entries.filter(e => ym(e.date)===month);
 
     let sumMin = 0;
-    const rowsHtml = monthEntries.map(e=>{
-      const mins = computeEntryMinutes(e);
+    const rowsHtml = monthDays.map(day=>{
+      const mins = computeDayMinutes(day);
       sumMin += mins;
       const pay = (mins/60)*(db.settings.rate||0);
 
-      const safeNote = (e.note || "")
+      const safeNote = (day.note || "")
         .replaceAll("&","&amp;")
         .replaceAll("<","&lt;")
         .replaceAll(">","&gt;");
 
-      const timesHtml = `
-        <div class="timesCell">
-          <span class="lbl">Wejście</span>
-          <span class="val">${e.start || "-"}</span>
-          <div class="sep"></div>
-          <span class="lbl">Wyjście</span>
-          <span class="val">${e.end || "-"}</span>
-        </div>
-      `;
+      const shiftsHtml = (day.shifts.length ? day.shifts : [{start:"", end:""}]).map((s, idx)=>{
+        const start = s.start || "-";
+        const end = s.end || "-";
+        const showDelete = day.shifts.length > 0 && (s.start || s.end);
+        return `
+          <div class="shiftRow">
+            <div class="miniRow">
+              <div>
+                <span class="lbl">Wejście</span>
+                <span class="val">${start}</span>
+                <span class="lbl" style="margin-top:6px;">Wyjście</span>
+                <span class="val">${end}</span>
+              </div>
+              <div class="miniBtns">
+                ${showDelete ? `<button class="miniBtn danger" data-delshift="${day.date}" data-idx="${idx}" title="Usuń ten zakres">Usuń</button>` : ``}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
 
       return `
         <tr>
-          <td>${fmtDMY(e.date)}</td>
-          <td>${timesHtml}</td>
+          <td>${fmtDMY(day.date)}</td>
+          <td class="timesCell">${shiftsHtml}</td>
           <td class="noteCol">${safeNote || "-"}</td>
           <td class="right">${mins ? fmtHM(mins) : "-"}</td>
           <td class="right payCol">${mins ? pln(pay) : "-"}</td>
           <td class="right actionsCol">
-            <button class="secondary" data-edit="${e.date}" style="max-width:110px;">Edytuj</button>
-            <button class="secondary" data-del="${e.date}" style="max-width:110px;">Usuń</button>
+            <button class="secondary" data-edit="${day.date}" style="max-width:110px;">Edytuj</button>
+            <button class="secondary" data-del="${day.date}" style="max-width:110px;">Usuń</button>
           </td>
         </tr>`;
     }).join("");
@@ -348,27 +404,40 @@
     $("sumHours").textContent = fmtHM(sumMin);
     $("sumPay").textContent = pln((sumMin/60)*(db.settings.rate||0));
 
-    // actions
+    // edit day to form
     document.querySelectorAll("[data-edit]").forEach(btn=>{
       btn.onclick = ()=>{
-        const d = btn.getAttribute("data-edit");
-        const e = db.entries.find(x=>x.date===d);
-        $("date").value = e.date;
-        $("start").value = e.start||"";
-        $("end").value = e.end||"";
-        $("note").value = e.note||"";
-        setStatus("Wczytano dzień do edycji.");
+        const date = btn.getAttribute("data-edit");
+        const day = getDay(date);
+        $("date").value = day.date;
+        // w formie ustawiamy "ostatni" zakres (żeby łatwo dopisać kolejny)
+        const last = day.shifts[day.shifts.length-1];
+        $("start").value = last?.start || "";
+        $("end").value = last?.end || "";
+        $("note").value = day.note || "";
+        setStatus("Wczytano dzień do edycji. Dodaj kolejny zakres przyciskiem.");
         render();
       };
     });
 
+    // delete whole day
     document.querySelectorAll("[data-del]").forEach(btn=>{
       btn.onclick = ()=>{
-        const d = btn.getAttribute("data-del");
-        if (confirm("Usunąć wpis z dnia " + fmtDMY(d) + "?")) {
-          deleteEntry(d);
-          save();
-          render();
+        const date = btn.getAttribute("data-del");
+        if (confirm("Usunąć CAŁY dzień " + fmtDMY(date) + " (wszystkie zakresy i notatkę)?")) {
+          deleteDay(date); save(); render();
+        }
+      };
+    });
+
+    // delete single shift
+    document.querySelectorAll("[data-delshift]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const date = btn.getAttribute("data-delshift");
+        const idx = Number(btn.getAttribute("data-idx"));
+        if (Number.isNaN(idx)) return;
+        if (confirm("Usunąć ten zakres godzin z dnia " + fmtDMY(date) + "?")) {
+          deleteShift(date, idx);
         }
       };
     });
@@ -397,6 +466,7 @@
       const obj = JSON.parse(txt);
       db = obj;
       normalize();
+      migrateIfNeeded();
       save();
       hydrateSettingsUI();
       render();
@@ -406,7 +476,7 @@
     }
   };
 
-  // Dodaj godziny + (opcjonalnie) notatka jednym przyciskiem
+  // Dodaj zakres + (opcjonalnie) notatka
   $("addHoursBtn").onclick = ()=>{
     const date = $("date").value;
     const start = $("start").value;
@@ -415,25 +485,47 @@
 
     if (!date) return alert("Wybierz datę.");
 
-    // jeśli są godziny – wymagamy obu
+    // jeśli godziny wpisane częściowo
     if ((start && !end) || (!start && end)) {
       return alert("Uzupełnij wejście i wyjście (albo zostaw oba puste).");
     }
 
-    // jeśli nie ma godzin i nie ma notatki – nic nie zapisujemy
+    // jeśli nic nie ma
     if (!start && !end && !note) {
       return alert("Wpisz godziny lub notatkę.");
     }
 
     readSettingsFromUI();
 
-    const payload = { date };
-    if (start && end) { payload.start = start; payload.end = end; }
-    if (note) { payload.note = note; }
+    // bierz obecny dzień albo stwórz
+    const day = getDay(date) || { date, note:"", shifts:[] };
 
-    upsertEntry(payload);
+    // dopisz shift jeśli jest komplet godzin
+    let addedShift = false;
+    if (start && end) {
+      day.shifts = Array.isArray(day.shifts) ? day.shifts : [];
+      day.shifts.push({ start, end });
+      addedShift = true;
+      // wyczyść godziny, żeby łatwo wbić kolejny zakres
+      $("start").value = "";
+      $("end").value = "";
+    }
 
-    setStatus(note && start && end ? "Zapisano godziny i notatkę." : (start && end ? "Zapisano godziny." : "Zapisano notatkę."));
+    // nadpisz notatkę jeśli podana (zostaje jedna na dzień)
+    let changedNote = false;
+    if (note) {
+      day.note = note;
+      changedNote = true;
+    }
+
+    upsertDay(date, day);
+
+    const msg = [
+      addedShift ? "Dodano zakres godzin." : null,
+      changedNote ? "Zapisano notatkę." : null
+    ].filter(Boolean).join(" ");
+    setStatus(msg || "Zapisano.");
+
     save();
     render();
   };
@@ -451,7 +543,6 @@
     render();
   };
 
-  // rerender on settings/date change
   ["rate","date"].forEach(id=>{
     $(id).addEventListener("input", render);
     $(id).addEventListener("change", render);
@@ -460,6 +551,7 @@
   // init
   $("date").value = todayISO();
   normalize();
+  migrateIfNeeded();
   hydrateSettingsUI();
   render();
 })();
