@@ -325,7 +325,20 @@
   </dialog>
 
 <script>
-(() => {
+(() => // === DEBUG: pokazuj błędy w aplikacji (na telefonie nie masz konsoli) ===
+  const showErr = (msg) => {
+    const el = document.getElementById("status");
+    if (el) el.textContent = "BŁĄD: " + msg;
+  };
+
+  window.addEventListener("error", (e) => {
+    showErr(e.message || "Nieznany błąd JS");
+  });
+
+  window.addEventListener("unhandledrejection", (e) => {
+    showErr((e.reason && e.reason.message) ? e.reason.message : String(e.reason || "Promise error"));
+  });
+  {
   // PWA SW (GitHub Pages path)
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/czas-pracy-pwa/sw.js", { scope: "/czas-pracy-pwa/" });
