@@ -59,19 +59,45 @@
     /* ===== KALENDARZ ===== */
     .calWrap{width:100%;}
     .calHead{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
-      margin-bottom:10px;
+      display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      margin-bottom:12px;
     }
-    .calMonth{
-      display:flex;gap:8px;align-items:center;
-      background:#eef1f8;border:1px solid #d7dbe7;border-radius:12px;padding:8px 10px;
-    }
-    .calMonth button{
-      width:auto;padding:8px 10px;border-radius:10px;border:1px solid #d7dbe7;background:#fff;color:#111;
+
+    /* Pasek miesiąca: full width + spójny cień */
+    .monthBar{
+      width:100%;
+      background:#fff;
+      border:1px solid #eef1f8;
+      border-radius:14px;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
+      padding:12px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      position:relative;
       cursor:pointer;
+      user-select:none;
     }
-    .calMonth input{
-      width:auto;min-width:160px;border:none;background:transparent;padding:8px 6px;
+    .monthBar .txt{
+      font-weight:800;
+      font-size:15px;
+      color:#1b2a3a;
+    }
+    .monthBar .sub{
+      font-size:12px;color:#666;margin-top:2px;
+    }
+    .monthBar .caret{
+      width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;
+      border-radius:8px;background:#eef1f8;border:1px solid #d7dbe7;
+      flex:0 0 auto;
+    }
+    /* niewidzialny input month na wierzchu – klik otwiera picker */
+    #monthPick{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      cursor:pointer;
     }
 
     .calGrid{
@@ -96,13 +122,14 @@
     }
     .dayCell:hover{border-color:#d7dbe7}
     .dayTop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-    .dayNum{font-size:18px;font-weight:600;color:#1b2a3a}
-    .dayNum.has{font-weight:800}
-    .dayNum.mutedNum{color:#9aa6b2;font-weight:600}
+    .dayNum{font-size:18px;font-weight:650;color:#1b2a3a}
+    .dayNum.has{font-weight:900}
+    .dayNum.mutedNum{color:#9aa6b2;font-weight:650}
     .dayNum.weekend{color:#c53030}
     .hasBar{
-      height:4px;border-radius:999px;background:#111;opacity:.22;
+      height:5px;border-radius:999px;background:#111;opacity:.28;
       margin-top:-2px;
+      width:100%;
     }
     .dayLines{
       font-size:12px;color:#607080;line-height:1.35;
@@ -110,12 +137,22 @@
       display:-webkit-box;
       -webkit-line-clamp:3;
       -webkit-box-orient:vertical;
+      white-space:normal;
+      word-break:break-word;
     }
-    .dayLines .plus{font-weight:700;color:#111}
+    .dayLines .plus{font-weight:800;color:#111}
+
+    /* MOBILE: kafelki bardziej “czytelne”, mniej ucinania */
     @media(max-width:640px){
       .calGrid{gap:8px}
-      .dayCell{min-height:84px;padding:9px}
+      .dayCell{
+        min-height:78px;
+        padding:8px;
+        border-radius:16px;
+      }
       .dayNum{font-size:16px}
+      .dayLines{font-size:11px; -webkit-line-clamp:2;}
+      .hasBar{height:4px}
     }
 
     /* ===== MODAL (dialog) ===== */
@@ -128,23 +165,30 @@
     .modalHead{
       display:flex;align-items:center;justify-content:space-between;gap:10px;
       padding:14px;border-bottom:1px solid #eef1f8;
+      background:#fff;
+      border-top-left-radius:16px;border-top-right-radius:16px;
     }
     .modalHead h3{margin:0;font-size:16px}
-    .modalBody{padding:14px}
+    .modalBody{padding:14px;background:#fff;border-bottom-left-radius:16px;border-bottom-right-radius:16px}
+
     .shiftList{display:grid;gap:10px;margin-top:10px}
     .shiftItem{
       border:1px solid #eef1f8;border-radius:14px;padding:10px;
       display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
       background:#fff;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
     }
-    .shiftItem .times{font-weight:700}
-    .shiftItem .mins{color:#666;font-size:12px}
+    .shiftItem .times{font-weight:800}
+    .shiftItem .mins{color:#666;font-size:12px;margin-top:2px}
     .miniBtn{
       width:auto;padding:8px 10px;border-radius:10px;border:1px solid #d7dbe7;background:#eef1f8;color:#111;
     }
     .miniBtn.danger{background:#ffe6e3;border-color:#ffb4ab;color:#7a1410}
 
     .divider{height:1px;background:#eef1f8;margin:14px 0}
+
+    /* status (na górze) – gdy pusty, nie robi “dziury” */
+    #status:empty{display:none;}
 
     @media print{
       body{background:#fff}
@@ -162,6 +206,7 @@
       <div class="muted" id="status"></div>
     </div>
 
+    <!-- Szybkie dodanie zakresu + notatka -->
     <div class="grid" style="margin-bottom:14px;">
       <div class="card col-12">
         <h2>Dodaj zakres</h2>
@@ -187,12 +232,13 @@
             <textarea id="note" placeholder="Opcjonalnie... (np. zaliczka -100 zł)"></textarea>
           </div>
           <div class="col-12">
-            <button class="secondary" id="openDayBtn">Otwórz ten dzień</button>
+            <button class="secondary" id="openDayBtn">Pokaż szczegóły dnia</button>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Ustawienia -->
     <div class="grid" style="margin-bottom:14px;">
       <div class="card col-12">
         <details id="extrasPanel">
@@ -212,6 +258,7 @@
       </div>
     </div>
 
+    <!-- Podsumowanie = kalendarz -->
     <div class="grid">
       <div class="card col-12">
         <div class="calHead">
@@ -219,15 +266,19 @@
             <h2 style="margin:0;">Podsumowanie miesiąca</h2>
             <div class="muted">Kliknij dzień, żeby zobaczyć szczegóły i akcje.</div>
           </div>
-
-          <div class="calMonth">
-            <button id="prevMonth" aria-label="Poprzedni miesiąc">‹</button>
-            <input id="monthPick" type="month" />
-            <button id="nextMonth" aria-label="Następny miesiąc">›</button>
-          </div>
         </div>
 
-        <div class="calWrap">
+        <!-- Pasek miesiąca (bez strzałek) -->
+        <div class="monthBar" id="monthBar">
+          <div>
+            <div class="txt" id="monthLabelText">—</div>
+            <div class="sub">Dotknij, aby zmienić miesiąc</div>
+          </div>
+          <div class="caret">▾</div>
+          <input id="monthPick" type="month" aria-label="Wybierz miesiąc" />
+        </div>
+
+        <div class="calWrap" style="margin-top:10px;">
           <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
           <div class="calGrid" id="calGrid"></div>
         </div>
@@ -237,11 +288,11 @@
         <div class="grid" style="margin-top:10px;">
           <div class="col-6">
             <div class="muted">Suma godzin</div>
-            <div style="font-size:22px;font-weight:800" id="sumHours">0:00</div>
+            <div style="font-size:22px;font-weight:900" id="sumHours">0:00</div>
           </div>
           <div class="col-6">
             <div class="muted">Wypłata</div>
-            <div style="font-size:22px;font-weight:800" id="sumPay">0,00 zł</div>
+            <div style="font-size:22px;font-weight:900" id="sumPay">0,00 zł</div>
           </div>
         </div>
 
@@ -251,6 +302,7 @@
       </div>
     </div>
 
+    <!-- Narzędzia -->
     <div class="grid" style="margin-top:14px;">
       <div class="card col-12">
         <details id="toolsPanel">
@@ -274,18 +326,33 @@
     </div>
   </div>
 
+  <!-- MODAL DNIA -->
   <dialog id="dayDialog">
     <div class="modalHead">
-      <h3 id="dlgTitle">Dzień</h3>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <button class="secondary" id="dlgClose" style="width:auto;">Zamknij</button>
+      <div>
+        <h3 id="dlgTitle" style="margin:0;">Dzień</h3>
+        <div class="muted" id="dlgMeta" style="margin-top:3px;"></div>
       </div>
+      <button class="secondary" id="dlgClose" style="width:auto;">Zamknij</button>
     </div>
 
     <div class="modalBody">
       <div class="grid">
+        <div class="col-12">
+          <div class="row" style="gap:10px;align-items:stretch;">
+            <div class="card" style="box-shadow:none;border:1px solid #eef1f8;">
+              <div class="muted">Suma dnia</div>
+              <div style="font-size:20px;font-weight:900" id="dlgSumHM">0:00</div>
+            </div>
+            <div class="card" style="box-shadow:none;border:1px solid #eef1f8;">
+              <div class="muted">Wypłata dnia</div>
+              <div style="font-size:20px;font-weight:900" id="dlgSumPay">0,00 zł</div>
+            </div>
+          </div>
+        </div>
+
         <div class="col-6">
-          <label>Dodaj zakres (do tego dnia)</label>
+          <label>Dodaj kolejny zakres</label>
           <div class="row" style="gap:8px;">
             <input id="dlgStart" type="time" style="min-width:140px;" />
             <input id="dlgEnd" type="time" style="min-width:140px;" />
@@ -318,14 +385,12 @@
 
 <script>
 (() => {
-  // === DEBUG: pokazuj błędy w aplikacji (na telefonie nie masz konsoli) ===
+  // === DEBUG (zostawiamy; nic nie pokazuje, dopóki nie ma błędu) ===
   const showErr = (msg) => {
     const el = document.getElementById("status");
     if (el) el.textContent = "BŁĄD: " + msg;
   };
-  window.addEventListener("error", (e) => {
-    showErr(e.message || "Nieznany błąd JS");
-  });
+  window.addEventListener("error", (e) => showErr(e.message || "Nieznany błąd JS"));
   window.addEventListener("unhandledrejection", (e) => {
     showErr((e.reason && e.reason.message) ? e.reason.message : String(e.reason || "Promise error"));
   });
@@ -351,6 +416,20 @@
     return `${d}-${m}-${y}`;
   };
 
+  const fmtMonthPL = (monthYM) => {
+    const [Y, M] = monthYM.split("-").map(Number);
+    const dt = new Date(Y, M-1, 1);
+    const s = new Intl.DateTimeFormat("pl-PL", { month:"long", year:"numeric" }).format(dt);
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+
+  const fmtWeekdayPL = (dateISO) => {
+    const [Y, M, D] = dateISO.split("-").map(Number);
+    const dt = new Date(Y, M-1, D);
+    const s = new Intl.DateTimeFormat("pl-PL", { weekday:"long" }).format(dt);
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+
   const STORAGE_KEY = "worktime_pwa_v1";
   let db = load() || { settings:{ rate:40 }, entries:[] };
 
@@ -359,6 +438,7 @@
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; }
   }
 
+  // migracja: {date,start,end,note} => {date, shifts:[{start,end}], note}
   function migrateIfNeeded(){
     let changed = false;
     db.entries = (Array.isArray(db.entries) ? db.entries : []).map(e=>{
@@ -387,7 +467,11 @@
     }
   }
 
-  function setStatus(t){ const el=$("status"); if(el) el.textContent = t || ""; }
+  function setStatus(t){
+    const el = $("status");
+    if (!el) return;
+    el.textContent = t || "";
+  }
 
   function minutesBetween(dateISO, start, end) {
     const [y,m,d] = dateISO.split("-").map(Number);
@@ -445,7 +529,6 @@
 
   // ===== KALENDARZ RENDER =====
   const DOW = ["Pn","Wt","Śr","Czw","Pt","Sb","Nd"];
-
   function mondayIndex(jsDay){ return (jsDay + 6) % 7; }
   function daysInMonth(year, month1){ return new Date(year, month1, 0).getDate(); }
 
@@ -453,7 +536,13 @@
     $("dowRow").innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
   }
 
+  // Krótki zapis: 06:00–14:00
+  const shortShift = (s) => `${s.start || "—"}–${s.end || "—"}`;
+
   function renderCalendar(monthYM){
+    // opis miesiąca
+    $("monthLabelText").textContent = fmtMonthPL(monthYM);
+
     const [Y, M] = monthYM.split("-").map(Number);
     const first = new Date(Y, M-1, 1);
     const firstIdx = mondayIndex(first.getDay());
@@ -464,7 +553,7 @@
     const prevM = prevMonth.getMonth()+1;
     const prevDim = daysInMonth(prevY, prevM);
 
-    const totalCells = 42;
+    const totalCells = 42; // 6 tygodni
     const cells = [];
 
     for (let i=0;i<totalCells;i++){
@@ -485,21 +574,15 @@
       const isWeekend = (jsDow === 0 || jsDow === 6);
 
       const day = getDay(dateISO);
-      const has = !!(day && day.shifts && day.shifts.length);
+      const shiftsCount = (day?.shifts || []).length;
+      const has = shiftsCount > 0;
 
+      // max 2 linie zakresów + ewentualnie "+n" i 📝
       let lines = "";
-      if (day && (day.shifts?.length || (day.note && day.note.trim()))){
-        const maxLines = 2;
-        const shiftLines = (day.shifts || []).slice(0, maxLines).map(s => {
-          const a = s.start || "-";
-          const b = s.end || "-";
-          return `od ${a}<br>do ${b}`;
-        }).join("<br>");
-
-        let extra = "";
-        if ((day.shifts || []).length > maxLines) extra = `<br><span class="plus">+${(day.shifts.length - maxLines)}</span>`;
-        if (shiftLines) lines += shiftLines + extra;
-
+      if (day && (shiftsCount || (day.note && day.note.trim()))){
+        const shown = (day.shifts || []).slice(0,2).map(shortShift);
+        if (shown.length) lines += shown.join("<br>");
+        if (shiftsCount > 2) lines += `<br><span class="plus">+${shiftsCount - 2}</span>`;
         if (day.note && day.note.trim()){
           lines += (lines ? "<br>" : "") + "📝";
         }
@@ -517,7 +600,7 @@
           <div class="dayTop">
             <div class="${numClass}">${cellD}</div>
           </div>
-          ${has ? `<div class="hasBar"></div>` : `<div style="height:4px;"></div>`}
+          ${has ? `<div class="hasBar"></div>` : `<div style="height:5px;"></div>`}
           <div class="dayLines">${lines || ""}</div>
         </div>
       `);
@@ -543,14 +626,16 @@
 
     const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[] };
 
-    $("dlgTitle").textContent = `Dzień: ${fmtDMY(dateISO)}`;
+    const weekday = fmtWeekdayPL(dateISO);
+    $("dlgTitle").textContent = `${fmtDMY(dateISO)}`;
+    $("dlgMeta").textContent = weekday;
+
     $("dlgStart").value = "";
     $("dlgEnd").value = "";
     $("dlgNote").value = day.note || "";
 
     renderDayDialog();
 
-    // Niektóre WebView mogą nie wspierać showModal()
     if (dlg && typeof dlg.showModal === "function") dlg.showModal();
     else if (dlg) dlg.setAttribute("open","");
   }
@@ -564,19 +649,24 @@
   function renderDayDialog(){
     const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
     const mins = computeDayMinutes(day);
-    $("dlgSummary").textContent = `Suma dnia: ${mins ? fmtHM(mins) : "0:00"}`;
+    const pay = (mins/60) * (db.settings.rate||0);
+
+    $("dlgSumHM").textContent = fmtHM(mins);
+    $("dlgSumPay").textContent = pln(pay);
+    $("dlgSummary").textContent = `Zakresy: ${day.shifts.length || 0}`;
 
     const items = (day.shifts || []).map((s, idx)=>{
-      const a = s.start || "-";
-      const b = s.end || "-";
+      const a = s.start || "—";
+      const b = s.end || "—";
       const m = (s.start && s.end) ? Math.max(0, minutesBetween(day.date, s.start, s.end)) : 0;
+
       return `
         <div class="shiftItem">
           <div>
             <div class="times">${a} – ${b}</div>
-            <div class="mins">${m ? fmtHM(m) : "-"}</div>
+            <div class="mins">${m ? ("Czas: " + fmtHM(m)) : "-"}</div>
           </div>
-          <button class="miniBtn danger" data-delshift="${idx}">Usuń</button>
+          <button class="miniBtn danger" data-delshift="${idx}">Usuń zakres</button>
         </div>
       `;
     }).join("");
@@ -597,7 +687,7 @@
     });
   }
 
-  // ===== PODSUMOWANIE + TOTALS =====
+  // ===== TOTALS =====
   function renderTotals(monthYM){
     const sumMin = computeMonthMinutes(monthYM);
     $("sumHours").textContent = fmtHM(sumMin);
@@ -693,16 +783,13 @@
     renderAll();
   };
 
-  // miesiąc: nawigacja
-  function shiftMonth(delta){
-    const v = $("monthPick").value || ym(todayISO());
-    const [Y, M] = v.split("-").map(Number);
-    const d = new Date(Y, M-1 + delta, 1);
-    $("monthPick").value = `${d.getFullYear()}-${pad2(d.getMonth()+1)}`;
-    renderAll();
-  }
-  $("prevMonth").onclick = ()=> shiftMonth(-1);
-  $("nextMonth").onclick = ()=> shiftMonth(1);
+  // klik w pasek miesiąca — spróbuj otworzyć picker (gdzie wspierane)
+  $("monthBar").onclick = ()=>{
+    const input = $("monthPick");
+    if (!input) return;
+    if (typeof input.showPicker === "function") input.showPicker();
+    else input.focus();
+  };
   $("monthPick").addEventListener("change", renderAll);
 
   // narzędzia
@@ -739,8 +826,7 @@
 
   $("clearMonth").onclick = ()=>{
     const monthYM = $("monthPick").value || ym(todayISO());
-    const [Y,M] = monthYM.split("-");
-    if (!confirm("Usunąć wszystkie wpisy z miesiąca " + `${M}-${Y}` + "?")) return;
+    if (!confirm("Usunąć wszystkie wpisy z tego miesiąca?")) return;
     db.entries = db.entries.filter(e => ym(e.date) !== monthYM);
     save();
     renderAll();
@@ -751,7 +837,7 @@
     $(id).addEventListener("change", renderAll);
   });
 
-  // === INIT (tu był fragment, którego nie mogłeś znaleźć) ===
+  // INIT
   try{
     normalize();
     migrateIfNeeded();
