@@ -1,4 +1,3 @@
-<script>
 (() => {
   const showErr = (msg) => {
     const el = document.getElementById("status");
@@ -423,4 +422,3 @@
     if (el) el.textContent = "BŁĄD INIT: " + msg;
   }
 })();
-</script>
