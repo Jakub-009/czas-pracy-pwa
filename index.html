@@ -9,6 +9,7 @@
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
 
   <style>
+    *{box-sizing:border-box}
     :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
     body{margin:0;background:#f6f7fb;color:#111}
     .wrap{max-width:980px;margin:24px auto;padding:0 14px}
@@ -17,7 +18,14 @@
     .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
     @media(max-width:820px){.col-3,.col-4,.col-6{grid-column:span 12}}
     label{display:block;font-size:12px;color:#444;margin-bottom:6px}
-    input,button,textarea,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d7dbe7;background:#fff;font-size:14px;box-sizing:border-box}
+    input,button,textarea,select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid #d7dbe7;
+      background:#fff;
+      font-size:14px;
+    }
     textarea{min-height:44px;resize:vertical}
     button{cursor:pointer;border:none;background:#111;color:#fff}
     button.secondary{background:#eef1f8;color:#111;border:1px solid #d7dbe7}
@@ -27,10 +35,32 @@
     .muted{color:#666;font-size:12px}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .row > *{flex:1;min-width:160px}
-    .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#eef1f8;font-size:12px}
-    #status:empty{display:none;}
 
-    /* ===== details: chevron (Opcja B) ===== */
+    /* ===== mały chevron bez tła (Opcja B) ===== */
+    .chev{
+      width:18px;height:18px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 auto;
+      margin-left:10px;
+      transition:transform .18s ease;
+      opacity:.65;
+    }
+    .chev::before{
+      content:"";
+      width:8px;height:8px;
+      border-right:2px solid #111;
+      border-bottom:2px solid #111;
+      transform:rotate(45deg);
+      display:block;
+      margin-top:-1px;
+    }
+    details[open] .chev{transform:rotate(180deg)}
+    details[open] .chev::before{margin-top:1px}
+
+    /* details */
+    details{border-radius:12px}
     details summary{
       cursor:pointer;
       font-weight:800;
@@ -39,22 +69,10 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
+      gap:10px;
       padding:2px 0;
     }
     details summary::-webkit-details-marker{display:none;}
-    .chev{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width:22px;
-      height:22px;
-      flex:0 0 auto;
-      margin-left:10px;
-      color:#111;
-      opacity:.65;
-      transition:transform .18s ease, opacity .18s ease;
-    }
-    details[open] .chev{transform:rotate(180deg); opacity:.9;}
     .panel{overflow:hidden;animation:panelIn .18s ease;}
     @keyframes panelIn{
       from{opacity:.4; transform:translateY(-4px)}
@@ -65,9 +83,9 @@
     .calWrap{width:100%;}
     .calHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
 
-    /* Pasek miesiąca: full width + spójny cień */
     .monthBar{
       width:100%;
+      max-width:100%;
       background:#fff;
       border:1px solid #eef1f8;
       border-radius:14px;
@@ -80,14 +98,10 @@
       position:relative;
       cursor:pointer;
       user-select:none;
+      overflow:hidden;
     }
-    .monthBar .txt{font-weight:900;font-size:15px;color:#1b2a3a}
-    .monthBar .sub{font-size:12px;color:#666;margin-top:2px}
-    .monthBar .chev{
-      width:auto;height:auto;margin-left:0;
-      font-size:16px;
-      opacity:.65;
-    }
+    .monthBar .txt{font-weight:900;font-size:15px;color:#1b2a3a;line-height:1.2}
+    .monthBar .sub{font-size:12px;color:#666;margin-top:3px}
     #monthPick{
       position:absolute;
       inset:0;
@@ -99,64 +113,79 @@
       display:grid;
       grid-template-columns:repeat(7, minmax(0, 1fr));
       gap:10px;
+      width:100%;
     }
-    .calDow{
-      font-size:12px;
-      color:#666;
-      text-align:center;
-      padding:6px 0;
-    }
+    .calDow{font-size:12px;color:#666;text-align:center;padding:6px 0;}
 
+    /* Kafelek dnia: stabilny rozmiar + delikatny cień */
     .dayCell{
       background:#fff;
       border:1px solid #eef1f8;
-      border-radius:14px;
+      border-radius:16px;
+      box-shadow:0 4px 10px rgba(0,0,0,.05);
       padding:10px;
-      min-height:76px;
-      box-shadow:0 6px 18px rgba(0,0,0,.04);
       cursor:pointer;
       display:flex;
       flex-direction:column;
       justify-content:flex-start;
-      gap:6px;
-      position:relative;
+      aspect-ratio:1 / 1.05;
+      min-height:64px;
+      overflow:hidden; /* ważne: mniej “wizualnego nachodzenia” */
     }
     .dayCell:hover{border-color:#d7dbe7}
-    .dayTop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-    .dayNum{font-size:18px;font-weight:750;color:#1b2a3a;line-height:1}
-    .dayNum.mutedNum{color:#9aa6b2;font-weight:700}
-    .dayNum.weekend{color:#c53030}
 
-    /* kropki statusu */
-    .dotRow{
+    .dayTop{
       display:flex;
-      gap:6px;
+      align-items:flex-start;
+      justify-content:flex-start;
+      gap:8px;
+    }
+    .dayNum{font-size:16px;font-weight:700;color:#1b2a3a}
+    .dayNum.has{font-weight:900}
+    .dayNum.weekend{color:#c53030}
+    .dayNum.mutedNum{color:#9aa6b2;font-weight:650}
+
+    /* Wariant 5: kropki pod numerem dnia */
+    .indRow{
+      margin-top:10px;
+      display:flex;
       align-items:center;
-      margin-top:2px;
+      gap:6px;
+      min-height:10px; /* żeby kafelki równe nawet bez kropek */
     }
     .dot{
-      width:8px;height:8px;border-radius:999px;
-      display:inline-block;
+      width:10px;height:10px;border-radius:999px;
       box-shadow:0 2px 8px rgba(0,0,0,.10);
+      flex:0 0 auto;
     }
-    .dot.work{background:#1a9a50;}   /* zielona: godziny */
-    .dot.note{background:#e0a600;}   /* żółta: notatka */
+    .dot.hidden{visibility:hidden}
+    .dot.shift{background:#50827C;} /* zielona: godziny */
+    .dot.note{background:#E5A823;}  /* żółta: notatka */
 
-    /* Android/mobile-safe: kafelki NIE mogą nachodzić */
+    /* placeholdery — utrzymują siatkę */
+    .blankCell{
+      border:none;
+      background:transparent;
+      box-shadow:none;
+      pointer-events:none;
+      aspect-ratio:1 / 1.05;
+      min-height:64px;
+    }
+
+    /* Mobile: bezpieczne odstępy + jeszcze delikatniejszy cień (S23 fix) */
     @media(max-width:640px){
       .calGrid{gap:8px}
       .dayCell{
         padding:8px;
         border-radius:16px;
-        min-height:auto;
-        aspect-ratio: 1 / 1;              /* przewidywalny kafelek */
-        box-shadow:0 3px 10px rgba(0,0,0,.06); /* delikatniejszy cień */
+        aspect-ratio:1 / 1.08;
+        min-height:56px;
+        box-shadow:0 2px 6px rgba(0,0,0,.04);
       }
-      .dayNum{font-size:16px}
-      .dot{width:7px;height:7px}
-    }
-    @media(max-width:420px){
-      .calGrid{gap:6px} /* jeszcze bezpieczniej na ciasnych ekranach */
+      .dayNum{font-size:15px}
+      .indRow{margin-top:8px}
+      .blankCell{min-height:56px}
+      .monthBar{box-shadow:0 4px 12px rgba(0,0,0,.035)}
     }
 
     /* ===== MODAL (dialog) ===== */
@@ -168,7 +197,8 @@
     dialog::backdrop{background:rgba(17,17,17,.45)}
     .modalHead{
       display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:14px;border-bottom:1px solid #eef1f8;background:#fff;
+      padding:14px;border-bottom:1px solid #eef1f8;
+      background:#fff;
       border-top-left-radius:16px;border-top-right-radius:16px;
     }
     .modalHead h3{margin:0;font-size:16px}
@@ -184,11 +214,11 @@
     .shiftItem .times{font-weight:900}
     .shiftItem .mins{color:#666;font-size:12px;margin-top:2px}
     .miniBtn{
-      width:auto;padding:8px 10px;border-radius:10px;border:1px solid #d7dbe7;background:#eef1f8;color:#111;
+      width:auto;padding:8px 10px;border-radius:12px;border:1px solid #d7dbe7;background:#eef1f8;color:#111;
     }
     .miniBtn.danger{background:#ffe6e3;border-color:#ffb4ab;color:#7a1410}
-
     .divider{height:1px;background:#eef1f8;margin:14px 0}
+    #status:empty{display:none;}
 
     @media print{
       body{background:#fff}
@@ -203,10 +233,9 @@
   <div class="wrap">
     <div class="card" style="margin-bottom:14px;">
       <h1>Godziny pracy ⏱️</h1>
-      <div class="muted" id="status"></div>
     </div>
 
-    <!-- Szybkie dodanie zakresu + notatka -->
+    <!-- Dodawanie -->
     <div class="grid" style="margin-bottom:14px;">
       <div class="card col-12">
         <h2>Dodaj godziny pracy</h2>
@@ -223,16 +252,20 @@
             <label>Wyjście</label>
             <input id="end" type="time" />
           </div>
+
+          <div class="col-12">
+            <label>Notatka</label>
+            <textarea id="note" placeholder="Opcjonalnie..."></textarea>
+          </div>
+
           <div class="col-3">
             <label>&nbsp;</label>
             <button id="addShiftBtn">Dodaj godziny</button>
           </div>
-          <div class="col-12">
-            <label>Notatka</label>
-            <textarea id="note" placeholder="Opcjonalnie... (np. zaliczka -100 zł)"></textarea>
-          </div>
+
           <div class="col-12">
             <button class="secondary" id="openDayBtn">Pokaż szczegóły dnia</button>
+            <div class="muted" id="status" style="margin-top:8px;"></div>
           </div>
         </div>
       </div>
@@ -244,7 +277,7 @@
         <details id="extrasPanel">
           <summary>
             <span>Ustawienia pracy</span>
-            <span class="chev">⌄</span>
+            <span class="chev" aria-hidden="true"></span>
           </summary>
           <div class="panel">
             <div class="grid" style="margin-top:12px;">
@@ -268,13 +301,12 @@
           </div>
         </div>
 
-        <!-- Pasek miesiąca (bez strzałek bocznych) -->
         <div class="monthBar" id="monthBar">
           <div>
             <div class="txt" id="monthLabelText">—</div>
             <div class="sub">Dotknij, aby zmienić miesiąc</div>
           </div>
-          <span class="chev">⌄</span>
+          <span class="chev" aria-hidden="true"></span>
           <input id="monthPick" type="month" aria-label="Wybierz miesiąc" />
         </div>
 
@@ -308,7 +340,7 @@
         <details id="toolsPanel">
           <summary>
             <span>Narzędzia</span>
-            <span class="chev">⌄</span>
+            <span class="chev" aria-hidden="true"></span>
           </summary>
           <div class="panel">
             <div class="row" style="margin-top:12px;">
@@ -385,7 +417,6 @@
 
 <script>
 (() => {
-  // Debug (nie pokazuje nic, dopóki nie ma błędu)
   const showErr = (msg) => {
     const el = document.getElementById("status");
     if (el) el.textContent = "BŁĄD: " + msg;
@@ -395,7 +426,6 @@
     showErr((e.reason && e.reason.message) ? e.reason.message : String(e.reason || "Promise error"));
   });
 
-  // PWA SW (GitHub Pages path)
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/czas-pracy-pwa/sw.js", { scope: "/czas-pracy-pwa/" });
   }
@@ -407,13 +437,13 @@
     const d = new Date();
     return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
   };
-
   const ym = (dateISO) => dateISO.slice(0,7);
 
-  const fmtDMY = (dateISO) => {
+  const MON = ["sty","lut","mar","kwi","maj","cze","lip","sie","wrz","paź","lis","gru"];
+  const fmtDMYText = (dateISO) => {
     if (!dateISO) return "";
-    const [y,m,d] = dateISO.split("-");
-    return `${d}.${m}.${y}`;
+    const [y,m,d] = dateISO.split("-").map(Number);
+    return `${pad2(d)}-${MON[m-1]}-${y}`;
   };
 
   const fmtMonthPL = (monthYM) => {
@@ -434,9 +464,7 @@
   let db = load() || { settings:{ rate:40 }, entries:[] };
 
   function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
-  function load(){
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; }
-  }
+  function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; } }
 
   // migracja: {date,start,end,note} => {date, shifts:[{start,end}], note}
   function migrateIfNeeded(){
@@ -444,15 +472,12 @@
     db.entries = (Array.isArray(db.entries) ? db.entries : []).map(e=>{
       if (!e) return e;
       if (Array.isArray(e.shifts)) return e;
-
       const shifts = [];
       if (e.start && e.end) shifts.push({ start:e.start, end:e.end });
-
       const ne = { date:e.date, note:e.note || "", shifts };
       changed = true;
       return ne;
     });
-
     if (changed) save();
   }
 
@@ -460,18 +485,13 @@
     db.settings = db.settings || {};
     db.settings.rate = Number(db.settings.rate ?? 40);
     db.entries = Array.isArray(db.entries) ? db.entries : [];
-
     for (const e of db.entries){
       e.shifts = Array.isArray(e.shifts) ? e.shifts : [];
       e.note = e.note || "";
     }
   }
 
-  function setStatus(t){
-    const el = $("status");
-    if (!el) return;
-    el.textContent = t || "";
-  }
+  function setStatus(t){ const el = $("status"); if (el) el.textContent = t || ""; }
 
   function minutesBetween(dateISO, start, end) {
     const [y,m,d] = dateISO.split("-").map(Number);
@@ -488,19 +508,12 @@
     const m = mins%60;
     return `${h}:${pad2(m)}`;
   }
-
   function pln(x){ return x.toLocaleString("pl-PL",{style:"currency",currency:"PLN"}); }
 
-  function readSettingsFromUI(){
-    db.settings.rate = Number($("rate").value || 0);
-  }
-  function hydrateSettingsUI(){
-    $("rate").value = db.settings.rate;
-  }
+  function readSettingsFromUI(){ db.settings.rate = Number($("rate").value || 0); }
+  function hydrateSettingsUI(){ $("rate").value = db.settings.rate; }
 
-  function getDay(date){
-    return db.entries.find(e => e.date === date) || null;
-  }
+  function getDay(date){ return db.entries.find(e => e.date === date) || null; }
 
   function upsertDay(date, patch){
     const i = db.entries.findIndex(e => e.date === date);
@@ -509,9 +522,7 @@
     db.entries.sort((a,b)=>a.date.localeCompare(b.date));
   }
 
-  function deleteDay(dateISO){
-    db.entries = db.entries.filter(e => e.date !== dateISO);
-  }
+  function deleteDay(dateISO){ db.entries = db.entries.filter(e => e.date !== dateISO); }
 
   function computeDayMinutes(day){
     let total = 0;
@@ -527,7 +538,7 @@
     return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
   }
 
-  // ===== KALENDARZ RENDER =====
+  // ===== KALENDARZ =====
   const DOW = ["Pn","Wt","Śr","Czw","Pt","Sb","Nd"];
   function mondayIndex(jsDay){ return (jsDay + 6) % 7; }
   function daysInMonth(year, month1){ return new Date(year, month1, 0).getDate(); }
@@ -544,56 +555,45 @@
     const firstIdx = mondayIndex(first.getDay());
     const dim = daysInMonth(Y, M);
 
-    const prevMonth = new Date(Y, M-2, 1);
-    const prevY = prevMonth.getFullYear();
-    const prevM = prevMonth.getMonth()+1;
-    const prevDim = daysInMonth(prevY, prevM);
-
-    const totalCells = 42;
     const cells = [];
 
-    for (let i=0;i<totalCells;i++){
-      const dayNum = i - firstIdx + 1;
-      let cellY=Y, cellM=M, cellD=dayNum, inMonth=true;
+    for (let i=0;i<firstIdx;i++){
+      cells.push(`<div class="blankCell"></div>`);
+    }
 
-      if (dayNum < 1){
-        inMonth = false;
-        cellY = prevY; cellM = prevM; cellD = prevDim + dayNum;
-      } else if (dayNum > dim){
-        inMonth = false;
-        const next = new Date(Y, M, 1);
-        cellY = next.getFullYear(); cellM = next.getMonth()+1; cellD = dayNum - dim;
-      }
-
-      const dateISO = `${cellY}-${pad2(cellM)}-${pad2(cellD)}`;
-      const jsDow = new Date(cellY, cellM-1, cellD).getDay();
+    for (let d=1; d<=dim; d++){
+      const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
+      const jsDow = new Date(Y, M-1, d).getDay();
       const isWeekend = (jsDow === 0 || jsDow === 6);
 
       const day = getDay(dateISO);
-      const hasWork = !!(day && (day.shifts || []).length);
-      const hasNote = !!(day && day.note && day.note.trim());
+      const shiftsCount = (day?.shifts || []).length;
+      const hasShifts = shiftsCount > 0;
+      const hasNote = !!(day?.note && day.note.trim());
 
       const numClass = [
         "dayNum",
-        !inMonth ? "mutedNum" : "",
-        isWeekend ? "weekend" : ""
+        isWeekend ? "weekend" : "",
+        hasShifts ? "has" : ""
       ].filter(Boolean).join(" ");
-
-      const dots = (inMonth && (hasWork || hasNote))
-        ? `<div class="dotRow">
-            ${hasWork ? `<span class="dot work" title="Godziny dodane"></span>` : ``}
-            ${hasNote ? `<span class="dot note" title="Notatka"></span>` : ``}
-          </div>`
-        : `<div style="height:14px;"></div>`;
 
       cells.push(`
         <div class="dayCell" data-date="${dateISO}">
           <div class="dayTop">
-            <div class="${numClass}">${cellD}</div>
+            <div class="${numClass}">${d}</div>
           </div>
-          ${dots}
+          <div class="indRow" aria-hidden="true">
+            <span class="dot shift ${hasShifts ? "" : "hidden"}" title="${hasShifts ? "Są godziny" : ""}"></span>
+            <span class="dot note ${hasNote ? "" : "hidden"}" title="${hasNote ? "Jest notatka" : ""}"></span>
+          </div>
         </div>
       `);
+    }
+
+    const mod = cells.length % 7;
+    if (mod !== 0){
+      const need = 7 - mod;
+      for (let i=0;i<need;i++) cells.push(`<div class="blankCell"></div>`);
     }
 
     $("calGrid").innerHTML = cells.join("");
@@ -614,12 +614,11 @@
     dlgDate = dateISO;
     $("date").value = dateISO;
 
-    const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[] };
-
     const weekday = fmtWeekdayPL(dateISO);
-    $("dlgTitle").textContent = `${fmtDMY(dateISO)}`;
+    $("dlgTitle").textContent = `${fmtDMYText(dateISO)}`;
     $("dlgMeta").textContent = weekday;
 
+    const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[] };
     $("dlgStart").value = "";
     $("dlgEnd").value = "";
     $("dlgNote").value = day.note || "";
@@ -739,8 +738,8 @@
     if (!dlgDate) return;
     const start = $("dlgStart").value;
     const end = $("dlgEnd").value;
-
     if (!start || !end) return alert("Uzupełnij wejście i wyjście.");
+
     const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
     day.shifts.push({ start, end });
     upsertDay(dlgDate, day);
@@ -755,7 +754,7 @@
   $("dlgSaveNote").onclick = ()=>{
     if (!dlgDate) return;
     const note = ($("dlgNote").value || "").trim();
-    const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
+    const day = getDay(dlgDate) || (getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] });
     day.note = note;
     upsertDay(dlgDate, day);
     save();
@@ -773,6 +772,7 @@
     renderAll();
   };
 
+  // miesiąc
   $("monthBar").onclick = ()=>{
     const input = $("monthPick");
     if (!input) return;
