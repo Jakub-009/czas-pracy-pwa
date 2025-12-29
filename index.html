@@ -17,7 +17,7 @@
     .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
     @media(max-width:820px){.col-3,.col-4,.col-6{grid-column:span 12}}
     label{display:block;font-size:12px;color:#444;margin-bottom:6px}
-    input,button,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d7dbe7;background:#fff;font-size:14px;box-sizing:border-box}
+    input,button,textarea,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #d7dbe7;background:#fff;font-size:14px;box-sizing:border-box}
     textarea{min-height:44px;resize:vertical}
     button{cursor:pointer;border:none;background:#111;color:#fff}
     button.secondary{background:#eef1f8;color:#111;border:1px solid #d7dbe7}
@@ -25,34 +25,9 @@
     h1{font-size:20px;margin:0 0 10px}
     h2{font-size:16px;margin:0 0 10px}
     .muted{color:#666;font-size:12px}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .row > *{flex:1;min-width:160px}
     .pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#eef1f8;font-size:12px}
-
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid #eef1f8;text-align:left;font-size:14px;vertical-align:top}
-    th{font-size:12px;color:#555}
-    .right{text-align:right}
-
-    .timesCell{line-height:1.25}
-    .shiftRow{padding:6px 0;border-bottom:1px dashed #e7ebf6}
-    .shiftRow:last-child{border-bottom:none}
-    .shiftRow .lbl{display:block;font-size:11px;color:#666;margin-top:2px}
-    .shiftRow .val{display:block;font-weight:700}
-    .shiftRow .miniRow{display:flex;gap:8px;align-items:center;justify-content:space-between}
-    .shiftRow .miniBtns{display:flex;gap:6px;flex:0 0 auto}
-    .miniBtn{
-      padding:6px 8px;border-radius:10px;border:1px solid #d7dbe7;background:#eef1f8;color:#111;
-      font-size:12px;cursor:pointer
-    }
-    .miniBtn.danger{background:#ffe6e3;border-color:#ffb4ab;color:#7a1410}
-
-    /* mobilnie: nie pokazuj wypłaty w tabeli (jest na górze w podsumowaniu) */
-    @media (max-width:520px){
-      th.payCol, td.payCol{display:none;}
-      th.actionsCol, td.actionsCol{white-space:nowrap;}
-      td.noteCol{min-width:160px;}
-    }
 
     /* details / trójkąt + animacja */
     details{border-radius:12px}
@@ -81,16 +56,104 @@
       to{opacity:1; transform:translateY(0)}
     }
 
+    /* ===== KALENDARZ ===== */
+    .calWrap{width:100%;}
+    .calHead{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .calHead .left{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .calMonth{
+      display:flex;gap:8px;align-items:center;
+      background:#eef1f8;border:1px solid #d7dbe7;border-radius:12px;padding:8px 10px;
+    }
+    .calMonth button{
+      width:auto;padding:8px 10px;border-radius:10px;border:1px solid #d7dbe7;background:#fff;color:#111;
+      cursor:pointer;
+    }
+    .calMonth input{
+      width:auto;min-width:160px;border:none;background:transparent;padding:8px 6px;
+    }
+
+    .calGrid{
+      display:grid;
+      grid-template-columns:repeat(7, minmax(0, 1fr));
+      gap:10px;
+    }
+    .calDow{
+      font-size:12px;color:#666;text-align:center;padding:6px 0;
+    }
+
+    .dayCell{
+      background:#fff;border:1px solid #eef1f8;border-radius:14px;
+      padding:10px;
+      min-height:92px;
+      box-shadow:0 6px 18px rgba(0,0,0,.04);
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      gap:6px;
+    }
+    .dayCell:hover{border-color:#d7dbe7}
+    .dayTop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+    .dayNum{font-size:18px;font-weight:600;color:#1b2a3a}
+    .dayNum.has{font-weight:800}
+    .dayNum.mutedNum{color:#9aa6b2;font-weight:600}
+    .dayNum.weekend{color:#c53030}
+    .hasBar{
+      height:4px;border-radius:999px;background:#111;opacity:.22;
+      margin-top:-2px;
+    }
+    .dayLines{
+      font-size:12px;color:#607080;line-height:1.35;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:3;
+      -webkit-box-orient:vertical;
+    }
+    .dayLines .plus{font-weight:700;color:#111}
+    @media(max-width:640px){
+      .calGrid{gap:8px}
+      .dayCell{min-height:84px;padding:9px}
+      .dayNum{font-size:16px}
+    }
+
+    /* ===== MODAL (dialog) ===== */
+    dialog{
+      border:none;border-radius:16px;padding:0;
+      width:min(720px, calc(100vw - 22px));
+      box-shadow:0 18px 60px rgba(0,0,0,.25);
+    }
+    dialog::backdrop{background:rgba(17,17,17,.45)}
+    .modalCard{padding:14px}
+    .modalHead{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:14px;border-bottom:1px solid #eef1f8;
+    }
+    .modalHead h3{margin:0;font-size:16px}
+    .modalBody{padding:14px}
+    .shiftList{display:grid;gap:10px;margin-top:10px}
+    .shiftItem{
+      border:1px solid #eef1f8;border-radius:14px;padding:10px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      background:#fff;
+    }
+    .shiftItem .times{font-weight:700}
+    .shiftItem .mins{color:#666;font-size:12px}
+    .miniBtn{
+      width:auto;padding:8px 10px;border-radius:10px;border:1px solid #d7dbe7;background:#eef1f8;color:#111;
+    }
+    .miniBtn.danger{background:#ffe6e3;border-color:#ffb4ab;color:#7a1410}
+
+    .divider{height:1px;background:#eef1f8;margin:14px 0}
+
     /* druk / PDF */
     @media print{
       body{background:#fff}
       .wrap{margin:0;padding:0;max-width:none}
       .card{box-shadow:none;border-radius:0;padding:0}
-      button, input, textarea, #status, details, .miniBtn{display:none !important}
-      table{font-size:12px}
-      th,td{padding:6px}
-      th.payCol, td.payCol{display:table-cell !important;}
-      .shiftRow{border-bottom:1px solid #eee}
+      button, input, textarea, details, dialog{display:none !important}
     }
   </style>
 </head>
@@ -99,13 +162,13 @@
   <div class="wrap">
     <div class="card" style="margin-bottom:14px;">
       <h1>Godziny pracy ⏱️</h1>
+      <div class="muted" id="status"></div>
     </div>
 
-    <!-- Dodaj dzień -->
+    <!-- Dodaj / dopisz zakres (szybkie) -->
     <div class="grid" style="margin-bottom:14px;">
       <div class="card col-12">
-        <h2>Dodaj dzień</h2>
-
+        <h2>Dodaj zakres</h2>
         <div class="grid">
           <div class="col-3">
             <label>Data</label>
@@ -119,19 +182,16 @@
             <label>Wyjście</label>
             <input id="end" type="time" />
           </div>
-
-          <div class="col-12">
-            <label>Notatka do dnia</label>
-            <textarea id="note" placeholder="Opcjonalnie..."></textarea>
-          </div>
-
           <div class="col-3">
             <label>&nbsp;</label>
-            <button id="addHoursBtn">Dodaj (kolejny) zakres</button>
+            <button id="addShiftBtn">Dodaj zakres</button>
           </div>
-
           <div class="col-12">
-            <div class="muted" style="margin-top:2px;" id="status"></div>
+            <label>Notatka do dnia</label>
+            <textarea id="note" placeholder="Opcjonalnie... (np. zaliczka -100 zł)"></textarea>
+          </div>
+          <div class="col-12">
+            <button class="secondary" id="openDayBtn">Otwórz ten dzień</button>
           </div>
         </div>
       </div>
@@ -157,42 +217,41 @@
       </div>
     </div>
 
-    <!-- Podsumowanie -->
+    <!-- PODSUMOWANIE MIESIĄCA: KALENDARZ -->
     <div class="grid">
       <div class="card col-12">
-        <div class="row" style="align-items:center;">
-          <h2 style="margin:0;">Podsumowanie miesiąca</h2>
-          <span class="pill" id="monthLabel"></span>
+        <div class="calHead">
+          <div>
+            <h2 style="margin:0;">Podsumowanie miesiąca</h2>
+            <div class="muted">Kliknij dzień, żeby zobaczyć szczegóły i akcje.</div>
+          </div>
+
+          <div class="calMonth">
+            <button id="prevMonth" aria-label="Poprzedni miesiąc">‹</button>
+            <input id="monthPick" type="month" />
+            <button id="nextMonth" aria-label="Następny miesiąc">›</button>
+          </div>
         </div>
+
+        <div class="calWrap">
+          <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
+          <div class="calGrid" id="calGrid"></div>
+        </div>
+
+        <div class="divider"></div>
 
         <div class="grid" style="margin-top:10px;">
           <div class="col-6">
             <div class="muted">Suma godzin</div>
-            <div style="font-size:22px;font-weight:700" id="sumHours">0:00</div>
+            <div style="font-size:22px;font-weight:800" id="sumHours">0:00</div>
           </div>
           <div class="col-6">
             <div class="muted">Wypłata</div>
-            <div style="font-size:22px;font-weight:700" id="sumPay">0,00 zł</div>
+            <div style="font-size:22px;font-weight:800" id="sumPay">0,00 zł</div>
           </div>
         </div>
 
-        <div style="margin-top:14px; overflow:auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Wejście / Wyjście</th>
-                <th>Notatka</th>
-                <th class="right">Czas pracy</th>
-                <th class="right payCol">Wypłata</th>
-                <th class="right actionsCol">Akcje</th>
-              </tr>
-            </thead>
-            <tbody id="rows"></tbody>
-          </table>
-        </div>
-
-        <div class="row" style="margin-top:12px;">
+        <div class="row" style="margin-top:14px;">
           <button class="secondary" id="printPdfBtn">Raport PDF / Wydrukuj</button>
         </div>
       </div>
@@ -222,8 +281,52 @@
     </div>
   </div>
 
+  <!-- MODAL DNIA -->
+  <dialog id="dayDialog">
+    <div class="modalHead">
+      <h3 id="dlgTitle">Dzień</h3>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button class="secondary" id="dlgClose" style="width:auto;">Zamknij</button>
+      </div>
+    </div>
+
+    <div class="modalBody">
+      <div class="grid">
+        <div class="col-6">
+          <label>Dodaj zakres (do tego dnia)</label>
+          <div class="row" style="gap:8px;">
+            <input id="dlgStart" type="time" style="min-width:140px;" />
+            <input id="dlgEnd" type="time" style="min-width:140px;" />
+            <button id="dlgAddShift" style="width:auto;">Dodaj</button>
+          </div>
+          <div class="muted" style="margin-top:6px;">Możesz dodawać kilka zakresów (np. przerwa w ciągu dnia).</div>
+        </div>
+
+        <div class="col-6">
+          <label>Notatka</label>
+          <textarea id="dlgNote" placeholder="Opcjonalnie..."></textarea>
+          <button class="secondary" id="dlgSaveNote" style="margin-top:8px;">Zapisz notatkę</button>
+        </div>
+
+        <div class="col-12">
+          <div class="divider"></div>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;">
+            <div>
+              <strong>Zakresy</strong>
+              <div class="muted" id="dlgSummary"></div>
+            </div>
+            <button class="danger" id="dlgDeleteDay" style="width:auto;">Usuń cały dzień</button>
+          </div>
+
+          <div class="shiftList" id="dlgShifts"></div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
 <script>
 (() => {
+  // PWA SW (GitHub Pages path)
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/czas-pracy-pwa/sw.js", { scope: "/czas-pracy-pwa/" });
   }
@@ -244,8 +347,9 @@
     return `${d}-${m}-${y}`;
   };
 
-  const STORAGE_KEY = "worktime_pwa_v1";
+  const fmtMonthLabel = (y, m) => `${pad2(m)}-${y}`; // MM-YYYY
 
+  const STORAGE_KEY = "worktime_pwa_v1";
   let db = load() || { settings:{ rate:40 }, entries:[] };
 
   function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
@@ -254,7 +358,7 @@
   }
 
   function migrateIfNeeded(){
-    // Jeśli mamy stare wpisy {date,start,end,note} -> przerób na {date, shifts:[{start,end}], note}
+    // Stare wpisy: {date,start,end,note} -> {date, shifts:[{start,end}], note}
     let changed = false;
     db.entries = (Array.isArray(db.entries) ? db.entries : []).map(e=>{
       if (!e) return e;
@@ -275,7 +379,7 @@
     db.settings = db.settings || {};
     db.settings.rate = Number(db.settings.rate ?? 40);
     db.entries = Array.isArray(db.entries) ? db.entries : [];
-    // upewnij się, że każdy dzień ma shifts[]
+
     for (const e of db.entries){
       e.shifts = Array.isArray(e.shifts) ? e.shifts : [];
       e.note = e.note || "";
@@ -324,13 +428,6 @@
     db.entries = db.entries.filter(e => e.date !== dateISO);
   }
 
-  function deleteShift(dateISO, idx){
-    const d = getDay(dateISO);
-    if (!d) return;
-    d.shifts.splice(idx, 1);
-    save(); render();
-  }
-
   function computeDayMinutes(day){
     let total = 0;
     for (const s of day.shifts){
@@ -340,221 +437,166 @@
     return total;
   }
 
-  function currentMonth(){
-    return ym($("date").value || todayISO());
+  function computeMonthMinutes(monthYM){
+    const days = db.entries.filter(e => ym(e.date) === monthYM);
+    return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
   }
 
-  function render(){
-    normalize();
-    readSettingsFromUI();
+  function safeText(s){
+    return (s || "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;");
+  }
 
-    const month = currentMonth();
-    const [Y,M] = month.split("-");
-    $("monthLabel").textContent = `${M}-${Y}`;
+  // ===== KALENDARZ RENDER =====
+  const DOW = ["Pn","Wt","Śr","Czw","Pt","Sb","Nd"];
 
-    const monthDays = db.entries.filter(e => ym(e.date)===month);
+  function mondayIndex(jsDay){ // JS: 0=Sun..6=Sat -> 0=Mon..6=Sun
+    return (jsDay + 6) % 7;
+  }
 
-    let sumMin = 0;
-    const rowsHtml = monthDays.map(day=>{
-      const mins = computeDayMinutes(day);
-      sumMin += mins;
-      const pay = (mins/60)*(db.settings.rate||0);
+  function daysInMonth(year, month1){ // month1: 1..12
+    return new Date(year, month1, 0).getDate();
+  }
 
-      const safeNote = (day.note || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;");
+  function renderDow(){
+    $("dowRow").innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
+  }
 
-      const shiftsHtml = (day.shifts.length ? day.shifts : [{start:"", end:""}]).map((s, idx)=>{
-        const start = s.start || "-";
-        const end = s.end || "-";
-        const showDelete = day.shifts.length > 0 && (s.start || s.end);
-        return `
-          <div class="shiftRow">
-            <div class="miniRow">
-              <div>
-                <span class="lbl">Wejście</span>
-                <span class="val">${start}</span>
-                <span class="lbl" style="margin-top:6px;">Wyjście</span>
-                <span class="val">${end}</span>
-              </div>
-              <div class="miniBtns">
-                ${showDelete ? `<button class="miniBtn danger" data-delshift="${day.date}" data-idx="${idx}" title="Usuń ten zakres">Usuń</button>` : ``}
-              </div>
-            </div>
+  function renderCalendar(monthYM){
+    const [Y, M] = monthYM.split("-").map(Number); // M: 1..12
+    const first = new Date(Y, M-1, 1);
+    const firstIdx = mondayIndex(first.getDay()); // 0..6
+    const dim = daysInMonth(Y, M);
+
+    const prevMonth = new Date(Y, M-2, 1);
+    const prevY = prevMonth.getFullYear();
+    const prevM = prevMonth.getMonth()+1;
+    const prevDim = daysInMonth(prevY, prevM);
+
+    // 42 pól (6 tygodni) – wygląda najczyściej
+    const totalCells = 42;
+    const cells = [];
+
+    for (let i=0;i<totalCells;i++){
+      const dayNum = i - firstIdx + 1;
+      let cellY=Y, cellM=M, cellD=dayNum, inMonth=true;
+
+      if (dayNum < 1){
+        inMonth = false;
+        cellY = prevY; cellM = prevM; cellD = prevDim + dayNum;
+      } else if (dayNum > dim){
+        inMonth = false;
+        const next = new Date(Y, M, 1);
+        cellY = next.getFullYear(); cellM = next.getMonth()+1; cellD = dayNum - dim;
+      }
+
+      const dateISO = `${cellY}-${pad2(cellM)}-${pad2(cellD)}`;
+      const jsDow = new Date(cellY, cellM-1, cellD).getDay(); // 0..6 (Sun..Sat)
+      const isWeekend = (jsDow === 0 || jsDow === 6);
+
+      const day = getDay(dateISO);
+      const has = !!(day && day.shifts && day.shifts.length);
+
+      // linie jak w screenie: "od 06:00 do 14:00"
+      let lines = "";
+      if (day && (day.shifts?.length || day.note)){
+        const maxLines = 2;
+        const shiftLines = (day.shifts || []).slice(0, maxLines).map(s => {
+          const a = s.start || "-";
+          const b = s.end || "-";
+          return `od ${a}<br>do ${b}`;
+        }).join("<br>");
+
+        let extra = "";
+        if ((day.shifts || []).length > maxLines) extra = `<br><span class="plus">+${(day.shifts.length - maxLines)}</span>`;
+        if (shiftLines) lines += shiftLines + extra;
+
+        // ikona “notatka” jeśli jest notatka
+        if (day.note && day.note.trim()){
+          lines += (lines ? "<br>" : "") + "📝";
+        }
+      }
+
+      const numClass = [
+        "dayNum",
+        !inMonth ? "mutedNum" : "",
+        isWeekend ? "weekend" : "",
+        has ? "has" : ""
+      ].filter(Boolean).join(" ");
+
+      cells.push(`
+        <div class="dayCell" data-date="${dateISO}">
+          <div class="dayTop">
+            <div class="${numClass}">${cellD}</div>
           </div>
-        `;
-      }).join("");
+          ${has ? `<div class="hasBar"></div>` : `<div style="height:4px;"></div>`}
+          <div class="dayLines">${lines || ""}</div>
+        </div>
+      `);
+    }
 
+    $("calGrid").innerHTML = cells.join("");
+
+    // click handlers
+    document.querySelectorAll(".dayCell[data-date]").forEach(el=>{
+      el.onclick = ()=>{
+        const date = el.getAttribute("data-date");
+        openDay(date);
+      };
+    });
+  }
+
+  // ===== MODAL DNIA =====
+  const dlg = $("dayDialog");
+  let dlgDate = null;
+
+  function openDay(dateISO){
+    dlgDate = dateISO;
+
+    // zsynchronizuj górny formularz
+    $("date").value = dateISO;
+
+    const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[] };
+
+    $("dlgTitle").textContent = `Dzień: ${fmtDMY(dateISO)}`;
+    $("dlgStart").value = "";
+    $("dlgEnd").value = "";
+    $("dlgNote").value = day.note || "";
+
+    renderDayDialog();
+
+    if (typeof dlg.showModal === "function") dlg.showModal();
+    else dlg.setAttribute("open",""); // fallback
+  }
+
+  function closeDay(){
+    dlgDate = null;
+    if (typeof dlg.close === "function") dlg.close();
+    else dlg.removeAttribute("open");
+  }
+
+  function renderDayDialog(){
+    const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
+    const mins = computeDayMinutes(day);
+    $("dlgSummary").textContent = `Suma dnia: ${mins ? fmtHM(mins) : "0:00"}`;
+
+    const items = (day.shifts || []).map((s, idx)=>{
+      const a = s.start || "-";
+      const b = s.end || "-";
+      const m = (s.start && s.end) ? Math.max(0, minutesBetween(day.date, s.start, s.end)) : 0;
       return `
-        <tr>
-          <td>${fmtDMY(day.date)}</td>
-          <td class="timesCell">${shiftsHtml}</td>
-          <td class="noteCol">${safeNote || "-"}</td>
-          <td class="right">${mins ? fmtHM(mins) : "-"}</td>
-          <td class="right payCol">${mins ? pln(pay) : "-"}</td>
-          <td class="right actionsCol">
-            <button class="secondary" data-edit="${day.date}" style="max-width:110px;">Edytuj</button>
-            <button class="secondary" data-del="${day.date}" style="max-width:110px;">Usuń</button>
-          </td>
-        </tr>`;
+        <div class="shiftItem">
+          <div>
+            <div class="times">${a} – ${b}</div>
+            <div class="mins">${m ? fmtHM(m) : "-"}</div>
+          </div>
+          <button class="miniBtn danger" data-delshift="${idx}">Usuń</button>
+        </div>
+      `;
     }).join("");
 
-    $("rows").innerHTML = rowsHtml || `<tr><td colspan="6" class="muted">Brak wpisów w tym miesiącu.</td></tr>`;
-    $("sumHours").textContent = fmtHM(sumMin);
-    $("sumPay").textContent = pln((sumMin/60)*(db.settings.rate||0));
+    $("dlgShifts").innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
 
-    // edit day to form
-    document.querySelectorAll("[data-edit]").forEach(btn=>{
-      btn.onclick = ()=>{
-        const date = btn.getAttribute("data-edit");
-        const day = getDay(date);
-        $("date").value = day.date;
-        // w formie ustawiamy "ostatni" zakres (żeby łatwo dopisać kolejny)
-        const last = day.shifts[day.shifts.length-1];
-        $("start").value = last?.start || "";
-        $("end").value = last?.end || "";
-        $("note").value = day.note || "";
-        setStatus("Wczytano dzień do edycji. Dodaj kolejny zakres przyciskiem.");
-        render();
-      };
-    });
-
-    // delete whole day
-    document.querySelectorAll("[data-del]").forEach(btn=>{
-      btn.onclick = ()=>{
-        const date = btn.getAttribute("data-del");
-        if (confirm("Usunąć CAŁY dzień " + fmtDMY(date) + " (wszystkie zakresy i notatkę)?")) {
-          deleteDay(date); save(); render();
-        }
-      };
-    });
-
-    // delete single shift
-    document.querySelectorAll("[data-delshift]").forEach(btn=>{
-      btn.onclick = ()=>{
-        const date = btn.getAttribute("data-delshift");
-        const idx = Number(btn.getAttribute("data-idx"));
-        if (Number.isNaN(idx)) return;
-        if (confirm("Usunąć ten zakres godzin z dnia " + fmtDMY(date) + "?")) {
-          deleteShift(date, idx);
-        }
-      };
-    });
-
-    save();
-  }
-
-  // backup/restore
-  $("backupJson").onclick = ()=>{
-    const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  $("restoreBtn").onclick = ()=> $("restoreJson").click();
-
-  $("restoreJson").onchange = async (ev)=>{
-    const f = ev.target.files?.[0];
-    if (!f) return;
-    try{
-      const txt = await f.text();
-      const obj = JSON.parse(txt);
-      db = obj;
-      normalize();
-      migrateIfNeeded();
-      save();
-      hydrateSettingsUI();
-      render();
-      setStatus("Przywrócono dane z pliku JSON.");
-    }catch{
-      alert("Nie udało się wczytać pliku JSON.");
-    }
-  };
-
-  // Dodaj zakres + (opcjonalnie) notatka
-  $("addHoursBtn").onclick = ()=>{
-    const date = $("date").value;
-    const start = $("start").value;
-    const end = $("end").value;
-    const note = ($("note").value || "").trim();
-
-    if (!date) return alert("Wybierz datę.");
-
-    // jeśli godziny wpisane częściowo
-    if ((start && !end) || (!start && end)) {
-      return alert("Uzupełnij wejście i wyjście (albo zostaw oba puste).");
-    }
-
-    // jeśli nic nie ma
-    if (!start && !end && !note) {
-      return alert("Wpisz godziny lub notatkę.");
-    }
-
-    readSettingsFromUI();
-
-    // bierz obecny dzień albo stwórz
-    const day = getDay(date) || { date, note:"", shifts:[] };
-
-    // dopisz shift jeśli jest komplet godzin
-    let addedShift = false;
-    if (start && end) {
-      day.shifts = Array.isArray(day.shifts) ? day.shifts : [];
-      day.shifts.push({ start, end });
-      addedShift = true;
-      // wyczyść godziny, żeby łatwo wbić kolejny zakres
-      $("start").value = "";
-      $("end").value = "";
-    }
-
-    // nadpisz notatkę jeśli podana (zostaje jedna na dzień)
-    let changedNote = false;
-    if (note) {
-      day.note = note;
-      changedNote = true;
-    }
-
-    upsertDay(date, day);
-
-    const msg = [
-      addedShift ? "Dodano zakres godzin." : null,
-      changedNote ? "Zapisano notatkę." : null
-    ].filter(Boolean).join(" ");
-    setStatus(msg || "Zapisano.");
-
-    save();
-    render();
-  };
-
-  // print / PDF
-  $("printPdfBtn").onclick = ()=> window.print();
-
-  // clear month
-  $("clearMonth").onclick = ()=>{
-    const month = currentMonth();
-    const [Y,M] = month.split("-");
-    if (!confirm("Usunąć wszystkie wpisy z miesiąca " + `${M}-${Y}` + "?")) return;
-    db.entries = db.entries.filter(e => ym(e.date)!==month);
-    save();
-    render();
-  };
-
-  ["rate","date"].forEach(id=>{
-    $(id).addEventListener("input", render);
-    $(id).addEventListener("change", render);
-  });
-
-  // init
-  $("date").value = todayISO();
-  normalize();
-  migrateIfNeeded();
-  hydrateSettingsUI();
-  render();
-})();
-</script>
-</body>
-</html>
+    document.querySelectorAll("[data-delshift
