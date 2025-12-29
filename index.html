@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Licznik godzin pracy</title>
+  <title>Godziny pracy</title>
   <meta name="theme-color" content="#111111" />
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
 
@@ -33,10 +33,16 @@
     th{font-size:12px;color:#555}
     .right{text-align:right}
 
-    /* mobilnie: mniej przewijania w bok */
+    .timesCell{line-height:1.25}
+    .timesCell .lbl{display:block;font-size:11px;color:#666;margin-top:2px}
+    .timesCell .val{display:block;font-weight:700}
+    .timesCell .sep{height:6px}
+
+    /* mobilnie: nie pokazuj wypłaty w tabeli (jest na górze w podsumowaniu) */
     @media (max-width:520px){
-      th:nth-child(3), td:nth-child(3){display:none;} /* ukryj "Wyjście" */
-      th:nth-child(5), td:nth-child(5){display:none;} /* ukryj "Wypłata" (mniej istotne na małym ekranie) */
+      th.payCol, td.payCol{display:none;}
+      th.actionsCol, td.actionsCol{white-space:nowrap;}
+      td.noteCol{min-width:160px;}
     }
 
     /* druk / PDF */
@@ -47,6 +53,7 @@
       button, input, textarea, #status, details{display:none !important}
       table{font-size:12px}
       th,td{padding:6px}
+      th.payCol, td.payCol{display:table-cell !important;} /* na wydruku wypłata ma sens */
     }
   </style>
 </head>
@@ -54,8 +61,7 @@
 <body>
   <div class="wrap">
     <div class="card" style="margin-bottom:14px;">
-      <h1>⏱️ Licznik godzin pracy</h1>
-      <div class="muted">Dane zapisują się lokalnie w telefonie (offline). Backup JSON = kopia do pliku.</div>
+      <h1>⏱️ Godziny pracy</h1>
     </div>
 
     <!-- Ustawienia jako zwijany panel -->
@@ -67,9 +73,6 @@
             <div class="col-4">
               <label>Stawka godzinowa (PLN)</label>
               <input id="rate" type="number" step="0.01" min="0" value="40" />
-            </div>
-            <div class="col-8">
-              <div class="muted" style="margin-top:26px;">Na razie tylko stawka. Tu będziemy dodawać kolejne opcje, jak rozwiniesz projekt.</div>
             </div>
           </div>
         </details>
@@ -139,12 +142,11 @@
             <thead>
               <tr>
                 <th>Data</th>
-                <th>Wejście</th>
-                <th>Wyjście</th>
+                <th>Wejście / Wyjście</th>
                 <th>Notatka</th>
                 <th class="right">Czas</th>
-                <th class="right">Wypłata</th>
-                <th class="right">Akcje</th>
+                <th class="right payCol">Wypłata</th>
+                <th class="right actionsCol">Akcje</th>
               </tr>
             </thead>
             <tbody id="rows"></tbody>
@@ -189,7 +191,8 @@
     return `${d}-${m}-${y}`;
   };
 
-  const STORAGE_KEY = "worktime_pwa_simple_v2";
+  // KLUCZ: wracamy do starego, żeby nie znikały wpisy
+  const STORAGE_KEY = "worktime_pwa_v1";
 
   let db = load() || { settings:{ rate:40 }, entries:[] };
 
@@ -240,8 +243,7 @@
 
   function computeEntryMinutes(e){
     if (!e.start || !e.end) return 0;
-    let mins = minutesBetween(e.date, e.start, e.end);
-    return Math.max(0, mins);
+    return Math.max(0, minutesBetween(e.date, e.start, e.end));
   }
 
   function currentMonth(){
@@ -253,8 +255,6 @@
     readSettingsFromUI();
 
     const month = currentMonth();
-    $("monthLabel").textContent = month.split("-").reverse().join("-"); // MM-YYYY -> YYYY-MM? wolimy 12-2025
-    // wolisz „12-2025”, więc:
     const [Y,M] = month.split("-");
     $("monthLabel").textContent = `${M}-${Y}`;
 
@@ -271,22 +271,31 @@
         .replaceAll("<","&lt;")
         .replaceAll(">","&gt;");
 
+      const timesHtml = `
+        <div class="timesCell">
+          <span class="lbl">Wejście</span>
+          <span class="val">${e.start || "-"}</span>
+          <div class="sep"></div>
+          <span class="lbl">Wyjście</span>
+          <span class="val">${e.end || "-"}</span>
+        </div>
+      `;
+
       return `
         <tr>
           <td>${fmtDMY(e.date)}</td>
-          <td>${e.start||"-"}</td>
-          <td>${e.end||"-"}</td>
-          <td>${safeNote || "-"}</td>
-          <td class="right">${mins?fmtHM(mins):"-"}</td>
-          <td class="right">${mins?pln(pay):"-"}</td>
-          <td class="right">
+          <td>${timesHtml}</td>
+          <td class="noteCol">${safeNote || "-"}</td>
+          <td class="right">${mins ? fmtHM(mins) : "-"}</td>
+          <td class="right payCol">${mins ? pln(pay) : "-"}</td>
+          <td class="right actionsCol">
             <button class="secondary" data-edit="${e.date}" style="max-width:110px;">Edytuj</button>
             <button class="secondary" data-del="${e.date}" style="max-width:110px;">Usuń</button>
           </td>
         </tr>`;
     }).join("");
 
-    $("rows").innerHTML = rowsHtml || `<tr><td colspan="7" class="muted">Brak wpisów w tym miesiącu.</td></tr>`;
+    $("rows").innerHTML = rowsHtml || `<tr><td colspan="6" class="muted">Brak wpisów w tym miesiącu.</td></tr>`;
     $("sumHours").textContent = fmtHM(sumMin);
     $("sumPay").textContent = pln((sumMin/60)*(db.settings.rate||0));
 
