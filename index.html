@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Licznik godzin pracy</title>
+  <title>Godziny pracy</title>
   <meta name="theme-color" content="#111111" />
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
 
@@ -45,14 +45,35 @@
       td.noteCol{min-width:160px;}
     }
 
-    /* summary/details look */
+    /* details / trójkąt + animacja */
+    details{border-radius:12px}
     details summary{
       cursor:pointer;
       font-weight:700;
       user-select:none;
       list-style:none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:2px 0;
     }
     details summary::-webkit-details-marker{display:none;}
+    .chev{
+      width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;
+      border-radius:8px;background:#eef1f8;border:1px solid #d7dbe7;
+      transition:transform .18s ease;
+      flex:0 0 auto;
+      margin-left:10px;
+    }
+    details[open] .chev{transform:rotate(180deg);}
+    .panel{
+      overflow:hidden;
+      animation:panelIn .18s ease;
+    }
+    @keyframes panelIn{
+      from{opacity:.4; transform:translateY(-4px)}
+      to{opacity:1; transform:translateY(0)}
+    }
 
     /* druk / PDF */
     @media print{
@@ -70,8 +91,7 @@
 <body>
   <div class="wrap">
     <div class="card" style="margin-bottom:14px;">
-      <h1>⏱️ Licznik godzin pracy</h1>
-      <div class="muted">Dane zapisują się lokalnie w telefonie (offline). Backup JSON = kopia do pliku.</div>
+      <h1>Godziny pracy ⏱️</h1>
     </div>
 
     <!-- Dodaj dzień -->
@@ -97,33 +117,33 @@
             <button id="addHoursBtn">Dodaj godziny</button>
           </div>
 
+          <!-- Notatka przeniesiona POD wyjście (czyli pod rząd z godzinami) -->
           <div class="col-12">
             <label>Notatka do dnia</label>
             <textarea id="note" placeholder="Opcjonalnie..."></textarea>
           </div>
 
           <div class="col-12">
-            <div class="row">
-              <button class="secondary" id="addNoteBtn">Dodaj notatkę</button>
-            </div>
-            <div class="muted" style="margin-top:8px;" id="status"></div>
+            <div class="muted" style="margin-top:2px;" id="status"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Dodatkowe (stawka) -->
+    <!-- Dodatkowe (osobny kafelek + trójkąt) -->
     <div class="grid" style="margin-bottom:14px;">
       <div class="card col-12">
         <details id="extrasPanel">
-          <summary>Dodatkowe</summary>
-          <div class="grid" style="margin-top:12px;">
-            <div class="col-4">
-              <label>Stawka godzinowa (PLN)</label>
-              <input id="rate" type="number" step="0.01" min="0" value="40" />
-            </div>
-            <div class="col-8">
-              <div class="muted" style="margin-top:26px;">Tu później możemy dodać np. nadgodziny, zaliczki, tryb tygodniowy itd.</div>
+          <summary>
+            <span>Dodatkowe</span>
+            <span class="chev">▾</span>
+          </summary>
+          <div class="panel">
+            <div class="grid" style="margin-top:12px;">
+              <div class="col-4">
+                <label>Stawka godzinowa (PLN)</label>
+                <input id="rate" type="number" step="0.01" min="0" value="40" />
+              </div>
             </div>
           </div>
         </details>
@@ -169,11 +189,18 @@
         <div class="row" style="margin-top:12px;">
           <button class="secondary" id="printPdfBtn">Raport PDF / Wydrukuj</button>
         </div>
+      </div>
+    </div>
 
-        <!-- Narzędzia (zwijane) -->
-        <div style="margin-top:12px;">
-          <details id="toolsPanel">
-            <summary>Narzędzia</summary>
+    <!-- Narzędzia (osobny kafelek + trójkąt) -->
+    <div class="grid" style="margin-top:14px;">
+      <div class="card col-12">
+        <details id="toolsPanel">
+          <summary>
+            <span>Narzędzia</span>
+            <span class="chev">▾</span>
+          </summary>
+          <div class="panel">
             <div class="row" style="margin-top:12px;">
               <button class="danger" id="clearMonth">Usuń wpisy z tego miesiąca</button>
               <button class="secondary" id="backupJson">Backup JSON</button>
@@ -183,8 +210,8 @@
             <div class="muted" style="margin-top:8px;">
               Tip: rób backup raz na jakiś czas (Google Drive / mail) i masz spokój.
             </div>
-          </details>
-        </div>
+          </div>
+        </details>
       </div>
     </div>
   </div>
@@ -213,7 +240,7 @@
     return `${d}-${m}-${y}`;
   };
 
-  // KLUCZ: stary, żeby nie znikały wpisy
+  // Klucz – stary, żeby nie znikały wpisy
   const STORAGE_KEY = "worktime_pwa_v1";
 
   let db = load() || { settings:{ rate:40 }, entries:[] };
@@ -379,32 +406,34 @@
     }
   };
 
-  // add hours
+  // Dodaj godziny + (opcjonalnie) notatka jednym przyciskiem
   $("addHoursBtn").onclick = ()=>{
     const date = $("date").value;
     const start = $("start").value;
     const end = $("end").value;
-
-    if (!date) return alert("Wybierz datę.");
-    if (!start || !end) return alert("Uzupełnij wejście i wyjście.");
-
-    readSettingsFromUI();
-    upsertEntry({ date, start, end });
-    setStatus("Zapisano godziny.");
-    save();
-    render();
-  };
-
-  // add note (can be without hours)
-  $("addNoteBtn").onclick = ()=>{
-    const date = $("date").value;
     const note = ($("note").value || "").trim();
 
     if (!date) return alert("Wybierz datę.");
-    if (!note) return alert("Wpisz notatkę (albo zostaw puste i nie zapisuj).");
 
-    upsertEntry({ date, note });
-    setStatus("Zapisano notatkę.");
+    // jeśli są godziny – wymagamy obu
+    if ((start && !end) || (!start && end)) {
+      return alert("Uzupełnij wejście i wyjście (albo zostaw oba puste).");
+    }
+
+    // jeśli nie ma godzin i nie ma notatki – nic nie zapisujemy
+    if (!start && !end && !note) {
+      return alert("Wpisz godziny lub notatkę.");
+    }
+
+    readSettingsFromUI();
+
+    const payload = { date };
+    if (start && end) { payload.start = start; payload.end = end; }
+    if (note) { payload.note = note; }
+
+    upsertEntry(payload);
+
+    setStatus(note && start && end ? "Zapisano godziny i notatkę." : (start && end ? "Zapisano godziny." : "Zapisano notatkę."));
     save();
     render();
   };
