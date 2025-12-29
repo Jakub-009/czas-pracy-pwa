@@ -203,13 +203,12 @@
   <div class="wrap">
     <div class="card" style="margin-bottom:14px;">
       <h1>Godziny pracy ⏱️</h1>
-      <div class="muted" id="status"></div>
     </div>
 
     <!-- Szybkie dodanie zakresu + notatka -->
     <div class="grid" style="margin-bottom:14px;">
       <div class="card col-12">
-        <h2>Dodaj zakres</h2>
+        <h2>Dodaj godziny pracy</h2>
         <div class="grid">
           <div class="col-3">
             <label>Data</label>
@@ -223,13 +222,13 @@
             <label>Wyjście</label>
             <input id="end" type="time" />
           </div>
+            <div class="col-12">
+            <label>Notatka</label>
+            <textarea id="note" placeholder="Opcjonalnie..."></textarea>
+          </div>
           <div class="col-3">
             <label>&nbsp;</label>
-            <button id="addShiftBtn">Dodaj zakres</button>
-          </div>
-          <div class="col-12">
-            <label>Notatka do dnia</label>
-            <textarea id="note" placeholder="Opcjonalnie... (np. zaliczka -100 zł)"></textarea>
+            <button id="addShiftBtn">Dodaj godziny</button>
           </div>
           <div class="col-12">
             <button class="secondary" id="openDayBtn">Pokaż szczegóły dnia</button>
@@ -244,7 +243,7 @@
         <details id="extrasPanel">
           <summary>
             <span>Ustawienia pracy</span>
-            <span class="chev">▾</span>
+            <span class="caret">▾</span>
           </summary>
           <div class="panel">
             <div class="grid" style="margin-top:12px;">
