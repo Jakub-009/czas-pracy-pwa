@@ -352,8 +352,8 @@
     /* ===== Status bars (Google vibe) ===== */
     .indRow{
       position:absolute;
-      left:0;                    /* <-- klucz */
-      right:0;                   /* <-- klucz */
+      left:0;
+      right:0;
       bottom:10px;
       display:flex;
       flex-direction:column;
@@ -378,10 +378,10 @@
       .bar{ height:3px; width:66%; }
     }
 
-    /* ===== ROZMIAR KAFELKÓW (jak wcześniej: wyższe na telefonie) ===== */
+    /* ===== ROZMIAR KAFELKÓW ===== */
     .dayCell,
     .blankCell{
-      aspect-ratio: 1 / 1.15; /* <-- WYŻSZE niż szersze */
+      aspect-ratio: 1 / 1.15;
       min-height: 0;
     }
 
@@ -420,13 +420,14 @@
       margin-top:4px;
     }
 
-    /* ===== Modal ===== */
+    /* ===== MODAL (poprawiony) ===== */
     dialog{
       border:none;
       border-radius:24px;
       padding:0;
-      width:min(720px, calc(100vw - 22px));
+      width:min(760px, calc(100vw - 22px));
       box-shadow:0 18px 60px rgba(0,0,0,.25);
+      overflow:hidden;
     }
 
     dialog::backdrop{
@@ -435,7 +436,7 @@
 
     .modalHead,.modalBody{
       background:var(--surface);
-      padding:16px;
+      padding:18px;
     }
 
     .modalHead{
@@ -443,13 +444,105 @@
       position:relative;
     }
 
-    .shiftItem{
+    /* FULLSCREEN na telefonie + oddech */
+    @media(max-width:640px){
+      dialog{
+        width:100vw;
+        height:100vh;
+        border-radius:0;
+        max-width:none;
+      }
+      .modalHead{
+        position:sticky;
+        top:0;
+        z-index:2;
+        padding:16px 16px 14px;
+      }
+      .modalBody{
+        padding:16px;
+      }
+    }
+
+    /* Back arrow zamiast X */
+    .backBtn{
+      width:44px;
+      height:44px;
+      border-radius:999px;
       border:1px solid var(--outline-soft);
-      border-radius:var(--radius-md);
-      padding:10px;
+      background:var(--surface-soft);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      position:absolute;
+      top:12px;
+      left:12px;
+    }
+    .backBtn svg{
+      width:20px;
+      height:20px;
+      opacity:.9;
+    }
+
+    /* Suma + dniówka w 1 linii (zawsze) */
+    .modalStats{
       display:flex;
       justify-content:space-between;
-      gap:10px;
+      align-items:stretch;
+      gap:12px;
+      margin-bottom:14px;
+      flex-wrap:nowrap;
+    }
+    .statMini{
+      flex:1;
+      min-width:0;
+      border:1px solid var(--outline-soft);
+      background:var(--surface-soft);
+      border-radius:16px;
+      padding:12px 14px;
+    }
+    .statMiniValue{
+      font-size:20px;
+      font-weight:900;
+      margin-top:4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    @media(max-width:380px){
+      .statMiniValue{ font-size:18px; }
+    }
+
+    /* Układ w modalu: najpierw dodawanie, potem notatka */
+    .modalStack{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .addRow{
+      display:flex;
+      gap:8px;
+      align-items:stretch;
+      flex-wrap:wrap;
+    }
+    .addRow input{ min-width:140px; flex:1 1 140px; }
+    .addRow button{ width:auto; min-width:120px; flex:0 0 auto; }
+
+    /* Lista zakresów: odstępy + bez obramowania dookoła */
+    .shiftList{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-top:10px;
+    }
+    .shiftItem{
+      border:none;
+      background:var(--surface-soft);
+      border-radius:16px;
+      padding:12px 12px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
       align-items:flex-start;
     }
 
@@ -459,42 +552,6 @@
       color:rgba(17,17,17,.6);
       margin-top:4px;
     }
-
-    .miniBtn{
-      padding:10px 14px;
-      border-radius:var(--radius-lg);
-      border:1px solid var(--outline-soft);
-      background:var(--surface-soft);
-      font-weight:600;
-      cursor:pointer;
-      color:#111;
-    }
-
-    .iconBtn{
-      width:40px;
-      height:40px;
-      border-radius:999px;
-      border:1px solid var(--outline-soft);
-      background:var(--surface-soft);
-      cursor:pointer;
-      position:absolute;
-      top:12px;
-      right:12px;
-    }
-
-    .iconBtn::before,.iconBtn::after{
-      content:"";
-      position:absolute;
-      top:50%;
-      left:50%;
-      width:16px;
-      height:2px;
-      background:#111;
-      border-radius:2px;
-      transform-origin:center;
-    }
-    .iconBtn::before{ transform:translate(-50%,-50%) rotate(45deg); }
-    .iconBtn::after{ transform:translate(-50%,-50%) rotate(-45deg); }
 
     .delIcon{
       width:36px;
@@ -519,24 +576,6 @@
     }
     .delIcon::before{ transform:translate(-50%,-50%) rotate(45deg); }
     .delIcon::after{ transform:translate(-50%,-50%) rotate(-45deg); }
-
-    /* modal: boxy suma/dniówka flat */
-    .modalBody .flatRow{
-      display:flex;
-      gap:12px;
-      align-items:stretch;
-      flex-wrap:wrap;
-    }
-    .modalBody .flatBox{
-      flex:1;
-      min-width:220px;
-      border:none;
-      background:transparent;
-      padding:0;
-    }
-
-    .shiftList{ margin-top:12px; }
-    .modalBody strong{ display:block; margin-bottom:10px; }
 
     /* blokuj scroll tła */
     body.modal-open{
@@ -564,56 +603,6 @@
     }
     .fab:active{ transform:scale(.98); }
     .fab svg{ width:22px;height:22px; }
-
-    /* ====== MODAL FIXY (Twoje 4 punkty) ====== */
-
-    /* Suma + dniówka w 1 linii */
-    .modalStats{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-bottom:14px;
-    }
-    .statMini{
-      border:1px solid var(--outline-soft);
-      background:var(--surface-soft);
-      border-radius:16px;
-      padding:12px 14px;
-    }
-    .statMiniValue{
-      font-size:20px;
-      font-weight:900;
-      margin-top:4px;
-    }
-
-    /* Notatka PRZED dodawaniem zakresu (na mobile też tak zostaje) */
-    .modalGrid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-    @media(max-width:640px){
-      .modalStats{ grid-template-columns:1fr; }
-      .modalGrid{ grid-template-columns:1fr; }
-    }
-
-    /* Lista zakresów: odstępy + bez obramowania dookoła */
-    .shiftList{
-      display:flex;
-      flex-direction:column;
-      gap:12px; /* odstęp między zakresami */
-      margin-top:10px;
-    }
-    .shiftItem{
-      border:none; /* wywalamy border dookoła */
-      background:var(--surface-soft);
-      border-radius:16px;
-      padding:12px 12px;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:flex-start;
-    }
 
     /* focus */
     *{-webkit-tap-highlight-color:transparent}
@@ -675,7 +664,6 @@
         <button class="secondary" id="printPdfBtn" type="button" style="width:100%;">Raport / Wydrukuj</button>
       </div>
 
-      <!-- miejsce na ewentualne tipy -->
       <div class="muted" style="margin-top:10px;">
         Tip: kliknij dzień, aby dodać godziny lub notatkę. Możesz dodać kilka zakresów w ciągu dnia.
       </div>
@@ -733,15 +721,20 @@
   <!-- MODAL DNIA -->
   <dialog id="dayDialog">
     <div class="modalHead">
-      <div>
+      <button class="backBtn" id="dlgBack" aria-label="Wróć" type="button" title="Wróć">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
+        </svg>
+      </button>
+
+      <div style="padding-left:56px;">
         <h3 id="dlgTitle" style="margin:0;">Dzień</h3>
         <div class="muted" id="dlgMeta" style="margin-top:3px;"></div>
       </div>
-      <button class="iconBtn" id="dlgClose" aria-label="Zamknij" type="button"></button>
     </div>
 
     <div class="modalBody">
-      <!-- 1) Suma + dniówka obok siebie -->
+      <!-- Suma + dniówka obok siebie -->
       <div class="modalStats">
         <div class="statMini">
           <div class="muted">Suma godzin w ciągu dnia</div>
@@ -753,28 +746,30 @@
         </div>
       </div>
 
-      <!-- 2) Notatka PRZED dodawaniem zakresu + bez przycisku "Zapisz notatkę" -->
-      <div class="modalGrid">
+      <!-- Najpierw dodawanie, potem notatka -->
+      <div class="modalStack">
+        <div>
+          <label>Dodaj kolejne godziny pracy</label>
+          <div class="addRow">
+            <input id="dlgStart" type="time" />
+            <input id="dlgEnd" type="time" />
+            <button id="dlgAddShift" type="button">Dodaj</button>
+          </div>
+        </div>
+
         <div>
           <label>Notatka</label>
           <textarea id="dlgNote"></textarea>
           <div class="muted" style="margin-top:6px;">Notatka zapisuje się automatycznie.</div>
         </div>
-
-        <div>
-          <label>Dodaj kolejne godziny pracy</label>
-          <div class="row" style="gap:8px;align-items:stretch;">
-            <input id="dlgStart" type="time" style="min-width:140px;" />
-            <input id="dlgEnd" type="time" style="min-width:140px;" />
-            <button id="dlgAddShift" type="button" style="width:auto; min-width:120px;">Dodaj</button>
-          </div>
-        </div>
       </div>
 
-      <div style="margin-top:14px;">
+      <div style="margin-top:16px;">
         <strong>Godziny pracy w ciągu dnia</strong>
         <div class="shiftList" id="dlgShifts"></div>
       </div>
+
+      <div style="height:10px;"></div>
     </div>
   </dialog>
 
@@ -1052,7 +1047,7 @@
 
       if (shouldScrollToToday){
         shouldScrollToToday = false;
-        const el = document.querySelector(\`.dayCell[data-date="\${today}"]\`);
+        const el = document.querySelector(`.dayCell[data-date="${today}"]`);
         if (el) el.scrollIntoView({behavior:"smooth", block:"center"});
       }
     }
@@ -1098,7 +1093,7 @@
       if (!dlgDate) return;
       const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
 
-      // zawsze pokazuj chronologicznie (nawet stare dane)
+      // zawsze pokazuj chronologicznie
       day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
 
       const mins = computeDayMinutes(day);
@@ -1163,10 +1158,10 @@
     }
 
     // ===== UI =====
-    const dlgCloseBtn = $("dlgClose");
-    if (dlgCloseBtn) dlgCloseBtn.onclick = closeDay;
+    const dlgBackBtn = $("dlgBack");
+    if (dlgBackBtn) dlgBackBtn.onclick = closeDay;
 
-    // 4) Dodawanie zakresu + sort chronologiczny
+    // Dodawanie zakresu + sort chronologiczny
     const dlgAddShiftBtn = $("dlgAddShift");
     if (dlgAddShiftBtn){
       dlgAddShiftBtn.onclick = ()=>{
@@ -1178,7 +1173,6 @@
         const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
         day.shifts.push({ start, end });
 
-        // sort: od rana do wieczora
         day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
 
         upsertDay(dlgDate, day);
@@ -1192,7 +1186,7 @@
       };
     }
 
-    // 2) Autosave notatki (bez przycisku)
+    // Autosave notatki
     const dlgNoteEl = $("dlgNote");
     let noteTimer = null;
     if (dlgNoteEl){
@@ -1205,8 +1199,8 @@
           day.note = note;
           upsertDay(dlgDate, day);
           save();
-          renderAll();       // odświeża paski w kalendarzu
-          renderDayDialog(); // odświeża listę/podsumowanie
+          renderAll();
+          renderDayDialog();
           setStatus("Zapisano notatkę.");
         }, 250);
       });
