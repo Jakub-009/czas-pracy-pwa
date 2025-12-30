@@ -931,8 +931,7 @@ body.modal-open{
 
     for (let d=1; d<=dim; d++){
       const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
-      const jsDow = new Date(Y, M-1, d).getDay();
-      const isWeekend = (jsDow === 0 || jsDow === 6);
+      const jsDow = new Date(Y, M-1, d).getDay(); // 0=Nd, 6=Sb
 
       const day = getDay(dateISO);
       const shiftsCount = (day?.shifts || []).length;
@@ -942,9 +941,14 @@ body.modal-open{
       const holidayName = holidays.get(dateISO) || "";
       const isHoliday = !!holidayName;
 
+      // KLASY KOLORÓW:
+      // - sobota: "saturday" (szary jak Google)
+      // - niedziela: "sunday" (czerwony jak Google)
+      // - święto: "holiday" (też czerwony, niezależnie od dnia tygodnia)
       const numClass = [
         "dayNum",
-        isWeekend ? "weekend" : "",
+        jsDow === 6 ? "saturday" : "",
+        jsDow === 0 ? "sunday" : "",
         isHoliday ? "holiday" : "",
         hasShifts ? "has" : ""
       ].filter(Boolean).join(" ");
@@ -1257,6 +1261,5 @@ body.modal-open{
   }
 })();
 </script>
-
 </body>
 </html>
