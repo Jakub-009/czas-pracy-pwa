@@ -327,18 +327,16 @@ details summary::-webkit-details-marker{display:none}
 }
 
 /* ===== Status bars (Google vibe) ===== */
-
-/* Google colors */
 :root{
-  --bar-work:#1e8e3e;   /* Google green */
-  --bar-note:#f9ab00;   /* Google yellow */
+  --bar-work:#1e8e3e;
+  --bar-note:#f9ab00;
 }
 
 .indRow{
   position:absolute;
   left:50%;
   transform:translateX(-50%);
-  bottom:10px;                 /* bliżej dołu kafelka */
+  bottom:10px;
   display:flex;
   flex-direction:column;
   gap:4px;
@@ -346,21 +344,16 @@ details summary::-webkit-details-marker{display:none}
   pointer-events:none;
 }
 
-/* pasek wspólny */
 .bar{
   height:4px;
-  width:64%;                   /* nie na całą szerokość */
-  border-radius:999px;         /* pill */
+  width:64%;
+  border-radius:999px;
 }
 
-/* warianty */
 .bar.shift{ background:var(--bar-work); }
 .bar.note{  background:var(--bar-note); }
-
-/* ukrywanie */
 .bar.hidden{ display:none; }
 
-/* bardzo małe ekrany */
 @media(max-width:420px){
   .indRow{ bottom:8px; gap:3px; }
   .bar{ height:3px; width:66%; }
@@ -997,9 +990,9 @@ body.modal-open{
             <div class="${numClass}">${d}</div>
           </div>
           <div class="indRow" aria-hidden="true">
-  <span class="bar shift ${hasShifts ? "" : "hidden"}"></span>
-  <span class="bar note ${hasNote ? "" : "hidden"}"></span>
-</div>
+            <span class="bar shift ${hasShifts ? "" : "hidden"}"></span>
+            <span class="bar note ${hasNote ? "" : "hidden"}"></span>
+          </div>
         </div>
       `);
     }
