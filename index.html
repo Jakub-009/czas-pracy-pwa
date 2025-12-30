@@ -120,15 +120,12 @@
       align-items:flex-end;
     }
 
-    .twoCols{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      margin-top:10px;
-    }
-    @media(max-width:520px){
-      .twoCols{ grid-template-columns:1fr; }
-    }
+    /* Suma/Wypłata zawsze obok siebie */
+.twoCols{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
 
     /* ===== Inputs (Google-like) ===== */
     input,textarea,select{
@@ -352,48 +349,48 @@
       background:rgba(255,255,255,.85);
     }
 
-    /* ===== Status bars (paski) ===== */
-    .indRow{
-      position:absolute;
-      left:50%;
-      transform:translateX(-50%);
-      bottom:10px;
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      align-items:center;
-      pointer-events:none;
-    }
+    /* ===== Status bars (Google vibe) ===== */
+.indRow{
+  position:absolute;
+  left:0;                    /* <-- klucz */
+  right:0;                   /* <-- klucz */
+  bottom:10px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  align-items:center;
+  pointer-events:none;
+}
 
-    .bar{
-      display:block;
-      height:4px;
-      width:64%;
-      border-radius:999px;
-    }
-    .bar.shift{ background:var(--bar-work); }
-    .bar.note{ background:var(--bar-note); }
-    .bar.hidden{ display:none; }
+.bar{
+  display:block;
+  height:4px;
+  width:64%;
+  border-radius:999px;
+}
 
-    @media(max-width:640px){
-      .dayCell,.blankCell{
-        aspect-ratio:1/1;
-        min-height:0;
-      }
-    }
+.bar.shift{ background:var(--bar-work); }
+.bar.note{  background:var(--bar-note); }
+.bar.hidden{ display:none; }
 
-    @media(max-width:420px){
-      .calGrid{gap:6px}
-      .dayNum{font-size:13px}
-      .indRow{ bottom:8px; gap:3px; }
-      .bar{ height:3px; width:66%; }
-    }
+@media(max-width:420px){
+  .indRow{ bottom:8px; gap:3px; }
+  .bar{ height:3px; width:66%; }
+}
+* ===== KWADRATY ZAWSZE (pewniak) ===== */
+.dayCell,
+.blankCell{
+  aspect-ratio:1/1;   /* zawsze kwadrat */
+  min-height:0;       /* nie pozwól rozciągać */
+}
 
-    @media(min-width:641px){
-      .dayCell,.blankCell{
-        min-height:74px;
-      }
-    }
+/* fallback: jeśli gdzieś aspect-ratio nie zadziała */
+@supports not (aspect-ratio: 1 / 1){
+  .dayCell,
+  .blankCell{
+    min-height:74px;
+  }
+}
 
     /* ===== Summary (suma/wypłata) ===== */
     .statBox{
@@ -592,7 +589,7 @@
       <!-- podsumowanie -->
       <div class="twoCols" style="margin-top:12px;">
         <div class="statBox">
-          <div class="muted">Suma godzin</div>
+          <div class="muted">Suma godzin w miesiącu</div>
           <div class="statValue" id="sumHours">0:00</div>
         </div>
         <div class="statBox">
@@ -610,7 +607,7 @@
       <div class="calGrid" id="calGrid"></div>
 
       <div class="row" style="margin-top:14px;">
-        <button class="secondary" id="printPdfBtn" type="button" style="width:100%;">Raport PDF / Wydrukuj</button>
+        <button class="secondary" id="printPdfBtn" type="button" style="width:100%;">Raport / Wydrukuj</button>
       </div>
 
       <!-- miejsce na ewentualne tipy -->
@@ -623,7 +620,7 @@
     <div class="section">
       <details id="extrasPanel">
         <summary>
-          <span>Ustawienia pracy</span>
+          <span>Stawka za godzinę</span>
           <span class="chev" aria-hidden="true"></span>
         </summary>
         <div class="panel">
