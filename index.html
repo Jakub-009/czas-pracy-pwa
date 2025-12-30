@@ -445,7 +445,30 @@ dialog::backdrop{
 
 .delIcon::before{ transform:translate(-50%,-50%) rotate(45deg); }
 .delIcon::after{  transform:translate(-50%,-50%) rotate(-45deg); }
+  
+/* odstęp między tytułem sekcji a wyborem miesiąca */
+.calHead{ margin-bottom:14px; }
 
+/* monthBar niech ma oddech od kalendarza */
+.monthBar{ margin-top:10px; margin-bottom:12px; }
+
+/* w modalu: odstęp między tytułem listy a listą zakresów */
+.shiftList{ margin-top:12px; }
+
+/* w modalu: odstęp pod nagłówkiem "Godziny pracy w ciągu dnia" */
+.modalBody strong{ display:block; margin-bottom:10px; }
+
+  /* w modalu te dwa boxy mają być flat – bez ramek */
+.modalBody .card{
+  border:none;
+  background:transparent;
+  padding:0;
+}
+  body.modal-open{
+  overflow:hidden;
+  height:100vh;
+  touch-action:none;
+}
 </style>
 </head>
 
@@ -847,12 +870,16 @@ dialog::backdrop{
 
     if (dlg && typeof dlg.showModal === "function") dlg.showModal();
     else if (dlg) dlg.setAttribute("open","");
+    document.body.classList.add("modal-open");
+
   }
 
   function closeDay(){
     dlgDate = null;
     if (dlg && typeof dlg.close === "function") dlg.close();
     else if (dlg) dlg.removeAttribute("open");
+    document.body.classList.remove("modal-open");
+    dlg.addEventListener("close", ()=> document.body.classList.remove("modal-open"));
   }
 
   function renderDayDialog(){
