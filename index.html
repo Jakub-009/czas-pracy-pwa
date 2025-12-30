@@ -233,6 +233,11 @@ details summary::-webkit-details-marker{display:none}
   font-size:15px;
   font-weight:700;
 }
+
+.monthBar .txt{ white-space:nowrap; }
+.monthBar .sub{ white-space:nowrap; opacity:.75; }
+.monthBar > div{ min-width:0; }
+
 #monthPick{
   position:absolute;
   inset:0;
@@ -255,52 +260,75 @@ details summary::-webkit-details-marker{display:none}
   color:rgba(17,17,17,.55);
 }
 
-/* day tiles */
+/* ===== NOWY KALENDARZ: Google vibe (kwadrat + numer na środku) ===== */
+
 .dayCell{
-  border-radius:16px;
+  border-radius:14px;
   border:1px solid var(--outline-soft);
   background:var(--surface-soft);
-  padding:10px;
-  min-height:74px;
   cursor:pointer;
   position:relative;
+
+  min-height:auto;
+  aspect-ratio:1/1;
+
   display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  gap:6px;
+  align-items:center;
+  justify-content:center;
+
+  padding:0;
 }
-@media(max-width:640px){
-  .dayCell, .blankCell{
-    min-height:auto;
-    aspect-ratio:1/1;
-    padding:10px;
-  }
+
+/* blank cell (puste pola) */
+.blankCell{
+  border:none;
+  background:transparent;
+  box-shadow:none;
+  pointer-events:none;
+
+  min-height:auto;
+  aspect-ratio:1/1;
 }
+
+/* numer dnia na środku, mniejszy */
 .dayNum{
-  font-size:18px;
-  font-weight:700;
+  font-size:14px;
+  font-weight:650;
+  line-height:1;
 }
 
-.dayNum.weekend{color:#c53030}
+/* weekend na czerwono */
+.dayNum.weekend{
+  color:#c53030;
+}
 
-/* dots */
+/* kropki wyśrodkowane pod numerem */
 .indRow{
   position:absolute;
-  top:30px;
-  left:12px;
+  left:50%;
+  transform:translateX(-50%);
+  top:58%;
   display:flex;
   gap:6px;
+  align-items:center;
 }
 
+/* subtelniejsze kropki */
 .dot{
-  width:8px;
-  height:8px;
+  width:7px;
+  height:7px;
   border-radius:999px;
 }
 
 .dot.shift{background:var(--primary)}
 .dot.note{background:#E5A823}
 .dot.hidden{visibility:hidden}
+
+@media(max-width:420px){
+  .calGrid{gap:6px}
+  .dayNum{font-size:13px}
+  .dot{width:6px;height:6px}
+}
 
 /* ===== Modal (Google surface) ===== */
 dialog{
@@ -323,6 +351,7 @@ dialog::backdrop{
 
 .modalHead{
   border-bottom:1px solid var(--outline-soft);
+  position:relative;
 }
 
 .shiftItem{
@@ -332,6 +361,18 @@ dialog::backdrop{
   display:flex;
   justify-content:space-between;
   gap:10px;
+  align-items:flex-start;
+}
+
+.shiftItem .times{
+  font-weight:650;
+  font-size:16px;
+}
+
+.shiftItem .mins{
+  font-size:12.5px;
+  color:rgba(17,17,17,.6);
+  margin-top:4px;
 }
 
 /* mini buttons */
@@ -370,11 +411,8 @@ dialog::backdrop{
   outline-offset:2px;
   border-radius:12px;
 }
-  .modalHead{
-  position:relative;
-  padding:16px;
-}
 
+/* ===== Ikona X w modalu ===== */
 .iconBtn{
   width:40px;
   height:40px;
@@ -402,23 +440,8 @@ dialog::backdrop{
 
 .iconBtn::before{ transform:translate(-50%,-50%) rotate(45deg); }
 .iconBtn::after{  transform:translate(-50%,-50%) rotate(-45deg); }
-.shiftItem{
-  align-items:flex-start;
-}
-.shiftItem .times{
-  font-weight:650;
-  font-size:16px;
-}
 
-.shiftItem .mins{
-  font-size:12.5px;
-  color:rgba(17,17,17,.6);
-  margin-top:4px;
-}
-.monthBar .txt{ white-space:nowrap; }
-.monthBar .sub{ white-space:nowrap; opacity:.75; }
-.monthBar > div{ min-width:0; }
-
+/* ===== Ikona usuwania zakresu (kółko X) ===== */
 .delIcon{
   width:36px;
   height:36px;
@@ -445,31 +468,28 @@ dialog::backdrop{
 
 .delIcon::before{ transform:translate(-50%,-50%) rotate(45deg); }
 .delIcon::after{  transform:translate(-50%,-50%) rotate(-45deg); }
-  
-/* odstęp między tytułem sekcji a wyborem miesiąca */
+
+/* ===== Oddech / odstępy ===== */
 .calHead{ margin-bottom:14px; }
-
-/* monthBar niech ma oddech od kalendarza */
 .monthBar{ margin-top:10px; margin-bottom:12px; }
-
-/* w modalu: odstęp między tytułem listy a listą zakresów */
 .shiftList{ margin-top:12px; }
-
-/* w modalu: odstęp pod nagłówkiem "Godziny pracy w ciągu dnia" */
 .modalBody strong{ display:block; margin-bottom:10px; }
 
-  /* w modalu te dwa boxy mają być flat – bez ramek */
+/* ===== Modal: boxy Suma/Dniówka flat ===== */
 .modalBody .card{
   border:none;
   background:transparent;
   padding:0;
 }
-  body.modal-open{
+
+/* ===== Zablokuj scroll tła przy otwartym modalu ===== */
+body.modal-open{
   overflow:hidden;
   height:100vh;
   touch-action:none;
 }
 </style>
+
 </head>
 
 <body>
@@ -657,7 +677,7 @@ dialog::backdrop{
     </div>
   </dialog>
 
-  <script>
+<script>
 (() => {
   const showErr = (msg) => {
     const el = document.getElementById("status");
@@ -752,8 +772,16 @@ dialog::backdrop{
   }
   function pln(x){ return x.toLocaleString("pl-PL",{style:"currency",currency:"PLN"}); }
 
-  function readSettingsFromUI(){ db.settings.rate = Number($("rate").value || 0); }
-  function hydrateSettingsUI(){ $("rate").value = db.settings.rate; }
+  function readSettingsFromUI(){
+    const rateEl = $("rate");
+    if (!rateEl) return;
+    db.settings.rate = Number(rateEl.value || 0);
+  }
+  function hydrateSettingsUI(){
+    const rateEl = $("rate");
+    if (!rateEl) return;
+    rateEl.value = db.settings.rate;
+  }
 
   function getDay(date){ return db.entries.find(e => e.date === date) || null; }
 
@@ -780,23 +808,96 @@ dialog::backdrop{
     return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
   }
 
+  // ===== ŚWIĘTA PL =====
+  function isoFromDate(dt){
+    return `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
+  }
+
+  // Algorytm daty Wielkanocy (kalendarz gregoriański)
+  function easterSunday(year){
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31); // 3=Mar, 4=Apr
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(year, month - 1, day);
+  }
+
+  function addDays(dt, n){
+    const x = new Date(dt);
+    x.setDate(x.getDate() + n);
+    return x;
+  }
+
+  // zwraca mapę ISO->nazwa święta
+  function polishHolidays(year){
+    const map = new Map();
+
+    // stałe
+    map.set(`${year}-01-01`, "Nowy Rok");
+    map.set(`${year}-01-06`, "Święto Trzech Króli");
+    map.set(`${year}-05-01`, "Święto Pracy");
+    map.set(`${year}-05-03`, "Święto Konstytucji 3 Maja");
+    map.set(`${year}-08-15`, "Wniebowzięcie NMP");
+    map.set(`${year}-11-01`, "Wszystkich Świętych");
+    map.set(`${year}-11-11`, "Narodowe Święto Niepodległości");
+    map.set(`${year}-12-25`, "Boże Narodzenie (1. dzień)");
+    map.set(`${year}-12-26`, "Boże Narodzenie (2. dzień)");
+
+    // ruchome
+    const easter = easterSunday(year);                 // Niedziela Wielkanocna
+    const easterMon = addDays(easter, 1);              // Poniedziałek Wielkanocny
+    const pentecost = addDays(easter, 49);             // Zielone Świątki (niedziela)
+    const corpusChristi = addDays(easter, 60);         // Boże Ciało (czwartek)
+
+    map.set(isoFromDate(easter), "Wielkanoc");
+    map.set(isoFromDate(easterMon), "Poniedziałek Wielkanocny");
+    map.set(isoFromDate(pentecost), "Zielone Świątki");
+    map.set(isoFromDate(corpusChristi), "Boże Ciało");
+
+    return map;
+  }
+
+  // cache świąt na rok
+  const holidayCache = new Map();
+  function getHolidayMap(year){
+    if (!holidayCache.has(year)) holidayCache.set(year, polishHolidays(year));
+    return holidayCache.get(year);
+  }
+
   // ===== KALENDARZ =====
   const DOW = ["Pn","Wt","Śr","Czw","Pt","Sb","Nd"];
   function mondayIndex(jsDay){ return (jsDay + 6) % 7; }
   function daysInMonth(year, month1){ return new Date(year, month1, 0).getDate(); }
 
   function renderDow(){
-    $("dowRow").innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
+    const dowRow = $("dowRow");
+    if (!dowRow) return;
+    dowRow.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
   }
 
   function renderCalendar(monthYM){
-    $("monthLabelText").textContent = fmtMonthPL(monthYM);
+    const monthLabel = $("monthLabelText");
+    const calGrid = $("calGrid");
+    if (!monthLabel || !calGrid) return;
+
+    monthLabel.textContent = fmtMonthPL(monthYM);
 
     const [Y, M] = monthYM.split("-").map(Number);
     const first = new Date(Y, M-1, 1);
     const firstIdx = mondayIndex(first.getDay());
     const dim = daysInMonth(Y, M);
 
+    const holidays = getHolidayMap(Y);
     const cells = [];
 
     for (let i=0;i<firstIdx;i++){
@@ -813,14 +914,20 @@ dialog::backdrop{
       const hasShifts = shiftsCount > 0;
       const hasNote = !!(day?.note && day.note.trim());
 
+      const holidayName = holidays.get(dateISO) || "";
+      const isHoliday = !!holidayName;
+
       const numClass = [
         "dayNum",
         isWeekend ? "weekend" : "",
+        isHoliday ? "holiday" : "",
         hasShifts ? "has" : ""
       ].filter(Boolean).join(" ");
 
+      const tileTitle = isHoliday ? holidayName : "";
+
       cells.push(`
-        <div class="dayCell" data-date="${dateISO}">
+        <div class="dayCell" data-date="${dateISO}" ${tileTitle ? `title="${tileTitle}"` : ""}>
           <div class="dayTop">
             <div class="${numClass}">${d}</div>
           </div>
@@ -838,7 +945,7 @@ dialog::backdrop{
       for (let i=0;i<need;i++) cells.push(`<div class="blankCell"></div>`);
     }
 
-    $("calGrid").innerHTML = cells.join("");
+    calGrid.innerHTML = cells.join("");
 
     document.querySelectorAll(".dayCell[data-date]").forEach(el=>{
       el.onclick = ()=>{
@@ -854,23 +961,28 @@ dialog::backdrop{
 
   function openDay(dateISO){
     dlgDate = dateISO;
-    $("date").value = dateISO;
+    const dateInput = $("date");
+    if (dateInput) dateInput.value = dateISO;
 
     const weekday = fmtWeekdayPL(dateISO);
-    $("dlgTitle").textContent = `${fmtDMYText(dateISO)}`;
-    $("dlgMeta").textContent = weekday;
+    const dlgTitle = $("dlgTitle");
+    const dlgMeta = $("dlgMeta");
+    if (dlgTitle) dlgTitle.textContent = `${fmtDMYText(dateISO)}`;
+    if (dlgMeta) dlgMeta.textContent = weekday;
 
     const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[] };
-    $("dlgStart").value = "";
-    $("dlgEnd").value = "";
-    $("dlgNote").value = day.note || "";
+    const dlgStart = $("dlgStart");
+    const dlgEnd = $("dlgEnd");
+    const dlgNote = $("dlgNote");
+    if (dlgStart) dlgStart.value = "";
+    if (dlgEnd) dlgEnd.value = "";
+    if (dlgNote) dlgNote.value = day.note || "";
 
     renderDayDialog();
 
     if (dlg && typeof dlg.showModal === "function") dlg.showModal();
     else if (dlg) dlg.setAttribute("open","");
     document.body.classList.add("modal-open");
-
   }
 
   function closeDay(){
@@ -878,16 +990,23 @@ dialog::backdrop{
     if (dlg && typeof dlg.close === "function") dlg.close();
     else if (dlg) dlg.removeAttribute("open");
     document.body.classList.remove("modal-open");
+  }
+
+  if (dlg){
     dlg.addEventListener("close", ()=> document.body.classList.remove("modal-open"));
+    dlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeDay(); });
   }
 
   function renderDayDialog(){
+    if (!dlgDate) return;
     const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
     const mins = computeDayMinutes(day);
     const pay = (mins/60) * (db.settings.rate||0);
 
-    $("dlgSumHM").textContent = fmtHM(mins);
-    $("dlgSumPay").textContent = pln(pay);
+    const sumHM = $("dlgSumHM");
+    const sumPay = $("dlgSumPay");
+    if (sumHM) sumHM.textContent = fmtHM(mins);
+    if (sumPay) sumPay.textContent = pln(pay);
 
     const items = (day.shifts || []).map((s, idx)=>{
       const a = s.start || "—";
@@ -905,7 +1024,10 @@ dialog::backdrop{
       `;
     }).join("");
 
-    $("dlgShifts").innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
+    const dlgShifts = $("dlgShifts");
+    if (dlgShifts){
+      dlgShifts.innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
+    }
 
     document.querySelectorAll("[data-delshift]").forEach(btn=>{
       btn.onclick = ()=>{
@@ -924,8 +1046,10 @@ dialog::backdrop{
   // ===== TOTALS =====
   function renderTotals(monthYM){
     const sumMin = computeMonthMinutes(monthYM);
-    $("sumHours").textContent = fmtHM(sumMin);
-    $("sumPay").textContent = pln((sumMin/60) * (db.settings.rate||0));
+    const sumHours = $("sumHours");
+    const sumPay = $("sumPay");
+    if (sumHours) sumHours.textContent = fmtHM(sumMin);
+    if (sumPay) sumPay.textContent = pln((sumMin/60) * (db.settings.rate||0));
   }
 
   function renderAll(){
@@ -933,143 +1057,173 @@ dialog::backdrop{
     readSettingsFromUI();
     save();
 
-    const monthYM = $("monthPick").value || ym(todayISO());
+    const monthPick = $("monthPick");
+    const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
+
     renderDow();
     renderCalendar(monthYM);
     renderTotals(monthYM);
   }
 
   // ===== EVENTY UI =====
-  $("addShiftBtn").onclick = ()=>{
-    const date = $("date").value;
-    const start = $("start").value;
-    const end = $("end").value;
-    const note = ($("note").value || "").trim();
+  const addShiftBtn = $("addShiftBtn");
+  if (addShiftBtn){
+    addShiftBtn.onclick = ()=>{
+      const date = $("date")?.value;
+      const start = $("start")?.value;
+      const end = $("end")?.value;
+      const note = ($("note")?.value || "").trim();
 
-    if (!date) return alert("Wybierz datę.");
-    if ((start && !end) || (!start && end)) return alert("Uzupełnij wejście i wyjście (albo zostaw oba puste).");
-    if (!start && !end && !note) return alert("Wpisz godziny lub notatkę.");
+      if (!date) return alert("Wybierz datę.");
+      if ((start && !end) || (!start && end)) return alert("Uzupełnij wejście i wyjście (albo zostaw oba puste).");
+      if (!start && !end && !note) return alert("Wpisz godziny lub notatkę.");
 
-    const day = getDay(date) || { date, note:"", shifts:[] };
+      const day = getDay(date) || { date, note:"", shifts:[] };
 
-    let msg = [];
-    if (start && end){
+      let msg = [];
+      if (start && end){
+        day.shifts.push({ start, end });
+        msg.push("Dodano zakres.");
+        if ($("start")) $("start").value = "";
+        if ($("end")) $("end").value = "";
+      }
+      if (note){
+        day.note = note;
+        msg.push("Zapisano notatkę.");
+      }
+
+      upsertDay(date, day);
+      setStatus(msg.join(" ") || "Zapisano.");
+      save();
+      renderAll();
+    };
+  }
+
+  const openDayBtn = $("openDayBtn");
+  if (openDayBtn){
+    openDayBtn.onclick = ()=>{
+      const date = $("date")?.value;
+      if (!date) return alert("Wybierz datę.");
+      openDay(date);
+    };
+  }
+
+  const dlgCloseBtn = $("dlgClose");
+  if (dlgCloseBtn) dlgCloseBtn.onclick = closeDay;
+
+  const dlgAddShiftBtn = $("dlgAddShift");
+  if (dlgAddShiftBtn){
+    dlgAddShiftBtn.onclick = ()=>{
+      if (!dlgDate) return;
+      const start = $("dlgStart")?.value;
+      const end = $("dlgEnd")?.value;
+      if (!start || !end) return alert("Uzupełnij wejście i wyjście.");
+
+      const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
       day.shifts.push({ start, end });
-      msg.push("Dodano zakres.");
-      $("start").value = "";
-      $("end").value = "";
-    }
-    if (note){
+      upsertDay(dlgDate, day);
+
+      if ($("dlgStart")) $("dlgStart").value = "";
+      if ($("dlgEnd")) $("dlgEnd").value = "";
+      save();
+      renderAll();
+      renderDayDialog();
+    };
+  }
+
+  const dlgSaveNoteBtn = $("dlgSaveNote");
+  if (dlgSaveNoteBtn){
+    dlgSaveNoteBtn.onclick = ()=>{
+      if (!dlgDate) return;
+      const note = ($("dlgNote")?.value || "").trim();
+      const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
       day.note = note;
-      msg.push("Zapisano notatkę.");
-    }
-
-    upsertDay(date, day);
-    setStatus(msg.join(" ") || "Zapisano.");
-    save();
-    renderAll();
-  };
-
-  $("openDayBtn").onclick = ()=>{
-    const date = $("date").value;
-    if (!date) return alert("Wybierz datę.");
-    openDay(date);
-  };
-
-  $("dlgClose").onclick = closeDay;
-  if (dlg) dlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeDay(); });
-
-  $("dlgAddShift").onclick = ()=>{
-    if (!dlgDate) return;
-    const start = $("dlgStart").value;
-    const end = $("dlgEnd").value;
-    if (!start || !end) return alert("Uzupełnij wejście i wyjście.");
-
-    const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
-    day.shifts.push({ start, end });
-    upsertDay(dlgDate, day);
-
-    $("dlgStart").value = "";
-    $("dlgEnd").value = "";
-    save();
-    renderAll();
-    renderDayDialog();
-  };
-
-  $("dlgSaveNote").onclick = ()=>{
-    if (!dlgDate) return;
-    const note = ($("dlgNote").value || "").trim();
-    const day = getDay(dlgDate) || (getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] });
-    day.note = note;
-    upsertDay(dlgDate, day);
-    save();
-    renderAll();
-    renderDayDialog();
-    setStatus("Zapisano notatkę.");
-  };
-
+      upsertDay(dlgDate, day);
+      save();
+      renderAll();
+      renderDayDialog();
+      setStatus("Zapisano notatkę.");
+    };
+  }
 
   // miesiąc
-  $("monthBar").onclick = ()=>{
-    const input = $("monthPick");
-    if (!input) return;
-    if (typeof input.showPicker === "function") input.showPicker();
-    else input.focus();
-  };
-  $("monthPick").addEventListener("change", renderAll);
+  const monthBar = $("monthBar");
+  const monthPick = $("monthPick");
+  if (monthBar && monthPick){
+    monthBar.onclick = ()=>{
+      if (typeof monthPick.showPicker === "function") monthPick.showPicker();
+      else monthPick.focus();
+    };
+    monthPick.addEventListener("change", renderAll);
+  }
 
   // narzędzia
-  $("printPdfBtn").onclick = ()=> window.print();
+  const printBtn = $("printPdfBtn");
+  if (printBtn) printBtn.onclick = ()=> window.print();
 
-  $("backupJson").onclick = ()=>{
-    const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const backupBtn = $("backupJson");
+  if (backupBtn){
+    backupBtn.onclick = ()=>{
+      const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+  }
 
-  $("restoreBtn").onclick = ()=> $("restoreJson").click();
-  $("restoreJson").onchange = async (ev)=>{
-    const f = ev.target.files?.[0];
-    if (!f) return;
-    try{
-      const txt = await f.text();
-      const obj = JSON.parse(txt);
-      db = obj;
-      normalize();
-      migrateIfNeeded();
+  const restoreBtn = $("restoreBtn");
+  const restoreInput = $("restoreJson");
+  if (restoreBtn && restoreInput){
+    restoreBtn.onclick = ()=> restoreInput.click();
+    restoreInput.onchange = async (ev)=>{
+      const f = ev.target.files?.[0];
+      if (!f) return;
+      try{
+        const txt = await f.text();
+        const obj = JSON.parse(txt);
+        db = obj;
+        normalize();
+        migrateIfNeeded();
+        save();
+        hydrateSettingsUI();
+        renderAll();
+        setStatus("Przywrócono dane z pliku JSON.");
+      }catch{
+        alert("Nie udało się wczytać pliku JSON.");
+      }
+    };
+  }
+
+  const clearMonthBtn = $("clearMonth");
+  if (clearMonthBtn){
+    clearMonthBtn.onclick = ()=>{
+      const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
+      if (!confirm("Usunąć wszystkie wpisy z tego miesiąca?")) return;
+      db.entries = db.entries.filter(e => ym(e.date) !== monthYM);
       save();
-      hydrateSettingsUI();
       renderAll();
-      setStatus("Przywrócono dane z pliku JSON.");
-    }catch{
-      alert("Nie udało się wczytać pliku JSON.");
-    }
-  };
+    };
+  }
 
-  $("clearMonth").onclick = ()=>{
-    const monthYM = $("monthPick").value || ym(todayISO());
-    if (!confirm("Usunąć wszystkie wpisy z tego miesiąca?")) return;
-    db.entries = db.entries.filter(e => ym(e.date) !== monthYM);
-    save();
-    renderAll();
-  };
-
-  ["rate"].forEach(id=>{
-    $(id).addEventListener("input", renderAll);
-    $(id).addEventListener("change", renderAll);
-  });
+  const rateEl = $("rate");
+  if (rateEl){
+    rateEl.addEventListener("input", renderAll);
+    rateEl.addEventListener("change", renderAll);
+  }
 
   // INIT
   try{
     normalize();
     migrateIfNeeded();
     hydrateSettingsUI();
-    $("date").value = todayISO();
-    $("monthPick").value = ym(todayISO());
+
+    const dateEl = $("date");
+    if (dateEl) dateEl.value = todayISO();
+    if (monthPick) monthPick.value = ym(todayISO());
+
     renderAll();
   } catch(err){
     const msg = (err && err.message) ? err.message : String(err);
@@ -1077,6 +1231,7 @@ dialog::backdrop{
     if (el) el.textContent = "BŁĄD INIT: " + msg;
   }
 })();
-  </script>
+</script>
+
 </body>
 </html>
