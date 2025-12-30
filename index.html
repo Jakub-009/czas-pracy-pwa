@@ -301,17 +301,17 @@
             <input id="date" type="date" />
           </div>
           <div class="col-3">
-            <label>Wejście</label>
+            <label>Godzina wejścia</label>
             <input id="start" type="time" />
           </div>
           <div class="col-3">
-            <label>Wyjście</label>
+            <label>Godzina wyjścia</label>
             <input id="end" type="time" />
           </div>
 
           <div class="col-12">
             <label>Notatka</label>
-            <textarea id="note" placeholder="Opcjonalnie..."></textarea>
+            <textarea id="note" </textarea>
           </div>
 
           <div class="col-3">
@@ -429,18 +429,18 @@
         <div class="col-12">
           <div class="row" style="gap:10px;align-items:stretch;">
             <div class="card" style="box-shadow:none;border:1px solid #eef1f8;">
-              <div class="muted">Suma dnia</div>
+              <div class="muted">Suma godzin w ciągu dnia</div>
               <div style="font-size:20px;font-weight:900" id="dlgSumHM">0:00</div>
             </div>
             <div class="card" style="box-shadow:none;border:1px solid #eef1f8;">
-              <div class="muted">Wypłata dnia</div>
+              <div class="muted">Dniówka</div>
               <div style="font-size:20px;font-weight:900" id="dlgSumPay">0,00 zł</div>
             </div>
           </div>
         </div>
 
         <div class="col-6">
-          <label>Dodaj kolejny zakres</label>
+          <label>Dodaj kolejne godziny pracy</label>
           <div class="row" style="gap:8px;">
             <input id="dlgStart" type="time" style="min-width:140px;" />
             <input id="dlgEnd" type="time" style="min-width:140px;" />
@@ -451,7 +451,7 @@
 
         <div class="col-6">
           <label>Notatka</label>
-          <textarea id="dlgNote" placeholder="Opcjonalnie..."></textarea>
+          <textarea id="dlgNote" ></textarea>
           <button class="secondary" id="dlgSaveNote" style="margin-top:8px;">Zapisz notatkę</button>
         </div>
 
@@ -459,10 +459,9 @@
           <div class="divider"></div>
           <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;">
             <div>
-              <strong>Zakresy</strong>
+              <strong>Godziny pracy w ciągu dnia</strong>
               <div class="muted" id="dlgSummary"></div>
             </div>
-            <button class="danger" id="dlgDeleteDay" style="width:auto;">Usuń cały dzień</button>
           </div>
 
           <div class="shiftList" id="dlgShifts"></div>
