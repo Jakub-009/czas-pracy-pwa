@@ -26,13 +26,13 @@
   --danger-soft:rgba(217,45,32,.12);
 
   /* ===== Google-like weekend/holiday colors ===== */
-  --sat:#3d85c6;      /* Google grey */
-  --sun:#E05950;      /* Google red  */
-  --holiday:#E05950;  /* jak niedziela */
+  --sat:rgba(60,64,67,.65);  /* Google-ish grey */
+  --sun:#d93025;             /* Google red */
+  --holiday:#d93025;         /* jak niedziela */
 
   /* ===== Status bars (Google vibe) ===== */
-  --bar-work:#1e8e3e; /* Google green */
-  --bar-note:#f9ab00; /* Google yellow */
+  --bar-work:#1e8e3e;         /* Google green */
+  --bar-note:#f9ab00;         /* Google yellow */
 
   --radius-lg:20px;
   --radius-md:16px;
@@ -269,11 +269,12 @@ details summary::-webkit-details-marker{display:none}
 }
 
 /* ===== NOWY KALENDARZ: Google vibe (KWADRAT + numer top-center) ===== */
+
 .dayCell{
   border-radius:16px;
   border:1px solid var(--outline-soft);
   background:var(--surface-soft);
-  padding:4px 10px 12px; /* trochę miejsca na paski */
+  padding:4px 10px 10px;
   cursor:pointer;
   position:relative;
 
@@ -333,7 +334,7 @@ details summary::-webkit-details-marker{display:none}
   position:absolute;
   left:50%;
   transform:translateX(-50%);
-  bottom:10px;            /* paski przy dole kafelka */
+  bottom:10px;               /* bliżej dołu kafelka */
   display:flex;
   flex-direction:column;
   gap:4px;
@@ -341,20 +342,20 @@ details summary::-webkit-details-marker{display:none}
   pointer-events:none;
 }
 
+/* pasek wspólny */
 .bar{
+  display:block;
   height:4px;
-  width:64%;
-  border-radius:999px;
+  width:64%;                 /* nie na całą szerokość */
+  border-radius:999px;       /* pill */
 }
 
+/* warianty */
 .bar.shift{ background:var(--bar-work); }
 .bar.note{  background:var(--bar-note); }
-.bar.hidden{ display:none; }
 
-@media(max-width:420px){
-  .indRow{ bottom:8px; gap:3px; }
-  .bar{ height:3px; width:66%; }
-}
+/* ukrywanie */
+.bar.hidden{ display:none; }
 
 /* MOBILE: wymuszamy KWADRATY dla dni i pustych pól */
 @media(max-width:640px){
@@ -369,6 +370,8 @@ details summary::-webkit-details-marker{display:none}
 @media(max-width:420px){
   .calGrid{gap:6px}
   .dayNum{font-size:13px}
+  .indRow{ bottom:8px; gap:3px; }
+  .bar{ height:3px; width:66%; }
 }
 
 /* desktop/tablet: pamiętaj o równej wysokości */
@@ -538,6 +541,7 @@ body.modal-open{
   touch-action:none;
 }
 </style>
+
 </head>
 
 <body>
