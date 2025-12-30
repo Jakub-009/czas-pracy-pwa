@@ -7,673 +7,666 @@
   <meta name="theme-color" content="#f6f7fb" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
-<style>
-*{box-sizing:border-box}
-
-:root{
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-
-  /* ===== Google / Material tokens ===== */
-  --bg:#f6f7fb;
-  --surface:#ffffff;
-  --surface-soft:rgba(255,255,255,.7);
-  --outline-soft:rgba(17,17,17,.08);
-
-  --primary:#50827C;
-  --primary-soft:rgba(80,130,124,.12);
-
-  --danger:#d92d20;
-  --danger-soft:rgba(217,45,32,.12);
-
-  /* ===== Google-like weekend/holiday colors ===== */
-  --sat:rgba(60,64,67,.65);  /* Google-ish grey */
-  --sun:#d93025;             /* Google red */
-  --holiday:#d93025;         /* jak niedziela */
-
-  /* ===== Status bars (Google vibe) ===== */
-  --bar-work:#1e8e3e;         /* Google green */
-  --bar-note:#f9ab00;         /* Google yellow */
-
-  --radius-lg:20px;
-  --radius-md:16px;
-  --radius-sm:12px;
-}
-
-html,body{
-  width:100%;
-  overflow-x:hidden;
-}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:#111;
-}
-
-/* ===== Layout ===== */
-.wrap{
-  max-width:980px;
-  margin:18px auto;
-  padding:0 14px;
-}
-
-/* ===== Sekcje zamiast kart ===== */
-.card{
-  background:transparent;
-  padding:14px 2px;
-}
-
-/* separator między sekcjami */
-.grid > .card.col-12{
-  border-bottom:1px solid var(--outline-soft);
-}
-
-.grid:last-of-type > .card.col-12{
-  border-bottom:none;
-}
-
-/* ===== Grid ===== */
-.grid{
-  display:grid;
-  gap:12px;
-  grid-template-columns:repeat(12,1fr);
-}
-
-.col-3{grid-column:span 3}
-.col-4{grid-column:span 4}
-.col-6{grid-column:span 6}
-.col-12{grid-column:span 12}
-
-@media(max-width:820px){
-  .col-3,.col-4,.col-6{grid-column:span 12}
-}
-
-/* ===== Typography ===== */
-h1{font-size:20px;margin:0}
-h2{
-  font-size:18px;
-  font-weight:650;
-  margin:0 0 12px;
-}
-
-label{
-  display:block;
-  font-size:12px;
-  color:rgba(17,17,17,.65);
-  margin-bottom:6px;
-}
-
-.muted{
-  font-size:12.5px;
-  color:rgba(17,17,17,.6);
-}
-
-/* ===== Inputs (Google-like) ===== */
-input,textarea,select{
-  width:100%;
-  padding:12px 14px;
-  border-radius:var(--radius-lg);
-  border:1px solid var(--outline-soft);
-  background:var(--surface-soft);
-  font-size:14px;
-  transition:border-color .15s ease, box-shadow .15s ease;
-}
-
-textarea{
-  min-height:44px;
-  resize:vertical;
-}
-
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible{
-  border-color:var(--primary);
-  box-shadow:0 0 0 4px var(--primary-soft);
-}
-
-/* ===== Buttons (Google style) ===== */
-button{
-  width:100%;
-  padding:12px 16px;
-  border-radius:var(--radius-lg);
-  border:none;
-  font-size:15px;
-  font-weight:500;
-  background:var(--primary);
-  color:#fff;
-  cursor:pointer;
-  transition:filter .15s ease, transform .08s ease;
-}
-
-button.secondary{
-  background:var(--primary-soft);
-  color:#0f2f2b;
-}
-
-button.danger{
-  background:var(--danger-soft);
-  color:#7a1410;
-}
-
-button:active{
-  transform:scale(.98);
-}
-
-button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-/* ===== Rows ===== */
-.row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-
-.row > *{
-  flex:1;
-  min-width:160px;
-}
-
-/* ===== Chevron ===== */
-.chev{
-  width:18px;
-  height:18px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  opacity:.6;
-  transition:transform .18s ease;
-}
-
-.chev::before{
-  content:"";
-  width:8px;
-  height:8px;
-  border-right:2px solid #111;
-  border-bottom:2px solid #111;
-  transform:rotate(45deg);
-}
-
-details[open] .chev{
-  transform:rotate(180deg);
-}
-
-/* ===== Details ===== */
-details summary{
-  cursor:pointer;
-  font-weight:500;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  list-style:none;
-  padding:10px 0;
-}
-
-details summary::-webkit-details-marker{display:none}
-
-.panel{
-  margin-top:10px;
-  animation:panelIn .18s ease;
-}
-
-@keyframes panelIn{
-  from{opacity:.4; transform:translateY(-4px)}
-  to{opacity:1; transform:translateY(0)}
-}
-
-/* ===== Calendar ===== */
-.monthBar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px 14px;
-  border-radius:var(--radius-lg);
-  border:1px solid var(--outline-soft);
-  background:transparent;
-  cursor:pointer;
-  position:relative;
-}
-
-.monthBar .txt{
-  font-size:15px;
-  font-weight:700;
-}
-
-.monthBar .txt{ white-space:nowrap; }
-.monthBar .sub{ white-space:nowrap; opacity:.75; }
-.monthBar > div{ min-width:0; }
-
-#monthPick{
-  position:absolute;
-  inset:0;
-  opacity:0;
-  cursor:pointer;
-
-  appearance:none;
-  -webkit-appearance:none;
-}
-
-.calGrid{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:8px;
-}
-
-.calDow{
-  text-align:center;
-  font-size:12px;
-  color:rgba(17,17,17,.55);
-}
-
-/* ===== NOWY KALENDARZ: Google vibe (KWADRAT + numer top-center) ===== */
-
-.dayCell{
-  border-radius:16px;
-  border:1px solid var(--outline-soft);
-  background:var(--surface-soft);
-  padding:4px 10px 10px;
-  cursor:pointer;
-  position:relative;
-
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  align-items:stretch;
-}
-
-/* blank cell (puste pola) */
-.blankCell{
-  border:none;
-  background:transparent;
-  box-shadow:none;
-  pointer-events:none;
-}
-
-/* numer dnia: góra + środek */
-.dayTop{
-  width:100%;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-}
-
-.dayNum{
-  width:100%;
-  text-align:center;
-  font-size:16px;
-  font-weight:700;
-  line-height:1.05;
-  margin-top:2px;
-}
-
-/* ===== weekend / święta (klasy z JS) ===== */
-.dayNum.saturday{
-  color:var(--sat);
-  font-weight:650;
-}
-
-.dayNum.sunday{
-  color:var(--sun);
-}
-
-.dayNum.holiday{
-  color:var(--holiday);
-}
-
-/* jeśli święto wypada w sobotę – ma wygrać święto */
-.dayNum.saturday.holiday{
-  color:var(--holiday);
-  font-weight:700;
-}
-
-/* ===== Status bars (Google vibe) ===== */
-.indRow{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:10px;               /* bliżej dołu kafelka */
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-  align-items:center;
-  pointer-events:none;
-}
-
-/* pasek wspólny */
-.bar{
-  display:block;
-  height:4px;
-  width:64%;                 /* teraz % liczy się od szerokości kafelka */
-  border-radius:999px;       /* pill */
-}
-
-.bar.shift{ background:var(--bar-work); }
-.bar.note{  background:var(--bar-note); }
-.bar.hidden{ display:none; }
-
-@media(max-width:420px){
-  .indRow{ bottom:8px; gap:3px; }
-  .bar{ height:3px; width:66%; }
-}
-
-/* MOBILE: wymuszamy KWADRATY dla dni i pustych pól */
-@media(max-width:640px){
-  .dayCell,
-  .blankCell{
-    aspect-ratio:1/1;
-    min-height:0;
-  }
-}
-
-/* bardzo małe ekrany */
-@media(max-width:420px){
-  .calGrid{gap:6px}
-  .dayNum{font-size:13px}
-  .indRow{ bottom:8px; gap:3px; }
-  .bar{ height:3px; width:66%; }
-}
-
-/* desktop/tablet: pamiętaj o równej wysokości */
-@media(min-width:641px){
-  .dayCell,
-  .blankCell{
-    min-height:74px;
-  }
-}
-
-/* ===== Modal (Google surface) ===== */
-dialog{
-  border:none;
-  border-radius:24px;
-  padding:0;
-  width:min(720px, calc(100vw - 22px));
-  box-shadow:0 18px 60px rgba(0,0,0,.25);
-}
-
-dialog::backdrop{
-  background:rgba(17,17,17,.45);
-}
-
-.modalHead,
-.modalBody{
-  background:var(--surface);
-  padding:16px;
-}
-
-.modalHead{
-  border-bottom:1px solid var(--outline-soft);
-  position:relative;
-}
-
-.shiftItem{
-  border:1px solid var(--outline-soft);
-  border-radius:var(--radius-md);
-  padding:10px;
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  align-items:flex-start;
-}
-
-.shiftItem .times{
-  font-weight:650;
-  font-size:16px;
-}
-
-.shiftItem .mins{
-  font-size:12.5px;
-  color:rgba(17,17,17,.6);
-  margin-top:4px;
-}
-
-/* mini buttons */
-.miniBtn{
-  padding:10px 14px;
-  border-radius:var(--radius-lg);
-  border:1px solid var(--outline-soft);
-  background:var(--surface-soft);
-  font-weight:500;
-  cursor:pointer;
-}
-
-/* ===== Header ===== */
-.appHeader{
-  text-align:center;
-  margin:14px 0 18px;
-}
-
-.appHeader h1{
-  font-size:22px;
-  font-weight:700;
-}
-
-.appHeader .emoji{
-  margin-left:6px;
-  opacity:.8;
-}
-
-/* ===== Focus / tap ===== */
-*{-webkit-tap-highlight-color:transparent}
-
-:focus{outline:none}
-
-:focus-visible{
-  outline:2px solid var(--primary);
-  outline-offset:2px;
-  border-radius:12px;
-}
-
-/* ===== Ikona X w modalu ===== */
-.iconBtn{
-  width:40px;
-  height:40px;
-  border-radius:999px;
-  border:1px solid var(--outline-soft);
-  background:var(--surface-soft);
-  cursor:pointer;
-  position:absolute;
-  top:12px;
-  right:12px;
-}
-
-.iconBtn::before,
-.iconBtn::after{
-  content:"";
-  position:absolute;
-  top:50%;
-  left:50%;
-  width:16px;
-  height:2px;
-  background:#111;
-  border-radius:2px;
-  transform-origin:center;
-}
-
-.iconBtn::before{ transform:translate(-50%,-50%) rotate(45deg); }
-.iconBtn::after{  transform:translate(-50%,-50%) rotate(-45deg); }
-
-/* ===== Ikona usuwania zakresu (kółko X) ===== */
-.delIcon{
-  width:36px;
-  height:36px;
-  border-radius:999px;
-  border:1px solid rgba(217,45,32,.22);
-  background:rgba(217,45,32,.10);
-  cursor:pointer;
-  position:relative;
-  flex:0 0 auto;
-}
-
-.delIcon::before,
-.delIcon::after{
-  content:"";
-  position:absolute;
-  top:50%;
-  left:50%;
-  width:14px;
-  height:2px;
-  background:#7a1410;
-  border-radius:2px;
-  transform-origin:center;
-}
-
-.delIcon::before{ transform:translate(-50%,-50%) rotate(45deg); }
-.delIcon::after{  transform:translate(-50%,-50%) rotate(-45deg); }
-
-/* ===== Oddech / odstępy ===== */
-.calHead{ margin-bottom:14px; }
-.monthBar{ margin-top:10px; margin-bottom:12px; }
-.shiftList{ margin-top:12px; }
-.modalBody strong{ display:block; margin-bottom:10px; }
-
-/* ===== Modal: boxy Suma/Dniówka flat ===== */
-.modalBody .card{
-  border:none;
-  background:transparent;
-  padding:0;
-}
-
-/* ===== Zablokuj scroll tła przy otwartym modalu ===== */
-body.modal-open{
-  overflow:hidden;
-  height:100vh;
-  touch-action:none;
-}
-</style>
 
+  <style>
+    *{box-sizing:border-box}
+
+    :root{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+
+      /* ===== Google / Material tokens ===== */
+      --bg:#f6f7fb;
+      --surface:#ffffff;
+      --surface-soft:rgba(255,255,255,.7);
+      --outline-soft:rgba(17,17,17,.08);
+
+      --primary:#50827C;
+      --primary-soft:rgba(80,130,124,.12);
+
+      --danger:#d92d20;
+      --danger-soft:rgba(217,45,32,.12);
+
+      /* ===== Google-like weekend/holiday colors ===== */
+      --sat:rgba(60,64,67,.65);  /* Google-ish grey */
+      --sun:#d93025;             /* Google red */
+      --holiday:#d93025;         /* jak niedziela */
+
+      /* ===== Status bars (Google vibe) ===== */
+      --bar-work:#1e8e3e;         /* Google green */
+      --bar-note:#f9ab00;         /* Google yellow */
+
+      --radius-lg:20px;
+      --radius-md:16px;
+      --radius-sm:12px;
+    }
+
+    html,body{
+      width:100%;
+      overflow-x:hidden;
+    }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:#111;
+    }
+
+    /* ===== Layout ===== */
+    .wrap{
+      max-width:980px;
+      margin:18px auto;
+      padding:0 14px 90px; /* miejsce na FAB */
+    }
+
+    .card{
+      background:transparent;
+      padding:14px 2px;
+    }
+
+    /* separator między sekcjami */
+    .section{
+      border-bottom:1px solid var(--outline-soft);
+      padding-bottom:14px;
+      margin-bottom:14px;
+    }
+    .section:last-of-type{
+      border-bottom:none;
+      padding-bottom:0;
+      margin-bottom:0;
+    }
+
+    /* ===== Typography ===== */
+    .appHeader{
+      text-align:center;
+      margin:14px 0 8px;
+    }
+    .appHeader h1{
+      font-size:22px;
+      font-weight:800;
+      margin:0;
+    }
+    .appHeader .emoji{
+      margin-left:6px;
+      opacity:.75;
+    }
+
+    h2{
+      font-size:18px;
+      font-weight:650;
+      margin:0 0 10px;
+    }
+
+    label{
+      display:block;
+      font-size:12px;
+      color:rgba(17,17,17,.65);
+      margin-bottom:6px;
+    }
+
+    .muted{
+      font-size:12.5px;
+      color:rgba(17,17,17,.6);
+    }
+
+    /* ===== Grid helpers ===== */
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .row.between{
+      justify-content:space-between;
+      align-items:flex-end;
+    }
+
+    .twoCols{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:10px;
+    }
+    @media(max-width:520px){
+      .twoCols{ grid-template-columns:1fr; }
+    }
+
+    /* ===== Inputs (Google-like) ===== */
+    input,textarea,select{
+      width:100%;
+      padding:12px 14px;
+      border-radius:var(--radius-lg);
+      border:1px solid var(--outline-soft);
+      background:var(--surface-soft);
+      font-size:14px;
+      transition:border-color .15s ease, box-shadow .15s ease;
+    }
+
+    textarea{
+      min-height:44px;
+      resize:vertical;
+    }
+
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px var(--primary-soft);
+    }
+
+    /* ===== Buttons ===== */
+    button{
+      padding:12px 16px;
+      border-radius:var(--radius-lg);
+      border:none;
+      font-size:15px;
+      font-weight:500;
+      background:var(--primary);
+      color:#fff;
+      cursor:pointer;
+      transition:filter .15s ease, transform .08s ease;
+    }
+
+    button.secondary{
+      background:var(--primary-soft);
+      color:#0f2f2b;
+    }
+
+    button.danger{
+      background:var(--danger-soft);
+      color:#7a1410;
+    }
+
+    button:active{
+      transform:scale(.98);
+    }
+
+    button:disabled{
+      opacity:.5;
+      cursor:not-allowed;
+    }
+
+    /* ===== Chevron ===== */
+    .chev{
+      width:18px;
+      height:18px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      opacity:.6;
+      transition:transform .18s ease;
+    }
+
+    .chev::before{
+      content:"";
+      width:8px;
+      height:8px;
+      border-right:2px solid #111;
+      border-bottom:2px solid #111;
+      transform:rotate(45deg);
+    }
+
+    details[open] .chev{
+      transform:rotate(180deg);
+    }
+
+    details summary{
+      cursor:pointer;
+      font-weight:600;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      list-style:none;
+      padding:10px 0;
+    }
+    details summary::-webkit-details-marker{display:none}
+
+    .panel{
+      margin-top:10px;
+      animation:panelIn .18s ease;
+    }
+
+    @keyframes panelIn{
+      from{opacity:.4; transform:translateY(-4px)}
+      to{opacity:1; transform:translateY(0)}
+    }
+
+    /* ===== Month Top Bar (nowy) ===== */
+    .topMonthBar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:10px 0 2px;
+    }
+    .monthTitle{
+      font-size:18px;
+      font-weight:800;
+      line-height:1.1;
+    }
+    .monthActions{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      position:relative;
+    }
+
+    .chip{
+      border:1px solid var(--outline-soft);
+      background:var(--surface-soft);
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:600;
+      font-size:13px;
+      color:#111;
+      cursor:pointer;
+    }
+    .chip:active{ transform:scale(.98); }
+
+    .iconCircle{
+      width:42px;
+      height:42px;
+      border-radius:999px;
+      border:1px solid var(--outline-soft);
+      background:var(--surface-soft);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      position:relative;
+    }
+    .iconCircle svg{
+      width:20px;height:20px;
+      opacity:.85;
+    }
+    /* ukryty input month "na klik" */
+    #monthPick{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      cursor:pointer;
+      appearance:none;
+      -webkit-appearance:none;
+    }
+
+    /* ===== Calendar ===== */
+    .calGrid{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:8px;
+    }
+
+    .calDow{
+      text-align:center;
+      font-size:12px;
+      color:rgba(17,17,17,.55);
+      padding:2px 0;
+    }
+
+    /* ===== Kafle dnia ===== */
+    .dayCell{
+      border-radius:16px;
+      border:1px solid var(--outline-soft);
+      background:var(--surface-soft);
+      padding:4px 10px 10px;
+      cursor:pointer;
+      position:relative;
+
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      align-items:stretch;
+    }
+
+    .blankCell{
+      border:none;
+      background:transparent;
+      box-shadow:none;
+      pointer-events:none;
+    }
+
+    .dayTop{
+      width:100%;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+    }
+
+    .dayNum{
+      width:100%;
+      text-align:center;
+      font-size:16px;
+      font-weight:750;
+      line-height:1.05;
+      margin-top:2px;
+    }
+
+    /* weekend/święta */
+    .dayNum.saturday{ color:var(--sat); font-weight:650; }
+    .dayNum.sunday{ color:var(--sun); }
+    .dayNum.holiday{ color:var(--holiday); }
+    .dayNum.saturday.holiday{ color:var(--holiday); font-weight:750; }
+
+    /* DZISIAJ (Google vibe) */
+    .dayCell.today{
+      border-color:rgba(26,115,232,.35);
+      box-shadow:0 0 0 3px rgba(26,115,232,.12);
+      background:rgba(255,255,255,.85);
+    }
+
+    /* ===== Status bars (paski) ===== */
+    .indRow{
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:10px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      align-items:center;
+      pointer-events:none;
+    }
+
+    .bar{
+      display:block;
+      height:4px;
+      width:64%;
+      border-radius:999px;
+    }
+    .bar.shift{ background:var(--bar-work); }
+    .bar.note{ background:var(--bar-note); }
+    .bar.hidden{ display:none; }
+
+    @media(max-width:640px){
+      .dayCell,.blankCell{
+        aspect-ratio:1/1;
+        min-height:0;
+      }
+    }
+
+    @media(max-width:420px){
+      .calGrid{gap:6px}
+      .dayNum{font-size:13px}
+      .indRow{ bottom:8px; gap:3px; }
+      .bar{ height:3px; width:66%; }
+    }
+
+    @media(min-width:641px){
+      .dayCell,.blankCell{
+        min-height:74px;
+      }
+    }
+
+    /* ===== Summary (suma/wypłata) ===== */
+    .statBox{
+      border:1px solid var(--outline-soft);
+      background:var(--surface-soft);
+      border-radius:16px;
+      padding:12px 14px;
+    }
+    .statValue{
+      font-size:22px;
+      font-weight:900;
+      margin-top:4px;
+    }
+
+    /* ===== Modal ===== */
+    dialog{
+      border:none;
+      border-radius:24px;
+      padding:0;
+      width:min(720px, calc(100vw - 22px));
+      box-shadow:0 18px 60px rgba(0,0,0,.25);
+    }
+
+    dialog::backdrop{
+      background:rgba(17,17,17,.45);
+    }
+
+    .modalHead,.modalBody{
+      background:var(--surface);
+      padding:16px;
+    }
+
+    .modalHead{
+      border-bottom:1px solid var(--outline-soft);
+      position:relative;
+    }
+
+    .shiftItem{
+      border:1px solid var(--outline-soft);
+      border-radius:var(--radius-md);
+      padding:10px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+    }
+
+    .shiftItem .times{ font-weight:650; font-size:16px; }
+    .shiftItem .mins{
+      font-size:12.5px;
+      color:rgba(17,17,17,.6);
+      margin-top:4px;
+    }
+
+    .miniBtn{
+      padding:10px 14px;
+      border-radius:var(--radius-lg);
+      border:1px solid var(--outline-soft);
+      background:var(--surface-soft);
+      font-weight:600;
+      cursor:pointer;
+      color:#111;
+    }
+
+    .iconBtn{
+      width:40px;
+      height:40px;
+      border-radius:999px;
+      border:1px solid var(--outline-soft);
+      background:var(--surface-soft);
+      cursor:pointer;
+      position:absolute;
+      top:12px;
+      right:12px;
+    }
+
+    .iconBtn::before,.iconBtn::after{
+      content:"";
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:16px;
+      height:2px;
+      background:#111;
+      border-radius:2px;
+      transform-origin:center;
+    }
+    .iconBtn::before{ transform:translate(-50%,-50%) rotate(45deg); }
+    .iconBtn::after{ transform:translate(-50%,-50%) rotate(-45deg); }
+
+    .delIcon{
+      width:36px;
+      height:36px;
+      border-radius:999px;
+      border:1px solid rgba(217,45,32,.22);
+      background:rgba(217,45,32,.10);
+      cursor:pointer;
+      position:relative;
+      flex:0 0 auto;
+    }
+    .delIcon::before,.delIcon::after{
+      content:"";
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:14px;
+      height:2px;
+      background:#7a1410;
+      border-radius:2px;
+      transform-origin:center;
+    }
+    .delIcon::before{ transform:translate(-50%,-50%) rotate(45deg); }
+    .delIcon::after{ transform:translate(-50%,-50%) rotate(-45deg); }
+
+    /* modal: boxy suma/dniówka flat */
+    .modalBody .flatRow{
+      display:flex;
+      gap:12px;
+      align-items:stretch;
+      flex-wrap:wrap;
+    }
+    .modalBody .flatBox{
+      flex:1;
+      min-width:220px;
+      border:none;
+      background:transparent;
+      padding:0;
+    }
+
+    .shiftList{ margin-top:12px; }
+    .modalBody strong{ display:block; margin-bottom:10px; }
+
+    /* blokuj scroll tła */
+    body.modal-open{
+      overflow:hidden;
+      height:100vh;
+      touch-action:none;
+    }
+
+    /* ===== FAB ===== */
+    .fab{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      width:56px;
+      height:56px;
+      border-radius:18px;
+      border:none;
+      background:var(--primary);
+      color:#fff;
+      box-shadow:0 12px 28px rgba(0,0,0,.18);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      z-index:999;
+    }
+    .fab:active{ transform:scale(.98); }
+    .fab svg{ width:22px;height:22px; }
+
+    /* focus */
+    *{-webkit-tap-highlight-color:transparent}
+    :focus{outline:none}
+    :focus-visible{
+      outline:2px solid var(--primary);
+      outline-offset:2px;
+      border-radius:12px;
+    }
+  </style>
 </head>
 
 <body>
   <div class="wrap">
     <header class="appHeader">
-  <h1>Godziny pracy <span class="emoji">⏱️</span></h1>
+      <h1>Godziny pracy <span class="emoji">⏱️</span></h1>
     </header>
 
-    <!-- Dodawanie -->
-    <div class="grid" style="margin-bottom:14px;">
-      <div class="card col-12">
-        <h2>Dodaj godziny pracy</h2>
-        <div class="grid">
-          <div class="col-3">
-            <label>Data</label>
-            <input id="date" type="date" />
-          </div>
-          <div class="col-3">
-            <label>Godzina wejścia</label>
-            <input id="start" type="time" />
-          </div>
-          <div class="col-3">
-            <label>Godzina wyjścia</label>
-            <input id="end" type="time" />
-          </div>
+    <!-- TOP: miesiąc + akcje -->
+    <div class="section">
+      <div class="topMonthBar">
+        <div class="monthTitle" id="monthLabelText">—</div>
 
-          <div class="col-12">
-            <label>Notatka</label>
-            <textarea id="note" ></textarea>
-          </div>
+        <div class="monthActions">
+          <button class="chip" id="todayBtn" type="button">Dzisiaj</button>
 
-          <div class="col-3">
-            <label>&nbsp;</label>
-            <button id="addShiftBtn">Dodaj godziny</button>
-          </div>
+          <div class="iconCircle" id="monthBar" title="Wybierz miesiąc" aria-label="Wybierz miesiąc">
+            <!-- calendar icon -->
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="currentColor" d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm12 8H5v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10ZM6 6a1 1 0 0 0-1 1v1h14V7a1 1 0 0 0-1-1H6Z"/>
+            </svg>
 
-          <div class="col-12">
-            <button class="secondary" id="openDayBtn">Pokaż szczegóły dnia</button>
-            <div class="muted" id="status" style="margin-top:8px;"></div>
+            <input id="monthPick" type="month" aria-label="Wybierz miesiąc" />
           </div>
         </div>
+      </div>
+
+      <!-- podsumowanie -->
+      <div class="twoCols" style="margin-top:12px;">
+        <div class="statBox">
+          <div class="muted">Suma godzin</div>
+          <div class="statValue" id="sumHours">0:00</div>
+        </div>
+        <div class="statBox">
+          <div class="muted">Wypłata</div>
+          <div class="statValue" id="sumPay">0,00 zł</div>
+        </div>
+      </div>
+
+      <div class="muted" id="status" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- KALENDARZ -->
+    <div class="section">
+      <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
+      <div class="calGrid" id="calGrid"></div>
+
+      <div class="row" style="margin-top:14px;">
+        <button class="secondary" id="printPdfBtn" type="button" style="width:100%;">Raport PDF / Wydrukuj</button>
+      </div>
+
+      <!-- miejsce na ewentualne tipy -->
+      <div class="muted" style="margin-top:10px;">
+        Tip: kliknij dzień, aby dodać godziny lub notatkę. Możesz dodać kilka zakresów w ciągu dnia.
       </div>
     </div>
 
     <!-- Ustawienia -->
-    <div class="grid" style="margin-bottom:14px;">
-      <div class="card col-12">
-        <details id="extrasPanel">
-          <summary>
-            <span>Ustawienia pracy</span>
-            <span class="chev" aria-hidden="true"></span>
-          </summary>
-          <div class="panel">
-            <div class="grid" style="margin-top:12px;">
-              <div class="col-4">
-                <label>Stawka godzinowa (PLN)</label>
-                <input id="rate" type="number" step="0.01" min="0" value="40" />
-              </div>
+    <div class="section">
+      <details id="extrasPanel">
+        <summary>
+          <span>Ustawienia pracy</span>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="panel">
+          <div class="row" style="margin-top:12px;">
+            <div style="flex:1; min-width:240px;">
+              <label>Stawka godzinowa (PLN)</label>
+              <input id="rate" type="number" step="0.01" min="0" value="40" />
             </div>
           </div>
-        </details>
-      </div>
-    </div>
-
-    <!-- Podsumowanie = kalendarz -->
-    <div class="grid">
-      <div class="card col-12">
-        <div class="calHead">
-          <div>
-            <h2 style="margin:0;">Podsumowanie miesiąca</h2>
-            <div class="muted">Kliknij dzień, żeby zobaczyć szczegóły i akcje.</div>
-          </div>
         </div>
-
-        <div class="monthBar" id="monthBar">
-          <div>
-            <div class="txt" id="monthLabelText">—</div>
-            <div class="sub">Dotknij, aby zmienić miesiąc</div>
-          </div>
-          <span class="chev" aria-hidden="true"></span>
-          <input id="monthPick" type="month" aria-label="Wybierz miesiąc" />
-        </div>
-
-        <div class="calWrap" style="margin-top:10px;">
-          <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
-          <div class="calGrid" id="calGrid"></div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="grid" style="margin-top:10px;">
-          <div class="col-6">
-            <div class="muted">Suma godzin</div>
-            <div style="font-size:22px;font-weight:900" id="sumHours">0:00</div>
-          </div>
-          <div class="col-6">
-            <div class="muted">Wypłata</div>
-            <div style="font-size:22px;font-weight:900" id="sumPay">0,00 zł</div>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:14px;">
-          <button class="secondary" id="printPdfBtn">Raport PDF / Wydrukuj</button>
-        </div>
-      </div>
+      </details>
     </div>
 
     <!-- Narzędzia -->
-    <div class="grid" style="margin-top:14px;">
-      <div class="card col-12">
-        <details id="toolsPanel">
-          <summary>
-            <span>Narzędzia</span>
-            <span class="chev" aria-hidden="true"></span>
-          </summary>
-          <div class="panel">
-            <div class="row" style="margin-top:12px;">
-              <button class="danger" id="clearMonth">Usuń wpisy z tego miesiąca</button>
-              <button class="secondary" id="backupJson">Backup JSON</button>
-              <input id="restoreJson" type="file" accept="application/json" style="display:none" />
-              <button class="secondary" id="restoreBtn">Przywróć z JSON</button>
-            </div>
-            <div class="muted" style="margin-top:8px;">
-              Tip: rób backup raz na jakiś czas (Google Drive / mail) i masz spokój.
-            </div>
+    <div class="section">
+      <details id="toolsPanel">
+        <summary>
+          <span>Narzędzia</span>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="panel">
+          <div class="row" style="margin-top:12px;">
+            <button class="danger" id="clearMonth" type="button" style="flex:1; min-width:240px;">Usuń wpisy z tego miesiąca</button>
+            <button class="secondary" id="backupJson" type="button" style="flex:1; min-width:180px;">Backup JSON</button>
+
+            <input id="restoreJson" type="file" accept="application/json" style="display:none" />
+            <button class="secondary" id="restoreBtn" type="button" style="flex:1; min-width:180px;">Przywróć z JSON</button>
           </div>
-        </details>
-      </div>
+
+          <div class="muted" style="margin-top:8px;">
+            Tip: rób backup raz na jakiś czas (Google Drive / mail) i masz spokój.
+          </div>
+        </div>
+      </details>
     </div>
   </div>
+
+  <!-- FAB -->
+  <button class="fab" id="fabAdd" aria-label="Dodaj godziny (dzisiaj)" title="Dodaj (dzisiaj)" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path fill="currentColor" d="M11 5a1 1 0 0 1 2 0v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5z"/>
+    </svg>
+  </button>
 
   <!-- MODAL DNIA -->
   <dialog id="dayDialog">
@@ -682,613 +675,582 @@ body.modal-open{
         <h3 id="dlgTitle" style="margin:0;">Dzień</h3>
         <div class="muted" id="dlgMeta" style="margin-top:3px;"></div>
       </div>
-      <button class="iconBtn" id="dlgClose" aria-label="Zamknij"></button>
+      <button class="iconBtn" id="dlgClose" aria-label="Zamknij" type="button"></button>
     </div>
 
     <div class="modalBody">
-      <div class="grid">
-        <div class="col-12">
-          <div class="row" style="gap:10px;align-items:stretch;">
-            <div class="card" >
-              <div class="muted">Suma godzin w ciągu dnia</div>
-              <div style="font-size:20px;font-weight:900" id="dlgSumHM">0:00</div>
-            </div>
-            <div class="card" >
-              <div class="muted">Dniówka</div>
-              <div style="font-size:20px;font-weight:900" id="dlgSumPay">0,00 zł</div>
-            </div>
-          </div>
+      <div class="flatRow">
+        <div class="flatBox">
+          <div class="muted">Suma godzin w ciągu dnia</div>
+          <div style="font-size:20px;font-weight:900" id="dlgSumHM">0:00</div>
         </div>
-
-        <div class="col-6">
-          <label>Dodaj kolejne godziny pracy</label>
-          <div class="row" style="gap:8px;">
-            <input id="dlgStart" type="time" style="min-width:140px;" />
-            <input id="dlgEnd" type="time" style="min-width:140px;" />
-            <button id="dlgAddShift" style="width:auto;">Dodaj</button>
-          </div>
+        <div class="flatBox">
+          <div class="muted">Dniówka</div>
+          <div style="font-size:20px;font-weight:900" id="dlgSumPay">0,00 zł</div>
         </div>
+      </div>
 
-        <div class="col-6">
+      <div class="row" style="margin-top:14px; align-items:flex-end;">
+        <div style="flex:1; min-width:140px;">
+          <label>Godzina wejścia</label>
+          <input id="dlgStart" type="time" />
+        </div>
+        <div style="flex:1; min-width:140px;">
+          <label>Godzina wyjścia</label>
+          <input id="dlgEnd" type="time" />
+        </div>
+        <div style="flex:0 0 auto; min-width:120px;">
+          <label>&nbsp;</label>
+          <button id="dlgAddShift" type="button" style="width:100%;">Dodaj</button>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <div style="flex:1;">
           <label>Notatka</label>
-          <textarea id="dlgNote" ></textarea>
-          <button class="secondary" id="dlgSaveNote" style="margin-top:8px;">Zapisz notatkę</button>
+          <textarea id="dlgNote"></textarea>
+          <button class="secondary" id="dlgSaveNote" type="button" style="margin-top:8px; width:100%;">Zapisz notatkę</button>
         </div>
+      </div>
 
-        <div class="col-12">
-          <div class="divider"></div>
-          <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;">
-            <div>
-              <strong>Godziny pracy w ciągu dnia</strong>
-            
-            </div>
-            
-          </div>
-
-          <div class="shiftList" id="dlgShifts"></div>
-        </div>
+      <div style="margin-top:14px;">
+        <strong>Godziny pracy w ciągu dnia</strong>
+        <div class="shiftList" id="dlgShifts"></div>
       </div>
     </div>
   </dialog>
 
-<script>
-(() => {
-  const showErr = (msg) => {
-    const el = document.getElementById("status");
-    if (el) el.textContent = "BŁĄD: " + msg;
-  };
-  window.addEventListener("error", (e) => showErr(e.message || "Nieznany błąd JS"));
-  window.addEventListener("unhandledrejection", (e) => {
-    showErr((e.reason && e.reason.message) ? e.reason.message : String(e.reason || "Promise error"));
-  });
-
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/czas-pracy-pwa/sw.js", { scope: "/czas-pracy-pwa/" });
-  }
-
-  const $ = (id) => document.getElementById(id);
-  const pad2 = (n) => String(n).padStart(2,"0");
-
-  const todayISO = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-  };
-  const ym = (dateISO) => dateISO.slice(0,7);
-
-  const MON = ["sty","lut","mar","kwi","maj","cze","lip","sie","wrz","paź","lis","gru"];
-  const fmtDMYText = (dateISO) => {
-    if (!dateISO) return "";
-    const [y,m,d] = dateISO.split("-").map(Number);
-    return `${pad2(d)}-${MON[m-1]}-${y}`;
-  };
-
-  const fmtMonthPL = (monthYM) => {
-    const [Y, M] = monthYM.split("-").map(Number);
-    const dt = new Date(Y, M-1, 1);
-    const s = new Intl.DateTimeFormat("pl-PL", { month:"long", year:"numeric" }).format(dt);
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  };
-
-  const fmtWeekdayPL = (dateISO) => {
-    const [Y, M, D] = dateISO.split("-").map(Number);
-    const dt = new Date(Y, M-1, D);
-    const s = new Intl.DateTimeFormat("pl-PL", { weekday:"long" }).format(dt);
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  };
-
-  const STORAGE_KEY = "worktime_pwa_v1";
-  let db = load() || { settings:{ rate:40 }, entries:[] };
-
-  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
-  function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; } }
-
-  // migracja: {date,start,end,note} => {date, shifts:[{start,end}], note}
-  function migrateIfNeeded(){
-    let changed = false;
-    db.entries = (Array.isArray(db.entries) ? db.entries : []).map(e=>{
-      if (!e) return e;
-      if (Array.isArray(e.shifts)) return e;
-      const shifts = [];
-      if (e.start && e.end) shifts.push({ start:e.start, end:e.end });
-      const ne = { date:e.date, note:e.note || "", shifts };
-      changed = true;
-      return ne;
+  <script>
+  (() => {
+    const showErr = (msg) => {
+      const el = document.getElementById("status");
+      if (el) el.textContent = "BŁĄD: " + msg;
+    };
+    window.addEventListener("error", (e) => showErr(e.message || "Nieznany błąd JS"));
+    window.addEventListener("unhandledrejection", (e) => {
+      showErr((e.reason && e.reason.message) ? e.reason.message : String(e.reason || "Promise error"));
     });
-    if (changed) save();
-  }
 
-  function normalize(){
-    db.settings = db.settings || {};
-    db.settings.rate = Number(db.settings.rate ?? 40);
-    db.entries = Array.isArray(db.entries) ? db.entries : [];
-    for (const e of db.entries){
-      e.shifts = Array.isArray(e.shifts) ? e.shifts : [];
-      e.note = e.note || "";
-    }
-  }
-
-  function setStatus(t){ const el = $("status"); if (el) el.textContent = t || ""; }
-
-  function minutesBetween(dateISO, start, end) {
-    const [y,m,d] = dateISO.split("-").map(Number);
-    const [sh,sm] = start.split(":").map(Number);
-    const [eh,em] = end.split(":").map(Number);
-    const a = new Date(y,m-1,d,sh,sm,0,0);
-    let b = new Date(y,m-1,d,eh,em,0,0);
-    if (b < a) b = new Date(y,m-1,d+1,eh,em,0,0);
-    return Math.round((b-a)/60000);
-  }
-
-  function fmtHM(mins){
-    const h = Math.floor(mins/60);
-    const m = mins%60;
-    return `${h}:${pad2(m)}`;
-  }
-  function pln(x){ return x.toLocaleString("pl-PL",{style:"currency",currency:"PLN"}); }
-
-  function readSettingsFromUI(){
-    const rateEl = $("rate");
-    if (!rateEl) return;
-    db.settings.rate = Number(rateEl.value || 0);
-  }
-  function hydrateSettingsUI(){
-    const rateEl = $("rate");
-    if (!rateEl) return;
-    rateEl.value = db.settings.rate;
-  }
-
-  function getDay(date){ return db.entries.find(e => e.date === date) || null; }
-
-  function upsertDay(date, patch){
-    const i = db.entries.findIndex(e => e.date === date);
-    if (i >= 0) db.entries[i] = { ...db.entries[i], ...patch };
-    else db.entries.push({ date, note:"", shifts:[], ...patch });
-    db.entries.sort((a,b)=>a.date.localeCompare(b.date));
-  }
-
-  function deleteDay(dateISO){ db.entries = db.entries.filter(e => e.date !== dateISO); }
-
-  function computeDayMinutes(day){
-    let total = 0;
-    for (const s of day.shifts){
-      if (!s?.start || !s?.end) continue;
-      total += Math.max(0, minutesBetween(day.date, s.start, s.end));
-    }
-    return total;
-  }
-
-  function computeMonthMinutes(monthYM){
-    const days = db.entries.filter(e => ym(e.date) === monthYM);
-    return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
-  }
-
-  // ===== ŚWIĘTA PL =====
-  function isoFromDate(dt){
-    return `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
-  }
-
-  // Algorytm daty Wielkanocy (kalendarz gregoriański)
-  function easterSunday(year){
-    const a = year % 19;
-    const b = Math.floor(year / 100);
-    const c = year % 100;
-    const d = Math.floor(b / 4);
-    const e = b % 4;
-    const f = Math.floor((b + 8) / 25);
-    const g = Math.floor((b - f + 1) / 3);
-    const h = (19 * a + b - d - g + 15) % 30;
-    const i = Math.floor(c / 4);
-    const k = c % 4;
-    const l = (32 + 2 * e + 2 * i - h - k) % 7;
-    const m = Math.floor((a + 11 * h + 22 * l) / 451);
-    const month = Math.floor((h + l - 7 * m + 114) / 31); // 3=Mar, 4=Apr
-    const day = ((h + l - 7 * m + 114) % 31) + 1;
-    return new Date(year, month - 1, day);
-  }
-
-  function addDays(dt, n){
-    const x = new Date(dt);
-    x.setDate(x.getDate() + n);
-    return x;
-  }
-
-  // zwraca mapę ISO->nazwa święta
-  function polishHolidays(year){
-    const map = new Map();
-
-    // stałe
-    map.set(`${year}-01-01`, "Nowy Rok");
-    map.set(`${year}-01-06`, "Święto Trzech Króli");
-    map.set(`${year}-05-01`, "Święto Pracy");
-    map.set(`${year}-05-03`, "Święto Konstytucji 3 Maja");
-    map.set(`${year}-08-15`, "Wniebowzięcie NMP");
-    map.set(`${year}-11-01`, "Wszystkich Świętych");
-    map.set(`${year}-11-11`, "Narodowe Święto Niepodległości");
-    map.set(`${year}-12-25`, "Boże Narodzenie (1. dzień)");
-    map.set(`${year}-12-26`, "Boże Narodzenie (2. dzień)");
-
-    // ruchome
-    const easter = easterSunday(year);                 // Niedziela Wielkanocna
-    const easterMon = addDays(easter, 1);              // Poniedziałek Wielkanocny
-    const pentecost = addDays(easter, 49);             // Zielone Świątki (niedziela)
-    const corpusChristi = addDays(easter, 60);         // Boże Ciało (czwartek)
-
-    map.set(isoFromDate(easter), "Wielkanoc");
-    map.set(isoFromDate(easterMon), "Poniedziałek Wielkanocny");
-    map.set(isoFromDate(pentecost), "Zielone Świątki");
-    map.set(isoFromDate(corpusChristi), "Boże Ciało");
-
-    return map;
-  }
-
-  // cache świąt na rok
-  const holidayCache = new Map();
-  function getHolidayMap(year){
-    if (!holidayCache.has(year)) holidayCache.set(year, polishHolidays(year));
-    return holidayCache.get(year);
-  }
-
-  // ===== KALENDARZ =====
-  const DOW = ["Pn","Wt","Śr","Czw","Pt","Sb","Nd"];
-  function mondayIndex(jsDay){ return (jsDay + 6) % 7; }
-  function daysInMonth(year, month1){ return new Date(year, month1, 0).getDate(); }
-
-  function renderDow(){
-    const dowRow = $("dowRow");
-    if (!dowRow) return;
-    dowRow.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
-  }
-
-  function renderCalendar(monthYM){
-    const monthLabel = $("monthLabelText");
-    const calGrid = $("calGrid");
-    if (!monthLabel || !calGrid) return;
-
-    monthLabel.textContent = fmtMonthPL(monthYM);
-
-    const [Y, M] = monthYM.split("-").map(Number);
-    const first = new Date(Y, M-1, 1);
-    const firstIdx = mondayIndex(first.getDay());
-    const dim = daysInMonth(Y, M);
-
-    const holidays = getHolidayMap(Y);
-    const cells = [];
-
-    for (let i=0;i<firstIdx;i++){
-      cells.push(`<div class="blankCell"></div>`);
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/czas-pracy-pwa/sw.js", { scope: "/czas-pracy-pwa/" });
     }
 
-    for (let d=1; d<=dim; d++){
-      const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
-      const jsDow = new Date(Y, M-1, d).getDay(); // 0=Nd, 6=Sb
+    const $ = (id) => document.getElementById(id);
+    const pad2 = (n) => String(n).padStart(2,"0");
 
-      const day = getDay(dateISO);
-      const shiftsCount = (day?.shifts || []).length;
-      const hasShifts = shiftsCount > 0;
-      const hasNote = !!(day?.note && day.note.trim());
+    const todayISO = () => {
+      const d = new Date();
+      return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+    };
+    const ym = (dateISO) => dateISO.slice(0,7);
 
-      const holidayName = holidays.get(dateISO) || "";
-      const isHoliday = !!holidayName;
+    const MON = ["sty","lut","mar","kwi","maj","cze","lip","sie","wrz","paź","lis","gru"];
+    const fmtDMYText = (dateISO) => {
+      if (!dateISO) return "";
+      const [y,m,d] = dateISO.split("-").map(Number);
+      return `${pad2(d)}-${MON[m-1]}-${y}`;
+    };
 
-      // KLASY KOLORÓW:
-      // - sobota: "saturday" (szary jak Google)
-      // - niedziela: "sunday" (czerwony jak Google)
-      // - święto: "holiday" (też czerwony, niezależnie od dnia tygodnia)
-      const numClass = [
-        "dayNum",
-        jsDow === 6 ? "saturday" : "",
-        jsDow === 0 ? "sunday" : "",
-        isHoliday ? "holiday" : "",
-        hasShifts ? "has" : ""
-      ].filter(Boolean).join(" ");
+    const fmtMonthPL = (monthYM) => {
+      const [Y, M] = monthYM.split("-").map(Number);
+      const dt = new Date(Y, M-1, 1);
+      const s = new Intl.DateTimeFormat("pl-PL", { month:"long", year:"numeric" }).format(dt);
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    };
 
-      const tileTitle = isHoliday ? holidayName : "";
+    const fmtWeekdayPL = (dateISO) => {
+      const [Y, M, D] = dateISO.split("-").map(Number);
+      const dt = new Date(Y, M-1, D);
+      const s = new Intl.DateTimeFormat("pl-PL", { weekday:"long" }).format(dt);
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    };
 
-      cells.push(`
-        <div class="dayCell" data-date="${dateISO}" ${tileTitle ? `title="${tileTitle}"` : ""}>
-          <div class="dayTop">
-            <div class="${numClass}">${d}</div>
+    const STORAGE_KEY = "worktime_pwa_v1";
+    let db = load() || { settings:{ rate:40 }, entries:[] };
+
+    function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+    function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; } }
+
+    // migracja: {date,start,end,note} => {date, shifts:[{start,end}], note}
+    function migrateIfNeeded(){
+      let changed = false;
+      db.entries = (Array.isArray(db.entries) ? db.entries : []).map(e=>{
+        if (!e) return e;
+        if (Array.isArray(e.shifts)) return e;
+        const shifts = [];
+        if (e.start && e.end) shifts.push({ start:e.start, end:e.end });
+        const ne = { date:e.date, note:e.note || "", shifts };
+        changed = true;
+        return ne;
+      });
+      if (changed) save();
+    }
+
+    function normalize(){
+      db.settings = db.settings || {};
+      db.settings.rate = Number(db.settings.rate ?? 40);
+      db.entries = Array.isArray(db.entries) ? db.entries : [];
+      for (const e of db.entries){
+        e.shifts = Array.isArray(e.shifts) ? e.shifts : [];
+        e.note = e.note || "";
+      }
+    }
+
+    function setStatus(t){ const el = $("status"); if (el) el.textContent = t || ""; }
+
+    function minutesBetween(dateISO, start, end) {
+      const [y,m,d] = dateISO.split("-").map(Number);
+      const [sh,sm] = start.split(":").map(Number);
+      const [eh,em] = end.split(":").map(Number);
+      const a = new Date(y,m-1,d,sh,sm,0,0);
+      let b = new Date(y,m-1,d,eh,em,0,0);
+      if (b < a) b = new Date(y,m-1,d+1,eh,em,0,0);
+      return Math.round((b-a)/60000);
+    }
+
+    function fmtHM(mins){
+      const h = Math.floor(mins/60);
+      const m = mins%60;
+      return `${h}:${pad2(m)}`;
+    }
+    function pln(x){ return x.toLocaleString("pl-PL",{style:"currency",currency:"PLN"}); }
+
+    function readSettingsFromUI(){
+      const rateEl = $("rate");
+      if (!rateEl) return;
+      db.settings.rate = Number(rateEl.value || 0);
+    }
+    function hydrateSettingsUI(){
+      const rateEl = $("rate");
+      if (!rateEl) return;
+      rateEl.value = db.settings.rate;
+    }
+
+    function getDay(date){ return db.entries.find(e => e.date === date) || null; }
+
+    function upsertDay(date, patch){
+      const i = db.entries.findIndex(e => e.date === date);
+      if (i >= 0) db.entries[i] = { ...db.entries[i], ...patch };
+      else db.entries.push({ date, note:"", shifts:[], ...patch });
+      db.entries.sort((a,b)=>a.date.localeCompare(b.date));
+    }
+
+    function computeDayMinutes(day){
+      let total = 0;
+      for (const s of day.shifts){
+        if (!s?.start || !s?.end) continue;
+        total += Math.max(0, minutesBetween(day.date, s.start, s.end));
+      }
+      return total;
+    }
+
+    function computeMonthMinutes(monthYM){
+      const days = db.entries.filter(e => ym(e.date) === monthYM);
+      return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
+    }
+
+    // ===== ŚWIĘTA PL =====
+    function isoFromDate(dt){
+      return `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
+    }
+
+    function easterSunday(year){
+      const a = year % 19;
+      const b = Math.floor(year / 100);
+      const c = year % 100;
+      const d = Math.floor(b / 4);
+      const e = b % 4;
+      const f = Math.floor((b + 8) / 25);
+      const g = Math.floor((b - f + 1) / 3);
+      const h = (19 * a + b - d - g + 15) % 30;
+      const i = Math.floor(c / 4);
+      const k = c % 4;
+      const l = (32 + 2 * e + 2 * i - h - k) % 7;
+      const m = Math.floor((a + 11 * h + 22 * l) / 451);
+      const month = Math.floor((h + l - 7 * m + 114) / 31);
+      const day = ((h + l - 7 * m + 114) % 31) + 1;
+      return new Date(year, month - 1, day);
+    }
+
+    function addDays(dt, n){
+      const x = new Date(dt);
+      x.setDate(x.getDate() + n);
+      return x;
+    }
+
+    function polishHolidays(year){
+      const map = new Map();
+      map.set(`${year}-01-01`, "Nowy Rok");
+      map.set(`${year}-01-06`, "Święto Trzech Króli");
+      map.set(`${year}-05-01`, "Święto Pracy");
+      map.set(`${year}-05-03`, "Święto Konstytucji 3 Maja");
+      map.set(`${year}-08-15`, "Wniebowzięcie NMP");
+      map.set(`${year}-11-01`, "Wszystkich Świętych");
+      map.set(`${year}-11-11`, "Narodowe Święto Niepodległości");
+      map.set(`${year}-12-25`, "Boże Narodzenie (1. dzień)");
+      map.set(`${year}-12-26`, "Boże Narodzenie (2. dzień)");
+
+      const easter = easterSunday(year);
+      const easterMon = addDays(easter, 1);
+      const pentecost = addDays(easter, 49);
+      const corpusChristi = addDays(easter, 60);
+
+      map.set(isoFromDate(easter), "Wielkanoc");
+      map.set(isoFromDate(easterMon), "Poniedziałek Wielkanocny");
+      map.set(isoFromDate(pentecost), "Zielone Świątki");
+      map.set(isoFromDate(corpusChristi), "Boże Ciało");
+
+      return map;
+    }
+
+    const holidayCache = new Map();
+    function getHolidayMap(year){
+      if (!holidayCache.has(year)) holidayCache.set(year, polishHolidays(year));
+      return holidayCache.get(year);
+    }
+
+    // ===== KALENDARZ =====
+    const DOW = ["Pn","Wt","Śr","Czw","Pt","Sb","Nd"];
+    function mondayIndex(jsDay){ return (jsDay + 6) % 7; }
+    function daysInMonth(year, month1){ return new Date(year, month1, 0).getDate(); }
+
+    let shouldScrollToToday = false;
+
+    function renderDow(){
+      const dowRow = $("dowRow");
+      if (!dowRow) return;
+      dowRow.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
+    }
+
+    function renderCalendar(monthYM){
+      const monthLabel = $("monthLabelText");
+      const calGrid = $("calGrid");
+      if (!monthLabel || !calGrid) return;
+
+      monthLabel.textContent = fmtMonthPL(monthYM);
+
+      const [Y, M] = monthYM.split("-").map(Number);
+      const first = new Date(Y, M-1, 1);
+      const firstIdx = mondayIndex(first.getDay());
+      const dim = daysInMonth(Y, M);
+
+      const holidays = getHolidayMap(Y);
+      const cells = [];
+      const today = todayISO();
+
+      for (let i=0;i<firstIdx;i++){
+        cells.push(`<div class="blankCell"></div>`);
+      }
+
+      for (let d=1; d<=dim; d++){
+        const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
+        const jsDow = new Date(Y, M-1, d).getDay(); // 0=Nd, 6=Sb
+
+        const day = getDay(dateISO);
+        const hasShifts = ((day?.shifts || []).length > 0);
+        const hasNote = !!(day?.note && day.note.trim());
+
+        const holidayName = holidays.get(dateISO) || "";
+        const isHoliday = !!holidayName;
+
+        const numClass = [
+          "dayNum",
+          jsDow === 6 ? "saturday" : "",
+          jsDow === 0 ? "sunday" : "",
+          isHoliday ? "holiday" : ""
+        ].filter(Boolean).join(" ");
+
+        const tileTitle = isHoliday ? holidayName : "";
+        const isToday = (dateISO === today);
+        const dayCellClass = ["dayCell", isToday ? "today" : ""].filter(Boolean).join(" ");
+
+        cells.push(`
+          <div class="${dayCellClass}" data-date="${dateISO}" ${tileTitle ? `title="${tileTitle}"` : ""}>
+            <div class="dayTop">
+              <div class="${numClass}">${d}</div>
+            </div>
+            <div class="indRow" aria-hidden="true">
+              <span class="bar shift ${hasShifts ? "" : "hidden"}"></span>
+              <span class="bar note ${hasNote ? "" : "hidden"}"></span>
+            </div>
           </div>
-          <div class="indRow" aria-hidden="true">
-            <span class="bar shift ${hasShifts ? "" : "hidden"}"></span>
-            <span class="bar note ${hasNote ? "" : "hidden"}"></span>
+        `);
+      }
+
+      const mod = cells.length % 7;
+      if (mod !== 0){
+        const need = 7 - mod;
+        for (let i=0;i<need;i++) cells.push(`<div class="blankCell"></div>`);
+      }
+
+      calGrid.innerHTML = cells.join("");
+
+      document.querySelectorAll(".dayCell[data-date]").forEach(el=>{
+        el.onclick = ()=>{
+          const date = el.getAttribute("data-date");
+          openDay(date);
+        };
+      });
+
+      if (shouldScrollToToday){
+        shouldScrollToToday = false;
+        const el = document.querySelector(`.dayCell[data-date="${today}"]`);
+        if (el) el.scrollIntoView({behavior:"smooth", block:"center"});
+      }
+    }
+
+    // ===== MODAL =====
+    const dlg = $("dayDialog");
+    let dlgDate = null;
+
+    function openDay(dateISO){
+      dlgDate = dateISO;
+
+      const weekday = fmtWeekdayPL(dateISO);
+      const dlgTitle = $("dlgTitle");
+      const dlgMeta = $("dlgMeta");
+      if (dlgTitle) dlgTitle.textContent = `${fmtDMYText(dateISO)}`;
+      if (dlgMeta) dlgMeta.textContent = weekday;
+
+      const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[] };
+      if ($("dlgStart")) $("dlgStart").value = "";
+      if ($("dlgEnd")) $("dlgEnd").value = "";
+      if ($("dlgNote")) $("dlgNote").value = day.note || "";
+
+      renderDayDialog();
+
+      if (dlg && typeof dlg.showModal === "function") dlg.showModal();
+      else if (dlg) dlg.setAttribute("open","");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeDay(){
+      dlgDate = null;
+      if (dlg && typeof dlg.close === "function") dlg.close();
+      else if (dlg) dlg.removeAttribute("open");
+      document.body.classList.remove("modal-open");
+    }
+
+    if (dlg){
+      dlg.addEventListener("close", ()=> document.body.classList.remove("modal-open"));
+      dlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeDay(); });
+    }
+
+    function renderDayDialog(){
+      if (!dlgDate) return;
+      const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
+      const mins = computeDayMinutes(day);
+      const pay = (mins/60) * (db.settings.rate||0);
+
+      if ($("dlgSumHM")) $("dlgSumHM").textContent = fmtHM(mins);
+      if ($("dlgSumPay")) $("dlgSumPay").textContent = pln(pay);
+
+      const items = (day.shifts || []).map((s, idx)=>{
+        const a = s.start || "—";
+        const b = s.end || "—";
+        const m = (s.start && s.end) ? Math.max(0, minutesBetween(day.date, s.start, s.end)) : 0;
+
+        return `
+          <div class="shiftItem">
+            <div>
+              <div class="times">${a} – ${b}</div>
+              <div class="mins">${m ? ("Ilość godzin: " + fmtHM(m)) : "-"}</div>
+            </div>
+            <button class="delIcon" data-delshift="${idx}" aria-label="Usuń zakres" type="button"></button>
           </div>
-        </div>
-      `);
+        `;
+      }).join("");
+
+      const dlgShifts = $("dlgShifts");
+      if (dlgShifts){
+        dlgShifts.innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
+      }
+
+      document.querySelectorAll("[data-delshift]").forEach(btn=>{
+        btn.onclick = ()=>{
+          const idx = Number(btn.getAttribute("data-delshift"));
+          if (!confirm("Usunąć ten zakres?")) return;
+          const d = getDay(dlgDate);
+          if (!d) return;
+          d.shifts.splice(idx, 1);
+          save();
+          renderAll();
+          renderDayDialog();
+        };
+      });
     }
 
-    const mod = cells.length % 7;
-    if (mod !== 0){
-      const need = 7 - mod;
-      for (let i=0;i<need;i++) cells.push(`<div class="blankCell"></div>`);
+    // ===== TOTALS =====
+    function renderTotals(monthYM){
+      const sumMin = computeMonthMinutes(monthYM);
+      if ($("sumHours")) $("sumHours").textContent = fmtHM(sumMin);
+      if ($("sumPay")) $("sumPay").textContent = pln((sumMin/60) * (db.settings.rate||0));
     }
 
-    calGrid.innerHTML = cells.join("");
+    function renderAll(){
+      normalize();
+      readSettingsFromUI();
+      save();
 
-    document.querySelectorAll(".dayCell[data-date]").forEach(el=>{
-      el.onclick = ()=>{
-        const date = el.getAttribute("data-date");
-        openDay(date);
-      };
-    });
-  }
+      const monthPick = $("monthPick");
+      const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
 
-  // ===== MODAL DNIA =====
-  const dlg = $("dayDialog");
-  let dlgDate = null;
-
-  function openDay(dateISO){
-    dlgDate = dateISO;
-    const dateInput = $("date");
-    if (dateInput) dateInput.value = dateISO;
-
-    const weekday = fmtWeekdayPL(dateISO);
-    const dlgTitle = $("dlgTitle");
-    const dlgMeta = $("dlgMeta");
-    if (dlgTitle) dlgTitle.textContent = `${fmtDMYText(dateISO)}`;
-    if (dlgMeta) dlgMeta.textContent = weekday;
-
-    const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[] };
-    const dlgStart = $("dlgStart");
-    const dlgEnd = $("dlgEnd");
-    const dlgNote = $("dlgNote");
-    if (dlgStart) dlgStart.value = "";
-    if (dlgEnd) dlgEnd.value = "";
-    if (dlgNote) dlgNote.value = day.note || "";
-
-    renderDayDialog();
-
-    if (dlg && typeof dlg.showModal === "function") dlg.showModal();
-    else if (dlg) dlg.setAttribute("open","");
-    document.body.classList.add("modal-open");
-  }
-
-  function closeDay(){
-    dlgDate = null;
-    if (dlg && typeof dlg.close === "function") dlg.close();
-    else if (dlg) dlg.removeAttribute("open");
-    document.body.classList.remove("modal-open");
-  }
-
-  if (dlg){
-    dlg.addEventListener("close", ()=> document.body.classList.remove("modal-open"));
-    dlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeDay(); });
-  }
-
-  function renderDayDialog(){
-    if (!dlgDate) return;
-    const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
-    const mins = computeDayMinutes(day);
-    const pay = (mins/60) * (db.settings.rate||0);
-
-    const sumHM = $("dlgSumHM");
-    const sumPay = $("dlgSumPay");
-    if (sumHM) sumHM.textContent = fmtHM(mins);
-    if (sumPay) sumPay.textContent = pln(pay);
-
-    const items = (day.shifts || []).map((s, idx)=>{
-      const a = s.start || "—";
-      const b = s.end || "—";
-      const m = (s.start && s.end) ? Math.max(0, minutesBetween(day.date, s.start, s.end)) : 0;
-
-      return `
-        <div class="shiftItem">
-          <div>
-            <div class="times">${a} – ${b}</div>
-            <div class="mins">${m ? ("Ilość godzin: " + fmtHM(m)) : "-"}</div>
-          </div>
-          <button class="delIcon" data-delshift="${idx}" aria-label="Usuń zakres"></button>
-        </div>
-      `;
-    }).join("");
-
-    const dlgShifts = $("dlgShifts");
-    if (dlgShifts){
-      dlgShifts.innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
+      renderDow();
+      renderCalendar(monthYM);
+      renderTotals(monthYM);
     }
 
-    document.querySelectorAll("[data-delshift]").forEach(btn=>{
-      btn.onclick = ()=>{
-        const idx = Number(btn.getAttribute("data-delshift"));
-        if (!confirm("Usunąć ten zakres?")) return;
-        const d = getDay(dlgDate);
-        if (!d) return;
-        d.shifts.splice(idx, 1);
+    // ===== UI =====
+    const dlgCloseBtn = $("dlgClose");
+    if (dlgCloseBtn) dlgCloseBtn.onclick = closeDay;
+
+    const dlgAddShiftBtn = $("dlgAddShift");
+    if (dlgAddShiftBtn){
+      dlgAddShiftBtn.onclick = ()=>{
+        if (!dlgDate) return;
+        const start = $("dlgStart")?.value;
+        const end = $("dlgEnd")?.value;
+        if (!start || !end) return alert("Uzupełnij wejście i wyjście.");
+
+        const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
+        day.shifts.push({ start, end });
+        upsertDay(dlgDate, day);
+
+        if ($("dlgStart")) $("dlgStart").value = "";
+        if ($("dlgEnd")) $("dlgEnd").value = "";
         save();
         renderAll();
         renderDayDialog();
+        setStatus("Dodano zakres.");
       };
-    });
-  }
+    }
 
-  // ===== TOTALS =====
-  function renderTotals(monthYM){
-    const sumMin = computeMonthMinutes(monthYM);
-    const sumHours = $("sumHours");
-    const sumPay = $("sumPay");
-    if (sumHours) sumHours.textContent = fmtHM(sumMin);
-    if (sumPay) sumPay.textContent = pln((sumMin/60) * (db.settings.rate||0));
-  }
-
-  function renderAll(){
-    normalize();
-    readSettingsFromUI();
-    save();
-
-    const monthPick = $("monthPick");
-    const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
-
-    renderDow();
-    renderCalendar(monthYM);
-    renderTotals(monthYM);
-  }
-
-  // ===== EVENTY UI =====
-  const addShiftBtn = $("addShiftBtn");
-  if (addShiftBtn){
-    addShiftBtn.onclick = ()=>{
-      const date = $("date")?.value;
-      const start = $("start")?.value;
-      const end = $("end")?.value;
-      const note = ($("note")?.value || "").trim();
-
-      if (!date) return alert("Wybierz datę.");
-      if ((start && !end) || (!start && end)) return alert("Uzupełnij wejście i wyjście (albo zostaw oba puste).");
-      if (!start && !end && !note) return alert("Wpisz godziny lub notatkę.");
-
-      const day = getDay(date) || { date, note:"", shifts:[] };
-
-      let msg = [];
-      if (start && end){
-        day.shifts.push({ start, end });
-        msg.push("Dodano zakres.");
-        if ($("start")) $("start").value = "";
-        if ($("end")) $("end").value = "";
-      }
-      if (note){
+    const dlgSaveNoteBtn = $("dlgSaveNote");
+    if (dlgSaveNoteBtn){
+      dlgSaveNoteBtn.onclick = ()=>{
+        if (!dlgDate) return;
+        const note = ($("dlgNote")?.value || "").trim();
+        const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
         day.note = note;
-        msg.push("Zapisano notatkę.");
-      }
-
-      upsertDay(date, day);
-      setStatus(msg.join(" ") || "Zapisano.");
-      save();
-      renderAll();
-    };
-  }
-
-  const openDayBtn = $("openDayBtn");
-  if (openDayBtn){
-    openDayBtn.onclick = ()=>{
-      const date = $("date")?.value;
-      if (!date) return alert("Wybierz datę.");
-      openDay(date);
-    };
-  }
-
-  const dlgCloseBtn = $("dlgClose");
-  if (dlgCloseBtn) dlgCloseBtn.onclick = closeDay;
-
-  const dlgAddShiftBtn = $("dlgAddShift");
-  if (dlgAddShiftBtn){
-    dlgAddShiftBtn.onclick = ()=>{
-      if (!dlgDate) return;
-      const start = $("dlgStart")?.value;
-      const end = $("dlgEnd")?.value;
-      if (!start || !end) return alert("Uzupełnij wejście i wyjście.");
-
-      const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
-      day.shifts.push({ start, end });
-      upsertDay(dlgDate, day);
-
-      if ($("dlgStart")) $("dlgStart").value = "";
-      if ($("dlgEnd")) $("dlgEnd").value = "";
-      save();
-      renderAll();
-      renderDayDialog();
-    };
-  }
-
-  const dlgSaveNoteBtn = $("dlgSaveNote");
-  if (dlgSaveNoteBtn){
-    dlgSaveNoteBtn.onclick = ()=>{
-      if (!dlgDate) return;
-      const note = ($("dlgNote")?.value || "").trim();
-      const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
-      day.note = note;
-      upsertDay(dlgDate, day);
-      save();
-      renderAll();
-      renderDayDialog();
-      setStatus("Zapisano notatkę.");
-    };
-  }
-
-  // miesiąc
-  const monthBar = $("monthBar");
-  const monthPick = $("monthPick");
-  if (monthBar && monthPick){
-    monthBar.onclick = ()=>{
-      if (typeof monthPick.showPicker === "function") monthPick.showPicker();
-      else monthPick.focus();
-    };
-    monthPick.addEventListener("change", renderAll);
-  }
-
-  // narzędzia
-  const printBtn = $("printPdfBtn");
-  if (printBtn) printBtn.onclick = ()=> window.print();
-
-  const backupBtn = $("backupJson");
-  if (backupBtn){
-    backupBtn.onclick = ()=>{
-      const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    };
-  }
-
-  const restoreBtn = $("restoreBtn");
-  const restoreInput = $("restoreJson");
-  if (restoreBtn && restoreInput){
-    restoreBtn.onclick = ()=> restoreInput.click();
-    restoreInput.onchange = async (ev)=>{
-      const f = ev.target.files?.[0];
-      if (!f) return;
-      try{
-        const txt = await f.text();
-        const obj = JSON.parse(txt);
-        db = obj;
-        normalize();
-        migrateIfNeeded();
+        upsertDay(dlgDate, day);
         save();
-        hydrateSettingsUI();
         renderAll();
-        setStatus("Przywrócono dane z pliku JSON.");
-      }catch{
-        alert("Nie udało się wczytać pliku JSON.");
-      }
-    };
-  }
+        renderDayDialog();
+        setStatus("Zapisano notatkę.");
+      };
+    }
 
-  const clearMonthBtn = $("clearMonth");
-  if (clearMonthBtn){
-    clearMonthBtn.onclick = ()=>{
-      const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
-      if (!confirm("Usunąć wszystkie wpisy z tego miesiąca?")) return;
-      db.entries = db.entries.filter(e => ym(e.date) !== monthYM);
-      save();
+    // miesiąc picker (klik w ikonę)
+    const monthBar = $("monthBar");
+    const monthPick = $("monthPick");
+    if (monthBar && monthPick){
+      monthBar.onclick = ()=>{
+        if (typeof monthPick.showPicker === "function") monthPick.showPicker();
+        else monthPick.focus();
+      };
+      monthPick.addEventListener("change", renderAll);
+    }
+
+    // Dzisiaj (chip)
+    const todayBtn = $("todayBtn");
+    if (todayBtn && monthPick){
+      todayBtn.onclick = ()=>{
+        const t = todayISO();
+        monthPick.value = ym(t);
+        shouldScrollToToday = true;
+        renderAll();
+      };
+    }
+
+    // FAB: otwórz dzisiaj
+    const fabAdd = $("fabAdd");
+    if (fabAdd){
+      fabAdd.onclick = ()=>{
+        const t = todayISO();
+        // jeśli jesteśmy w innym miesiącu, przełącz:
+        if (monthPick){
+          monthPick.value = ym(t);
+          shouldScrollToToday = false;
+          renderAll();
+        }
+        openDay(t);
+      };
+    }
+
+    // narzędzia
+    const printBtn = $("printPdfBtn");
+    if (printBtn) printBtn.onclick = ()=> window.print();
+
+    const backupBtn = $("backupJson");
+    if (backupBtn){
+      backupBtn.onclick = ()=>{
+        const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+    }
+
+    const restoreBtn = $("restoreBtn");
+    const restoreInput = $("restoreJson");
+    if (restoreBtn && restoreInput){
+      restoreBtn.onclick = ()=> restoreInput.click();
+      restoreInput.onchange = async (ev)=>{
+        const f = ev.target.files?.[0];
+        if (!f) return;
+        try{
+          const txt = await f.text();
+          const obj = JSON.parse(txt);
+          db = obj;
+          normalize();
+          migrateIfNeeded();
+          save();
+          hydrateSettingsUI();
+          renderAll();
+          setStatus("Przywrócono dane z pliku JSON.");
+        }catch{
+          alert("Nie udało się wczytać pliku JSON.");
+        }
+      };
+    }
+
+    const clearMonthBtn = $("clearMonth");
+    if (clearMonthBtn){
+      clearMonthBtn.onclick = ()=>{
+        const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
+        if (!confirm("Usunąć wszystkie wpisy z tego miesiąca?")) return;
+        db.entries = db.entries.filter(e => ym(e.date) !== monthYM);
+        save();
+        renderAll();
+        setStatus("Wyczyszczono miesiąc.");
+      };
+    }
+
+    const rateEl = $("rate");
+    if (rateEl){
+      rateEl.addEventListener("input", renderAll);
+      rateEl.addEventListener("change", renderAll);
+    }
+
+    // INIT
+    try{
+      normalize();
+      migrateIfNeeded();
+      hydrateSettingsUI();
+
+      const t = todayISO();
+      if (monthPick) monthPick.value = ym(t);
+
       renderAll();
-    };
-  }
-
-  const rateEl = $("rate");
-  if (rateEl){
-    rateEl.addEventListener("input", renderAll);
-    rateEl.addEventListener("change", renderAll);
-  }
-
-  // INIT
-  try{
-    normalize();
-    migrateIfNeeded();
-    hydrateSettingsUI();
-
-    const dateEl = $("date");
-    if (dateEl) dateEl.value = todayISO();
-    if (monthPick) monthPick.value = ym(todayISO());
-
-    renderAll();
-  } catch(err){
-    const msg = (err && err.message) ? err.message : String(err);
-    const el = document.getElementById("status");
-    if (el) el.textContent = "BŁĄD INIT: " + msg;
-  }
-})();
-</script>
+    } catch(err){
+      const msg = (err && err.message) ? err.message : String(err);
+      const el = document.getElementById("status");
+      if (el) el.textContent = "BŁĄD INIT: " + msg;
+    }
+  })();
+  </script>
 </body>
 </html>
