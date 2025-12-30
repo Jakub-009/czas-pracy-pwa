@@ -240,14 +240,40 @@
     .card{box-shadow:none;border-radius:0;padding:0}
     button, input, textarea, details, dialog{display:none !important}
   }
+     /* ===== Nagłówek ===== */
+  .appHeader{
+  text-align:center;
+  margin:16px 0 20px;
+}
+
+.appHeader h1{
+  font-size:22px;
+  font-weight:900;
+  margin:0;
+  letter-spacing:.2px;
+}
+
+.appHeader .emoji{
+  font-size:20px;
+  margin-left:6px;
+  vertical-align:middle;
+  opacity:.85;
+}
+
+/* mobile – trochę lżej */
+@media(max-width:420px){
+  .appHeader h1{
+    font-size:20px;
+  }
+}
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <div class="card" style="margin-bottom:14px;">
-      <h1>Godziny pracy ⏱️</h1>
-    </div>
+    <header class="appHeader">
+  <h1>Godziny pracy <span class="emoji">⏱️</span></h1>
+    </header>
 
     <!-- Dodawanie -->
     <div class="grid" style="margin-bottom:14px;">
