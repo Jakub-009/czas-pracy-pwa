@@ -52,7 +52,7 @@ body{
 /* ===== Sekcje zamiast kart ===== */
 .card{
   background:transparent;
-  padding:16px 2px;
+  padding:14px 2px;
 }
 
 /* separator między sekcjami */
@@ -201,12 +201,13 @@ details summary{
   justify-content:space-between;
   align-items:center;
   list-style:none;
+  padding:10px 0;
 }
 
 details summary::-webkit-details-marker{display:none}
 
 .panel{
-  margin-top:12px;
+  margin-top:10px;
   animation:panelIn .18s ease;
 }
 
@@ -225,11 +226,21 @@ details summary::-webkit-details-marker{display:none}
   border:1px solid var(--outline-soft);
   background:transparent;
   cursor:pointer;
+  position:relative;
 }
 
 .monthBar .txt{
   font-size:15px;
   font-weight:700;
+}
+#monthPick{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  cursor:pointer;
+
+  appearance:none;
+  -webkit-appearance:none;
 }
 
 .calGrid{
@@ -246,15 +257,25 @@ details summary::-webkit-details-marker{display:none}
 
 /* day tiles */
 .dayCell{
-  border-radius:var(--radius-md);
+  border-radius:16px;
   border:1px solid var(--outline-soft);
   background:var(--surface-soft);
   padding:10px;
-  min-height:76px;
+  min-height:74px;
   cursor:pointer;
   position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  gap:6px;
 }
-
+@media(max-width:640px){
+  .dayCell, .blankCell{
+    min-height:auto;
+    aspect-ratio:1/1;
+    padding:10px;
+  }
+}
 .dayNum{
   font-size:18px;
   font-weight:700;
@@ -349,6 +370,82 @@ dialog::backdrop{
   outline-offset:2px;
   border-radius:12px;
 }
+  .modalHead{
+  position:relative;
+  padding:16px;
+}
+
+.iconBtn{
+  width:40px;
+  height:40px;
+  border-radius:999px;
+  border:1px solid var(--outline-soft);
+  background:var(--surface-soft);
+  cursor:pointer;
+  position:absolute;
+  top:12px;
+  right:12px;
+}
+
+.iconBtn::before,
+.iconBtn::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:16px;
+  height:2px;
+  background:#111;
+  border-radius:2px;
+  transform-origin:center;
+}
+
+.iconBtn::before{ transform:translate(-50%,-50%) rotate(45deg); }
+.iconBtn::after{  transform:translate(-50%,-50%) rotate(-45deg); }
+.shiftItem{
+  align-items:flex-start;
+}
+.shiftItem .times{
+  font-weight:650;
+  font-size:16px;
+}
+
+.shiftItem .mins{
+  font-size:12.5px;
+  color:rgba(17,17,17,.6);
+  margin-top:4px;
+}
+.monthBar .txt{ white-space:nowrap; }
+.monthBar .sub{ white-space:nowrap; opacity:.75; }
+.monthBar > div{ min-width:0; }
+
+.delIcon{
+  width:36px;
+  height:36px;
+  border-radius:999px;
+  border:1px solid rgba(217,45,32,.22);
+  background:rgba(217,45,32,.10);
+  cursor:pointer;
+  position:relative;
+  flex:0 0 auto;
+}
+
+.delIcon::before,
+.delIcon::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:14px;
+  height:2px;
+  background:#7a1410;
+  border-radius:2px;
+  transform-origin:center;
+}
+
+.delIcon::before{ transform:translate(-50%,-50%) rotate(45deg); }
+.delIcon::after{  transform:translate(-50%,-50%) rotate(-45deg); }
+
 </style>
 </head>
 
@@ -488,7 +585,7 @@ dialog::backdrop{
         <h3 id="dlgTitle" style="margin:0;">Dzień</h3>
         <div class="muted" id="dlgMeta" style="margin-top:3px;"></div>
       </div>
-      <button class="secondary" id="dlgClose" style="width:auto;">Zamknij</button>
+      <button class="iconBtn" id="dlgClose" aria-label="Zamknij"></button>
     </div>
 
     <div class="modalBody">
@@ -777,7 +874,7 @@ dialog::backdrop{
             <div class="times">${a} – ${b}</div>
             <div class="mins">${m ? ("Ilość godzin: " + fmtHM(m)) : "-"}</div>
           </div>
-          <button class="miniBtn danger" data-delshift="${idx}">Usuń zakres</button>
+          <button class="delIcon" data-delshift="${idx}" aria-label="Usuń zakres"></button>
         </div>
       `;
     }).join("");
