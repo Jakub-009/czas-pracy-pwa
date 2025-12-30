@@ -377,18 +377,38 @@
   .indRow{ bottom:8px; gap:3px; }
   .bar{ height:3px; width:66%; }
 }
-* ===== KWADRATY ZAWSZE (pewniak) ===== */
+    
+/* ===== ROZMIAR KAFELKÓW (jak wcześniej: wyższe na telefonie) ===== */
+
+/* MOBILE: wyższe kafelki (Google-ish) */
 .dayCell,
 .blankCell{
-  aspect-ratio:1/1;   /* zawsze kwadrat */
-  min-height:0;       /* nie pozwól rozciągać */
+  aspect-ratio: 1 / 1.15; /* <-- WYŻSZE niż szersze */
+  min-height: 0;
 }
 
-/* fallback: jeśli gdzieś aspect-ratio nie zadziała */
+/* większe ekrany: bardziej „kwadratowo” */
+@media (min-width: 520px){
+  .dayCell,
+  .blankCell{
+    aspect-ratio: 1 / 1.05;
+  }
+}
+
+/* desktop: klasyczny kwadrat i sensowna min wysokość */
+@media (min-width: 900px){
+  .dayCell,
+  .blankCell{
+    aspect-ratio: 1 / 1;
+    min-height: 74px;
+  }
+}
+
+/* fallback gdyby aspect-ratio nie działało */
 @supports not (aspect-ratio: 1 / 1){
   .dayCell,
   .blankCell{
-    min-height:74px;
+    min-height: 74px;
   }
 }
 
