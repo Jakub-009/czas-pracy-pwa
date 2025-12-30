@@ -266,6 +266,22 @@
     font-size:20px;
   }
 }
+
+    /* ===== Niebieska otoczka po tapnięciu off ===== */
+    
+    /* tap highlight off */
+*{ -webkit-tap-highlight-color: transparent; }
+
+/* usuń focus wszędzie... */
+:focus{ outline: none; }
+
+/* ...ale pokaż go, gdy user używa klawiatury */
+:focus-visible{
+  outline: 2px solid rgba(80,130,124,.45);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
   </style>
 </head>
 
