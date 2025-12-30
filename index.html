@@ -332,8 +332,8 @@ details summary::-webkit-details-marker{display:none}
 /* ===== Status bars (Google vibe) ===== */
 .indRow{
   position:absolute;
-  left:50%;
-  transform:translateX(-50%);
+  left:0;
+  right:0;
   bottom:10px;               /* bliżej dołu kafelka */
   display:flex;
   flex-direction:column;
@@ -346,16 +346,18 @@ details summary::-webkit-details-marker{display:none}
 .bar{
   display:block;
   height:4px;
-  width:64%;                 /* nie na całą szerokość */
+  width:64%;                 /* teraz % liczy się od szerokości kafelka */
   border-radius:999px;       /* pill */
 }
 
-/* warianty */
 .bar.shift{ background:var(--bar-work); }
 .bar.note{  background:var(--bar-note); }
-
-/* ukrywanie */
 .bar.hidden{ display:none; }
+
+@media(max-width:420px){
+  .indRow{ bottom:8px; gap:3px; }
+  .bar{ height:3px; width:66%; }
+}
 
 /* MOBILE: wymuszamy KWADRATY dla dni i pustych pól */
 @media(max-width:640px){
