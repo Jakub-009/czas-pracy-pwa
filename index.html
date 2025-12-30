@@ -326,29 +326,46 @@ details summary::-webkit-details-marker{display:none}
   font-weight:700;
 }
 
-/* kropki: pod numerem, ZAWSZE w tym samym miejscu */
+/* ===== Status bars (Google vibe) ===== */
+
+/* Google colors */
+:root{
+  --bar-work:#1e8e3e;   /* Google green */
+  --bar-note:#f9ab00;   /* Google yellow */
+}
+
 .indRow{
   position:absolute;
   left:50%;
   transform:translateX(-50%);
-  top:38px;
+  bottom:10px;                 /* bliżej dołu kafelka */
   display:flex;
-  gap:6px;
+  flex-direction:column;
+  gap:4px;
   align-items:center;
   pointer-events:none;
 }
 
-/* subtelniejsze kropki */
-.dot{
-  width:7px;
-  height:7px;
-  border-radius:999px;
+/* pasek wspólny */
+.bar{
+  height:4px;
+  width:64%;                   /* nie na całą szerokość */
+  border-radius:999px;         /* pill */
 }
 
-.dot.shift{background:var(--primary)}
-.dot.note{background:#E5A823}
-.dot.hidden{visibility:hidden}
+/* warianty */
+.bar.shift{ background:var(--bar-work); }
+.bar.note{  background:var(--bar-note); }
 
+/* ukrywanie */
+.bar.hidden{ display:none; }
+
+/* bardzo małe ekrany */
+@media(max-width:420px){
+  .indRow{ bottom:8px; gap:3px; }
+  .bar{ height:3px; width:66%; }
+}
+  
 /* MOBILE: wymuszamy KWADRATY dla dni i pustych pól */
 @media(max-width:640px){
   .dayCell,
@@ -980,9 +997,9 @@ body.modal-open{
             <div class="${numClass}">${d}</div>
           </div>
           <div class="indRow" aria-hidden="true">
-            <span class="dot shift ${hasShifts ? "" : "hidden"}" title="${hasShifts ? "Są godziny" : ""}"></span>
-            <span class="dot note ${hasNote ? "" : "hidden"}" title="${hasNote ? "Jest notatka" : ""}"></span>
-          </div>
+  <span class="bar shift ${hasShifts ? "" : "hidden"}"></span>
+  <span class="bar note ${hasNote ? "" : "hidden"}"></span>
+</div>
         </div>
       `);
     }
