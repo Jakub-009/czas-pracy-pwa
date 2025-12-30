@@ -7,7 +7,6 @@
   <meta name="theme-color" content="#f6f7fb" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
-
 <style>
 *{box-sizing:border-box}
 
@@ -27,9 +26,13 @@
   --danger-soft:rgba(217,45,32,.12);
 
   /* ===== Google-like weekend/holiday colors ===== */
-  --sat:#b6d7a8;      /* Google grey */
-  --sun:#E46E66;      /* Google red  */
-  --holiday:#E46E66;  /* jak niedziela */
+  --sat:#3d85c6;      /* Google grey */
+  --sun:#E05950;      /* Google red  */
+  --holiday:#E05950;  /* jak niedziela */
+
+  /* ===== Status bars (Google vibe) ===== */
+  --bar-work:#1e8e3e; /* Google green */
+  --bar-note:#f9ab00; /* Google yellow */
 
   --radius-lg:20px;
   --radius-md:16px;
@@ -266,12 +269,11 @@ details summary::-webkit-details-marker{display:none}
 }
 
 /* ===== NOWY KALENDARZ: Google vibe (KWADRAT + numer top-center) ===== */
-
 .dayCell{
   border-radius:16px;
   border:1px solid var(--outline-soft);
   background:var(--surface-soft);
-  padding:4px 10px 10px;
+  padding:4px 10px 12px; /* trochę miejsca na paski */
   cursor:pointer;
   position:relative;
 
@@ -327,16 +329,11 @@ details summary::-webkit-details-marker{display:none}
 }
 
 /* ===== Status bars (Google vibe) ===== */
-:root{
-  --bar-work:#1e8e3e;
-  --bar-note:#f9ab00;
-}
-
 .indRow{
   position:absolute;
   left:50%;
   transform:translateX(-50%);
-  bottom:10px;
+  bottom:10px;            /* paski przy dole kafelka */
   display:flex;
   flex-direction:column;
   gap:4px;
@@ -358,7 +355,7 @@ details summary::-webkit-details-marker{display:none}
   .indRow{ bottom:8px; gap:3px; }
   .bar{ height:3px; width:66%; }
 }
-  
+
 /* MOBILE: wymuszamy KWADRATY dla dni i pustych pól */
 @media(max-width:640px){
   .dayCell,
@@ -372,8 +369,6 @@ details summary::-webkit-details-marker{display:none}
 @media(max-width:420px){
   .calGrid{gap:6px}
   .dayNum{font-size:13px}
-  .dot{width:6px;height:6px}
-  .indRow{ top:34px; }
 }
 
 /* desktop/tablet: pamiętaj o równej wysokości */
@@ -543,7 +538,6 @@ body.modal-open{
   touch-action:none;
 }
 </style>
-
 </head>
 
 <body>
