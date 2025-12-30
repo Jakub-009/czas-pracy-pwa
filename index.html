@@ -263,22 +263,27 @@ details summary::-webkit-details-marker{display:none}
 /* ===== NOWY KALENDARZ: Google vibe (kwadrat + numer na środku) ===== */
 
 .dayCell{
-  border-radius:14px;
+  border-radius:16px;
   border:1px solid var(--outline-soft);
   background:var(--surface-soft);
+  padding:10px;
+  min-height:74px;
   cursor:pointer;
   position:relative;
 
-  min-height:auto;
-  aspect-ratio:1/1;
-
+  /* było: flex + column + justify-content:flex-start */
   display:flex;
-  align-items:center;
-  justify-content:center;
-
-  padding:0;
+  flex-direction:column;
+  align-items:center;     /* <<< środek poziomo */
+  justify-content:flex-start;
+  gap:6px;
 }
-
+.dayTop{
+  width:100%;
+  display:flex;
+  justify-content:center; /* <<< numer na środku */
+  align-items:flex-start;
+}
 /* blank cell (puste pola) */
 .blankCell{
   border:none;
@@ -292,9 +297,12 @@ details summary::-webkit-details-marker{display:none}
 
 /* numer dnia na środku, mniejszy */
 .dayNum{
-  font-size:14px;
-  font-weight:650;
-  line-height:1;
+  width:100%;
+  text-align:center;      /* <<< pewne centrowanie */
+  font-size:16px;         /* możesz dać 15-16 jak w Google */
+  font-weight:700;
+  line-height:1.05;
+  margin-top:2px;         /* delikatnie w dół jeśli chcesz */
 }
 
 /* weekend na czerwono */
