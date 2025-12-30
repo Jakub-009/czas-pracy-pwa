@@ -260,49 +260,45 @@ details summary::-webkit-details-marker{display:none}
   color:rgba(17,17,17,.55);
 }
 
-/* ===== NOWY KALENDARZ: Google vibe (kwadrat + numer na środku) ===== */
+/* ===== NOWY KALENDARZ: Google vibe (KWADRAT + numer top-center) ===== */
 
 .dayCell{
   border-radius:16px;
   border:1px solid var(--outline-soft);
   background:var(--surface-soft);
   padding:10px;
-  min-height:74px;
   cursor:pointer;
   position:relative;
 
-  /* było: flex + column + justify-content:flex-start */
   display:flex;
   flex-direction:column;
-  align-items:center;     /* <<< środek poziomo */
   justify-content:flex-start;
-  gap:6px;
+  align-items:stretch;
 }
-.dayTop{
-  width:100%;
-  display:flex;
-  justify-content:center; /* <<< numer na środku */
-  align-items:flex-start;
-}
+
 /* blank cell (puste pola) */
 .blankCell{
   border:none;
   background:transparent;
   box-shadow:none;
   pointer-events:none;
-
-  min-height:auto;
-  aspect-ratio:1/1;
 }
 
-/* numer dnia na środku, mniejszy */
+/* numer dnia: góra + środek */
+.dayTop{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+}
+
 .dayNum{
   width:100%;
-  text-align:center;      /* <<< pewne centrowanie */
-  font-size:16px;         /* możesz dać 15-16 jak w Google */
+  text-align:center;
+  font-size:16px;
   font-weight:700;
   line-height:1.05;
-  margin-top:2px;         /* delikatnie w dół jeśli chcesz */
+  margin-top:2px;
 }
 
 /* weekend na czerwono */
@@ -310,15 +306,16 @@ details summary::-webkit-details-marker{display:none}
   color:#c53030;
 }
 
-/* kropki wyśrodkowane pod numerem */
+/* kropki: pod numerem, ZAWSZE w tym samym miejscu */
 .indRow{
   position:absolute;
   left:50%;
   transform:translateX(-50%);
-  top:58%;
+  top:38px;
   display:flex;
   gap:6px;
   align-items:center;
+  pointer-events:none;
 }
 
 /* subtelniejsze kropki */
@@ -332,11 +329,31 @@ details summary::-webkit-details-marker{display:none}
 .dot.note{background:#E5A823}
 .dot.hidden{visibility:hidden}
 
+/* MOBILE: wymuszamy KWADRATY dla dni i pustych pól */
+@media(max-width:640px){
+  .dayCell,
+  .blankCell{
+    aspect-ratio:1/1;
+    min-height:0;
+  }
+}
+
+/* bardzo małe ekrany */
 @media(max-width:420px){
   .calGrid{gap:6px}
   .dayNum{font-size:13px}
   .dot{width:6px;height:6px}
+  .indRow{ top:34px; }
 }
+
+/* desktop/tablet: pamiętaj o równej wysokości */
+@media(min-width:641px){
+  .dayCell,
+  .blankCell{
+    min-height:74px;
+  }
+}
+
 
 /* ===== Modal (Google surface) ===== */
 dialog{
