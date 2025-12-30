@@ -27,29 +27,21 @@
       --danger-soft:rgba(217,45,32,.12);
 
       /* ===== Google-like weekend/holiday colors ===== */
-      --sat:rgba(60,64,67,.65);  /* Google-ish grey */
-      --sun:#d93025;             /* Google red */
-      --holiday:#d93025;         /* jak niedziela */
+      --sat:rgba(60,64,67,.65);
+      --sun:#d93025;
+      --holiday:#d93025;
 
       /* ===== Status bars (Google vibe) ===== */
-      --bar-work:#1e8e3e;         /* Google green */
-      --bar-note:#f9ab00;         /* Google yellow */
+      --bar-work:#1e8e3e;
+      --bar-note:#f9ab00;
 
       --radius-lg:20px;
       --radius-md:16px;
       --radius-sm:12px;
     }
 
-    html,body{
-      width:100%;
-      overflow-x:hidden;
-    }
-
-    body{
-      margin:0;
-      background:var(--bg);
-      color:#111;
-    }
+    html,body{ width:100%; overflow-x:hidden; }
+    body{ margin:0; background:var(--bg); color:#111; }
 
     /* ===== Layout ===== */
     .wrap{
@@ -58,10 +50,7 @@
       padding:0 14px 90px; /* miejsce na FAB */
     }
 
-    .card{
-      background:transparent;
-      padding:14px 2px;
-    }
+    .card{ background:transparent; padding:14px 2px; }
 
     /* separator między sekcjami */
     .section{
@@ -69,32 +58,14 @@
       padding-bottom:14px;
       margin-bottom:14px;
     }
-    .section:last-of-type{
-      border-bottom:none;
-      padding-bottom:0;
-      margin-bottom:0;
-    }
+    .section:last-of-type{ border-bottom:none; padding-bottom:0; margin-bottom:0; }
 
     /* ===== Typography ===== */
-    .appHeader{
-      text-align:center;
-      margin:14px 0 8px;
-    }
-    .appHeader h1{
-      font-size:22px;
-      font-weight:800;
-      margin:0;
-    }
-    .appHeader .emoji{
-      margin-left:6px;
-      opacity:.75;
-    }
+    .appHeader{ text-align:center; margin:14px 0 8px; }
+    .appHeader h1{ font-size:22px; font-weight:800; margin:0; }
+    .appHeader .emoji{ margin-left:6px; opacity:.75; }
 
-    h2{
-      font-size:18px;
-      font-weight:650;
-      margin:0 0 10px;
-    }
+    h2{ font-size:18px; font-weight:650; margin:0 0 10px; }
 
     label{
       display:block;
@@ -103,10 +74,7 @@
       margin-bottom:6px;
     }
 
-    .muted{
-      font-size:12.5px;
-      color:rgba(17,17,17,.6);
-    }
+    .muted{ font-size:12.5px; color:rgba(17,17,17,.6); }
 
     /* ===== Grid helpers ===== */
     .row{
@@ -115,12 +83,8 @@
       align-items:center;
       flex-wrap:wrap;
     }
-    .row.between{
-      justify-content:space-between;
-      align-items:flex-end;
-    }
+    .row.between{ justify-content:space-between; align-items:flex-end; }
 
-    /* Suma/Wypłata zawsze obok siebie */
     .twoCols{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -138,10 +102,7 @@
       transition:border-color .15s ease, box-shadow .15s ease;
     }
 
-    textarea{
-      min-height:44px;
-      resize:vertical;
-    }
+    textarea{ min-height:44px; resize:vertical; }
 
     input:focus-visible,
     textarea:focus-visible,
@@ -162,50 +123,27 @@
       cursor:pointer;
       transition:filter .15s ease, transform .08s ease;
     }
-
-    button.secondary{
-      background:var(--primary-soft);
-      color:#0f2f2b;
-    }
-
-    button.danger{
-      background:var(--danger-soft);
-      color:#7a1410;
-    }
-
-    button:active{
-      transform:scale(.98);
-    }
-
-    button:disabled{
-      opacity:.5;
-      cursor:not-allowed;
-    }
+    button.secondary{ background:var(--primary-soft); color:#0f2f2b; }
+    button.danger{ background:var(--danger-soft); color:#7a1410; }
+    button:active{ transform:scale(.98); }
+    button:disabled{ opacity:.5; cursor:not-allowed; }
 
     /* ===== Chevron ===== */
     .chev{
-      width:18px;
-      height:18px;
+      width:18px; height:18px;
       display:inline-flex;
-      align-items:center;
-      justify-content:center;
+      align-items:center; justify-content:center;
       opacity:.6;
       transition:transform .18s ease;
     }
-
     .chev::before{
       content:"";
-      width:8px;
-      height:8px;
+      width:8px; height:8px;
       border-right:2px solid #111;
       border-bottom:2px solid #111;
       transform:rotate(45deg);
     }
-
-    details[open] .chev{
-      transform:rotate(180deg);
-    }
-
+    details[open] .chev{ transform:rotate(180deg); }
     details summary{
       cursor:pointer;
       font-weight:600;
@@ -216,18 +154,10 @@
       padding:10px 0;
     }
     details summary::-webkit-details-marker{display:none}
+    .panel{ margin-top:10px; animation:panelIn .18s ease; }
+    @keyframes panelIn{ from{opacity:.4; transform:translateY(-4px)} to{opacity:1; transform:translateY(0)} }
 
-    .panel{
-      margin-top:10px;
-      animation:panelIn .18s ease;
-    }
-
-    @keyframes panelIn{
-      from{opacity:.4; transform:translateY(-4px)}
-      to{opacity:1; transform:translateY(0)}
-    }
-
-    /* ===== Month Top Bar (nowy) ===== */
+    /* ===== Month Top Bar ===== */
     .topMonthBar{
       display:flex;
       justify-content:space-between;
@@ -235,17 +165,8 @@
       gap:10px;
       padding:10px 0 2px;
     }
-    .monthTitle{
-      font-size:18px;
-      font-weight:800;
-      line-height:1.1;
-    }
-    .monthActions{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      position:relative;
-    }
+    .monthTitle{ font-size:18px; font-weight:800; line-height:1.1; }
+    .monthActions{ display:flex; gap:8px; align-items:center; position:relative; }
 
     .chip{
       border:1px solid var(--outline-soft);
@@ -260,8 +181,7 @@
     .chip:active{ transform:scale(.98); }
 
     .iconCircle{
-      width:42px;
-      height:42px;
+      width:42px; height:42px;
       border-radius:999px;
       border:1px solid var(--outline-soft);
       background:var(--surface-soft);
@@ -270,11 +190,8 @@
       place-items:center;
       position:relative;
     }
-    .iconCircle svg{
-      width:20px;height:20px;
-      opacity:.85;
-    }
-    /* ukryty input month "na klik" */
+    .iconCircle svg{ width:20px; height:20px; opacity:.85; }
+
     #monthPick{
       position:absolute;
       inset:0;
@@ -290,7 +207,6 @@
       grid-template-columns:repeat(7,1fr);
       gap:8px;
     }
-
     .calDow{
       text-align:center;
       font-size:12px;
@@ -306,27 +222,23 @@
       padding:4px 10px 10px;
       cursor:pointer;
       position:relative;
-
       display:flex;
       flex-direction:column;
       justify-content:flex-start;
       align-items:stretch;
     }
-
     .blankCell{
       border:none;
       background:transparent;
       box-shadow:none;
       pointer-events:none;
     }
-
     .dayTop{
       width:100%;
       display:flex;
       justify-content:center;
       align-items:flex-start;
     }
-
     .dayNum{
       width:100%;
       text-align:center;
@@ -336,24 +248,20 @@
       margin-top:2px;
     }
 
-    /* weekend/święta */
     .dayNum.saturday{ color:var(--sat); font-weight:650; }
     .dayNum.sunday{ color:var(--sun); }
     .dayNum.holiday{ color:var(--holiday); }
     .dayNum.saturday.holiday{ color:var(--holiday); font-weight:750; }
 
-    /* DZISIAJ (Google vibe) */
     .dayCell.today{
       border-color:rgba(26,115,232,.35);
       box-shadow:0 0 0 3px rgba(26,115,232,.12);
       background:rgba(255,255,255,.85);
     }
 
-    /* ===== Status bars (Google vibe) ===== */
     .indRow{
       position:absolute;
-      left:0;
-      right:0;
+      left:0; right:0;
       bottom:10px;
       display:flex;
       flex-direction:column;
@@ -361,16 +269,9 @@
       align-items:center;
       pointer-events:none;
     }
-
-    .bar{
-      display:block;
-      height:4px;
-      width:64%;
-      border-radius:999px;
-    }
-
+    .bar{ display:block; height:4px; width:64%; border-radius:999px; }
     .bar.shift{ background:var(--bar-work); }
-    .bar.note{  background:var(--bar-note); }
+    .bar.note{ background:var(--bar-note); }
     .bar.hidden{ display:none; }
 
     @media(max-width:420px){
@@ -378,61 +279,34 @@
       .bar{ height:3px; width:66%; }
     }
 
-    /* ===== ROZMIAR KAFELKÓW ===== */
-    .dayCell,
-    .blankCell{
-      aspect-ratio: 1 / 1.15;
-      min-height: 0;
-    }
+    .dayCell, .blankCell{ aspect-ratio: 1 / 1.15; min-height:0; }
+    @media (min-width:520px){ .dayCell, .blankCell{ aspect-ratio: 1 / 1.05; } }
+    @media (min-width:900px){ .dayCell, .blankCell{ aspect-ratio: 1 / 1; min-height:74px; } }
+    @supports not (aspect-ratio: 1 / 1){ .dayCell, .blankCell{ min-height:74px; } }
 
-    @media (min-width: 520px){
-      .dayCell,
-      .blankCell{
-        aspect-ratio: 1 / 1.05;
-      }
-    }
-
-    @media (min-width: 900px){
-      .dayCell,
-      .blankCell{
-        aspect-ratio: 1 / 1;
-        min-height: 74px;
-      }
-    }
-
-    @supports not (aspect-ratio: 1 / 1){
-      .dayCell,
-      .blankCell{
-        min-height: 74px;
-      }
-    }
-
-    /* ===== Summary (suma/wypłata) ===== */
+    /* ===== Summary ===== */
     .statBox{
       border:1px solid var(--outline-soft);
       background:var(--surface-soft);
       border-radius:16px;
       padding:12px 14px;
     }
-    .statValue{
-      font-size:22px;
-      font-weight:900;
-      margin-top:4px;
-    }
+    .statValue{ font-size:22px; font-weight:900; margin-top:4px; }
 
-    /* ===== MODAL (poprawiony) ===== */
+    /* ===== MODAL (pełny ekran + poprawki) ===== */
     dialog{
       border:none;
-      border-radius:24px;
       padding:0;
-      width:min(760px, calc(100vw - 22px));
+      width:100vw;
+      height:100dvh;       /* klucz: bez pasków */
+      max-width:100vw;
+      max-height:100dvh;
+      margin:0;
+      border-radius:0;
       box-shadow:0 18px 60px rgba(0,0,0,.25);
       overflow:hidden;
     }
-
-    dialog::backdrop{
-      background:rgba(17,17,17,.45);
-    }
+    dialog::backdrop{ background:rgba(17,17,17,.45); }
 
     .modalHead,.modalBody{
       background:var(--surface);
@@ -441,49 +315,39 @@
 
     .modalHead{
       border-bottom:1px solid var(--outline-soft);
-      position:relative;
+      position:sticky;
+      top:0;
+      z-index:2;
+      padding:16px 16px 14px;
     }
 
-    /* FULLSCREEN na telefonie + oddech */
-    @media(max-width:640px){
-      dialog{
-        width:100vw;
-        height:100vh;
-        border-radius:0;
-        max-width:none;
-      }
-      .modalHead{
-        position:sticky;
-        top:0;
-        z-index:2;
-        padding:16px 16px 14px;
-      }
-      .modalBody{
-        padding:16px;
-      }
-    }
-
-    /* Back arrow zamiast X */
+    /* strzałka "wstecz" po PRAWEJ */
     .backBtn{
       width:44px;
       height:44px;
+      padding:0;
       border-radius:999px;
+
       border:1px solid var(--outline-soft);
       background:var(--surface-soft);
+      color:#111;                 /* klucz: żeby strzałka była widoczna */
       cursor:pointer;
+
       display:grid;
       place-items:center;
+
       position:absolute;
-      top:12px;
-      left:12px;
+      top:10px;
+      right:12px;                 /* przeniesiona na prawą */
+      left:auto;
     }
-    .backBtn svg{
-      width:20px;
-      height:20px;
-      opacity:.9;
+    .backBtn svg{ width:20px; height:20px; opacity:.92; }
+
+    .modalHeadInner{
+      padding-right:58px;         /* miejsce na przycisk po prawej */
     }
 
-    /* Suma + dniówka w 1 linii (zawsze) */
+    /* Suma + dniówka obok siebie (zawsze) */
     .modalStats{
       display:flex;
       justify-content:space-between;
@@ -508,27 +372,31 @@
       overflow:hidden;
       text-overflow:ellipsis;
     }
-    @media(max-width:380px){
-      .statMiniValue{ font-size:18px; }
-    }
+    @media(max-width:380px){ .statMiniValue{ font-size:18px; } }
 
-    /* Układ w modalu: najpierw dodawanie, potem notatka */
+    /* Układ: godziny -> notatka -> przycisk Dodaj na środku */
     .modalStack{
       display:flex;
       flex-direction:column;
       gap:14px;
     }
 
-    .addRow{
-      display:flex;
-      gap:8px;
-      align-items:stretch;
-      flex-wrap:wrap;
+    .timeGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
     }
-    .addRow input{ min-width:140px; flex:1 1 140px; }
-    .addRow button{ width:auto; min-width:120px; flex:0 0 auto; }
+    @media(max-width:520px){
+      .timeGrid{ grid-template-columns:1fr 1fr; gap:10px; }
+    }
 
-    /* Lista zakresów: odstępy + bez obramowania dookoła */
+    .addBtnCenter{
+      width:min(320px, 100%);
+      margin:4px auto 0;
+      display:block;
+    }
+
+    /* Lista zakresów: odstępy + bez bordera dookoła + oddech */
     .shiftList{
       display:flex;
       flex-direction:column;
@@ -545,7 +413,6 @@
       gap:12px;
       align-items:flex-start;
     }
-
     .shiftItem .times{ font-weight:650; font-size:16px; }
     .shiftItem .mins{
       font-size:12.5px;
@@ -630,11 +497,9 @@
           <button class="chip" id="todayBtn" type="button">Dzisiaj</button>
 
           <div class="iconCircle" id="monthBar" title="Wybierz miesiąc" aria-label="Wybierz miesiąc">
-            <!-- calendar icon -->
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path fill="currentColor" d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm12 8H5v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10ZM6 6a1 1 0 0 0-1 1v1h14V7a1 1 0 0 0-1-1H6Z"/>
             </svg>
-
             <input id="monthPick" type="month" aria-label="Wybierz miesiąc" />
           </div>
         </div>
@@ -721,16 +586,16 @@
   <!-- MODAL DNIA -->
   <dialog id="dayDialog">
     <div class="modalHead">
+      <div class="modalHeadInner">
+        <h3 id="dlgTitle" style="margin:0;">Dzień</h3>
+        <div class="muted" id="dlgMeta" style="margin-top:3px;"></div>
+      </div>
+
       <button class="backBtn" id="dlgBack" aria-label="Wróć" type="button" title="Wróć">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
         </svg>
       </button>
-
-      <div style="padding-left:56px;">
-        <h3 id="dlgTitle" style="margin:0;">Dzień</h3>
-        <div class="muted" id="dlgMeta" style="margin-top:3px;"></div>
-      </div>
     </div>
 
     <div class="modalBody">
@@ -746,14 +611,16 @@
         </div>
       </div>
 
-      <!-- Najpierw dodawanie, potem notatka -->
+      <!-- Godziny + Notatka + Dodaj na środku pod notatką -->
       <div class="modalStack">
-        <div>
-          <label>Dodaj kolejne godziny pracy</label>
-          <div class="addRow">
+        <div class="timeGrid">
+          <div>
+            <label>Godzina wejścia</label>
             <input id="dlgStart" type="time" />
+          </div>
+          <div>
+            <label>Godzina wyjścia</label>
             <input id="dlgEnd" type="time" />
-            <button id="dlgAddShift" type="button">Dodaj</button>
           </div>
         </div>
 
@@ -762,6 +629,8 @@
           <textarea id="dlgNote"></textarea>
           <div class="muted" style="margin-top:6px;">Notatka zapisuje się automatycznie.</div>
         </div>
+
+        <button id="dlgAddShift" type="button" class="addBtnCenter">Dodaj</button>
       </div>
 
       <div style="margin-top:16px;">
@@ -769,7 +638,7 @@
         <div class="shiftList" id="dlgShifts"></div>
       </div>
 
-      <div style="height:10px;"></div>
+      <div style="height:14px;"></div>
     </div>
   </dialog>
 
@@ -1093,7 +962,7 @@
       if (!dlgDate) return;
       const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
 
-      // zawsze pokazuj chronologicznie
+      // zawsze chronologicznie
       day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
 
       const mins = computeDayMinutes(day);
@@ -1168,11 +1037,12 @@
         if (!dlgDate) return;
         const start = $("dlgStart")?.value;
         const end = $("dlgEnd")?.value;
-        if (!start || !end) return alert("Uzupełnij wejście i wyjście.");
+        if (!start || !end) return alert("Uzupełnij godzinę wejścia i wyjścia.");
 
         const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
         day.shifts.push({ start, end });
 
+        // sort: od rana do wieczora
         day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
 
         upsertDay(dlgDate, day);
