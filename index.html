@@ -34,6 +34,7 @@
       /* ===== Status bars (Google vibe) ===== */
       --bar-work:#1e8e3e;
       --bar-note:#f9ab00;
+      --bar-vac:#1a73e8; /* urlop */
 
       --radius-lg:20px;
       --radius-md:16px;
@@ -272,6 +273,7 @@
     .bar{ display:block; height:4px; width:64%; border-radius:999px; }
     .bar.shift{ background:var(--bar-work); }
     .bar.note{ background:var(--bar-note); }
+    .bar.vacation{ background:var(--bar-vac); }
     .bar.hidden{ display:none; }
 
     @media(max-width:420px){
@@ -446,6 +448,21 @@
       touch-action:none;
     }
 
+    /* ===== Urlop (UI) ===== */
+    .vacBox{
+      background:rgba(26,115,232,.10);
+      border:1px solid rgba(26,115,232,.18);
+      border-radius:16px;
+      padding:12px 14px;
+    }
+    .vacRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+    }
+    .vacRow > *{ flex:1; min-width:150px; }
+
     /* ===== FAB ===== */
     .fab{
       position:fixed;
@@ -532,7 +549,7 @@
     <div class="section">
       <details id="extrasPanel">
         <summary>
-          <span>Stawka za godzinę</span>
+          <span>Ustawienia pracy i urlopu</span>
           <span class="chev" aria-hidden="true"></span>
         </summary>
         <div class="panel">
@@ -540,6 +557,31 @@
             <div style="flex:1; min-width:240px;">
               <label>Stawka godzinowa (PLN)</label>
               <input id="rate" type="number" step="0.01" min="0" value="40" />
+            </div>
+          </div>
+
+          <div class="vacBox" style="margin-top:14px;">
+            <div style="font-weight:700; margin-bottom:8px;">Urlop (zakres dat)</div>
+            <div class="vacRow">
+              <div>
+                <label>Od</label>
+                <input id="vacFrom" type="date" />
+              </div>
+              <div>
+                <label>Do</label>
+                <input id="vacTo" type="date" />
+              </div>
+              <div>
+                <label>&nbsp;</label>
+                <button id="setVacationRange" type="button">Ustaw urlop</button>
+              </div>
+              <div>
+                <label>&nbsp;</label>
+                <button class="danger" id="clearVacationRange" type="button">Usuń urlop (od–do)</button>
+              </div>
+            </div>
+            <div class="muted" style="margin-top:8px;">
+              Urlop oznacza dzień niebieskim paskiem w kalendarzu i nie liczy się do sumy godzin.
             </div>
           </div>
         </div>
@@ -602,8 +644,21 @@
         </div>
       </div>
 
+      <div class="vacBox" style="margin-bottom:14px;">
+        <div class="row between" style="gap:10px;">
+          <div style="font-weight:700;">Tryb dnia</div>
+          <div style="width:min(240px, 100%);">
+            <select id="dlgMode" aria-label="Tryb dnia">
+              <option value="work">Praca (godziny)</option>
+              <option value="vacation">Urlop</option>
+            </select>
+          </div>
+        </div>
+        <div class="muted" id="dlgModeHint" style="margin-top:8px;"></div>
+      </div>
+
       <!-- Godziny + Notatka + Dodaj na środku pod notatką -->
-      <div class="modalStack">
+      <div class="modalStack" id="dlgWorkBlock">
         <div class="timeGrid">
           <div>
             <label>Godzina wejścia</label>
@@ -624,7 +679,7 @@
         <button id="dlgAddShift" type="button" class="addBtnCenter">Dodaj</button>
       </div>
 
-      <div style="margin-top:16px;">
+      <div style="margin-top:16px;" id="dlgShiftsBlock">
         <strong>Godziny pracy w ciągu dnia</strong>
         <div class="shiftList" id="dlgShifts"></div>
       </div>
@@ -689,10 +744,14 @@
       let changed = false;
       db.entries = (Array.isArray(db.entries) ? db.entries : []).map(e=>{
         if (!e) return e;
-        if (Array.isArray(e.shifts)) return e;
+        if (Array.isArray(e.shifts)) {
+          // dopnij brakujące pola
+          if (typeof e.vacation !== "boolean"){ e.vacation = false; changed = true; }
+          return e;
+        }
         const shifts = [];
         if (e.start && e.end) shifts.push({ start:e.start, end:e.end });
-        const ne = { date:e.date, note:e.note || "", shifts };
+        const ne = { date:e.date, note:e.note || "", shifts, vacation:false };
         changed = true;
         return ne;
       });
@@ -706,6 +765,7 @@
       for (const e of db.entries){
         e.shifts = Array.isArray(e.shifts) ? e.shifts : [];
         e.note = e.note || "";
+        e.vacation = !!e.vacation;
       }
     }
 
@@ -744,11 +804,12 @@
     function upsertDay(date, patch){
       const i = db.entries.findIndex(e => e.date === date);
       if (i >= 0) db.entries[i] = { ...db.entries[i], ...patch };
-      else db.entries.push({ date, note:"", shifts:[], ...patch });
+      else db.entries.push({ date, note:"", shifts:[], vacation:false, ...patch });
       db.entries.sort((a,b)=>a.date.localeCompare(b.date));
     }
 
     function computeDayMinutes(day){
+      if (day.vacation) return 0;
       let total = 0;
       for (const s of day.shifts){
         if (!s?.start || !s?.end) continue;
@@ -762,11 +823,50 @@
       return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
     }
 
-    // ===== ŚWIĘTA PL =====
+    // ===== URL0P: zakres dat =====
+    function parseISODate(s){
+      if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+      const [Y,M,D] = s.split("-").map(Number);
+      const dt = new Date(Y, M-1, D);
+      if (dt.getFullYear() !== Y || dt.getMonth() !== (M-1) || dt.getDate() !== D) return null;
+      return dt;
+    }
     function isoFromDate(dt){
       return `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
     }
+    function addDays(dt, n){
+      const x = new Date(dt);
+      x.setDate(x.getDate() + n);
+      return x;
+    }
+    function applyVacationRange(fromISO, toISO, enable){
+      const a = parseISODate(fromISO);
+      const b = parseISODate(toISO);
+      if (!a || !b) return alert("Uzupełnij poprawnie daty 'Od' i 'Do'.");
+      if (b < a) return alert("Data 'Do' nie może być wcześniejsza niż 'Od'.");
 
+      let cur = a;
+      let count = 0;
+      while (cur <= b){
+        const dISO = isoFromDate(cur);
+        const day = getDay(dISO) || { date:dISO, note:"", shifts:[], vacation:false };
+        if (enable){
+          day.vacation = true;
+          day.shifts = []; // urlop = bez godzin
+        } else {
+          day.vacation = false;
+        }
+        upsertDay(dISO, day);
+        count++;
+        cur = addDays(cur, 1);
+      }
+      save();
+      renderAll();
+      if (dlgDate) renderDayDialog();
+      setStatus(enable ? (`Ustawiono urlop: ${count} dni.`) : (`Usunięto urlop: ${count} dni.`));
+    }
+
+    // ===== ŚWIĘTA PL =====
     function easterSunday(year){
       const a = year % 19;
       const b = Math.floor(year / 100);
@@ -783,12 +883,6 @@
       const month = Math.floor((h + l - 7 * m + 114) / 31);
       const day = ((h + l - 7 * m + 114) % 31) + 1;
       return new Date(year, month - 1, day);
-    }
-
-    function addDays(dt, n){
-      const x = new Date(dt);
-      x.setDate(x.getDate() + n);
-      return x;
     }
 
     function polishHolidays(year){
@@ -861,7 +955,8 @@
         const jsDow = new Date(Y, M-1, d).getDay(); // 0=Nd, 6=Sb
 
         const day = getDay(dateISO);
-        const hasShifts = ((day?.shifts || []).length > 0);
+        const isVacation = !!day?.vacation;
+        const hasShifts = !isVacation && ((day?.shifts || []).length > 0);
         const hasNote = !!(day?.note && day.note.trim());
 
         const holidayName = holidays.get(dateISO) || "";
@@ -874,7 +969,7 @@
           isHoliday ? "holiday" : ""
         ].filter(Boolean).join(" ");
 
-        const tileTitle = isHoliday ? holidayName : "";
+        const tileTitle = isVacation ? "Urlop" : (isHoliday ? holidayName : "");
         const isToday = (dateISO === today);
         const dayCellClass = ["dayCell", isToday ? "today" : ""].filter(Boolean).join(" ");
 
@@ -884,6 +979,7 @@
               <div class="${numClass}">${d}</div>
             </div>
             <div class="indRow" aria-hidden="true">
+              <span class="bar vacation ${isVacation ? "" : "hidden"}"></span>
               <span class="bar shift ${hasShifts ? "" : "hidden"}"></span>
               <span class="bar note ${hasNote ? "" : "hidden"}"></span>
             </div>
@@ -908,7 +1004,7 @@
 
       if (shouldScrollToToday){
         shouldScrollToToday = false;
-        const el = document.querySelector(`.dayCell[data-date="${today}"]`);
+        const el = document.querySelector(\`.dayCell[data-date="\${today}"]\`);
         if (el) el.scrollIntoView({behavior:"smooth", block:"center"});
       }
     }
@@ -917,20 +1013,42 @@
     const dlg = $("dayDialog");
     let dlgDate = null;
 
+    function syncModeUI(){
+      if (!dlgDate) return;
+      const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
+      const modeEl = $("dlgMode");
+      const hint = $("dlgModeHint");
+      const workBlock = $("dlgWorkBlock");
+      const shiftsBlock = $("dlgShiftsBlock");
+
+      if (modeEl) modeEl.value = day.vacation ? "vacation" : "work";
+
+      if (day.vacation){
+        if (hint) hint.textContent = "Dzień jest oznaczony jako urlop (nie liczy się do godzin).";
+        if (workBlock) workBlock.style.display = "none";
+        if (shiftsBlock) shiftsBlock.style.display = "none";
+      } else {
+        if (hint) hint.textContent = "Dzień roboczy – dodawaj godziny wejścia/wyjścia i notatkę.";
+        if (workBlock) workBlock.style.display = "";
+        if (shiftsBlock) shiftsBlock.style.display = "";
+      }
+    }
+
     function openDay(dateISO){
       dlgDate = dateISO;
 
       const weekday = fmtWeekdayPL(dateISO);
       const dlgTitle = $("dlgTitle");
       const dlgMeta = $("dlgMeta");
-      if (dlgTitle) dlgTitle.textContent = `${fmtDMYText(dateISO)}`;
+      if (dlgTitle) dlgTitle.textContent = \`\${fmtDMYText(dateISO)}\`;
       if (dlgMeta) dlgMeta.textContent = weekday;
 
-      const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[] };
+      const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[], vacation:false };
       if ($("dlgStart")) $("dlgStart").value = "";
       if ($("dlgEnd")) $("dlgEnd").value = "";
       if ($("dlgNote")) $("dlgNote").value = day.note || "";
 
+      syncModeUI();
       renderDayDialog();
 
       if (dlg && typeof dlg.showModal === "function") dlg.showModal();
@@ -952,7 +1070,7 @@
 
     function renderDayDialog(){
       if (!dlgDate) return;
-      const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
+      const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
 
       // zawsze chronologicznie
       day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
@@ -1022,16 +1140,56 @@
     const dlgBackBtn = $("dlgBack");
     if (dlgBackBtn) dlgBackBtn.onclick = closeDay;
 
+    // przełącznik trybu dnia: praca/urlop
+    const dlgMode = $("dlgMode");
+    if (dlgMode){
+      dlgMode.addEventListener("change", ()=>{
+        if (!dlgDate) return;
+        const val = dlgMode.value;
+        const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
+
+        if (val === "vacation"){
+          const hadShifts = (day.shifts || []).length > 0;
+          if (hadShifts){
+            const ok = confirm("Ustawiasz urlop – usunąć istniejące godziny z tego dnia?");
+            if (!ok){
+              dlgMode.value = "work";
+              return;
+            }
+          }
+          day.vacation = true;
+          day.shifts = [];
+          upsertDay(dlgDate, day);
+          save();
+          syncModeUI();
+          renderAll();
+          renderDayDialog();
+          setStatus("Ustawiono urlop dla dnia.");
+        } else {
+          day.vacation = false;
+          upsertDay(dlgDate, day);
+          save();
+          syncModeUI();
+          renderAll();
+          renderDayDialog();
+          setStatus("Ustawiono dzień roboczy.");
+        }
+      });
+    }
+
     // Dodawanie zakresu + sort chronologiczny
     const dlgAddShiftBtn = $("dlgAddShift");
     if (dlgAddShiftBtn){
       dlgAddShiftBtn.onclick = ()=>{
         if (!dlgDate) return;
+        const dayNow = getDay(dlgDate);
+        if (dayNow?.vacation) return alert("Ten dzień jest ustawiony jako urlop. Przełącz tryb na 'Praca' aby dodać godziny.");
+
         const start = $("dlgStart")?.value;
         const end = $("dlgEnd")?.value;
         if (!start || !end) return alert("Uzupełnij godzinę wejścia i wyjścia.");
 
-        const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
+        const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
         day.shifts.push({ start, end });
 
         // sort: od rana do wieczora
@@ -1057,7 +1215,7 @@
         clearTimeout(noteTimer);
         noteTimer = setTimeout(()=>{
           const note = (dlgNoteEl.value || "").trim();
-          const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[] };
+          const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
           day.note = note;
           upsertDay(dlgDate, day);
           save();
@@ -1066,6 +1224,24 @@
           setStatus("Zapisano notatkę.");
         }, 250);
       });
+    }
+
+    // urlop: zakres w ustawieniach
+    const setVacationRangeBtn = $("setVacationRange");
+    if (setVacationRangeBtn){
+      setVacationRangeBtn.onclick = ()=>{
+        const from = $("vacFrom")?.value;
+        const to = $("vacTo")?.value;
+        applyVacationRange(from, to, true);
+      };
+    }
+    const clearVacationRangeBtn = $("clearVacationRange");
+    if (clearVacationRangeBtn){
+      clearVacationRangeBtn.onclick = ()=>{
+        const from = $("vacFrom")?.value;
+        const to = $("vacTo")?.value;
+        applyVacationRange(from, to, false);
+      };
     }
 
     // miesiąc picker (klik w ikonę)
@@ -1137,6 +1313,7 @@
           save();
           hydrateSettingsUI();
           renderAll();
+          if (dlgDate) { syncModeUI(); renderDayDialog(); }
           setStatus("Przywrócono dane z pliku JSON.");
         }catch{
           alert("Nie udało się wczytać pliku JSON.");
@@ -1170,6 +1347,12 @@
 
       const t = todayISO();
       if (monthPick) monthPick.value = ym(t);
+
+      // podpowiedz do urlopu: ustaw domyślnie dzisiaj w polach, żeby szybciej testować
+      const vf = $("vacFrom");
+      const vt = $("vacTo");
+      if (vf && !vf.value) vf.value = t;
+      if (vt && !vt.value) vt.value = t;
 
       renderAll();
     } catch(err){
