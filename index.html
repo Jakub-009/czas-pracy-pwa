@@ -14,7 +14,6 @@
     :root{
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
 
-      /* ===== Google / Material tokens ===== */
       --bg:#f6f7fb;
       --surface:#ffffff;
       --surface-soft:rgba(255,255,255,.7);
@@ -26,15 +25,13 @@
       --danger:#d92d20;
       --danger-soft:rgba(217,45,32,.12);
 
-      /* ===== Google-like weekend/holiday colors ===== */
       --sat:rgba(60,64,67,.65);
       --sun:#d93025;
       --holiday:#d93025;
 
-      /* ===== Status bars (Google vibe) ===== */
       --bar-work:#1e8e3e;
       --bar-note:#f9ab00;
-      --bar-vac:#1a73e8; /* urlop */
+      --bar-vac:#1a73e8;
 
       --radius-lg:20px;
       --radius-md:16px;
@@ -44,16 +41,12 @@
     html,body{ width:100%; overflow-x:hidden; }
     body{ margin:0; background:var(--bg); color:#111; }
 
-    /* ===== Layout ===== */
     .wrap{
       max-width:980px;
       margin:18px auto;
-      padding:0 14px 90px; /* miejsce na FAB */
+      padding:0 14px 90px;
     }
 
-    .card{ background:transparent; padding:14px 2px; }
-
-    /* separator między sekcjami */
     .section{
       border-bottom:1px solid var(--outline-soft);
       padding-bottom:14px;
@@ -61,12 +54,9 @@
     }
     .section:last-of-type{ border-bottom:none; padding-bottom:0; margin-bottom:0; }
 
-    /* ===== Typography ===== */
     .appHeader{ text-align:center; margin:14px 0 8px; }
     .appHeader h1{ font-size:22px; font-weight:800; margin:0; }
     .appHeader .emoji{ margin-left:6px; opacity:.75; }
-
-    h2{ font-size:18px; font-weight:650; margin:0 0 10px; }
 
     label{
       display:block;
@@ -74,17 +64,14 @@
       color:rgba(17,17,17,.65);
       margin-bottom:6px;
     }
-
     .muted{ font-size:12.5px; color:rgba(17,17,17,.6); }
 
-    /* ===== Grid helpers ===== */
     .row{
       display:flex;
       gap:10px;
       align-items:center;
       flex-wrap:wrap;
     }
-    .row.between{ justify-content:space-between; align-items:flex-end; }
 
     .twoCols{
       display:grid;
@@ -92,7 +79,6 @@
       gap:12px;
     }
 
-    /* ===== Inputs (Google-like) ===== */
     input,textarea,select{
       width:100%;
       padding:12px 14px;
@@ -102,9 +88,7 @@
       font-size:14px;
       transition:border-color .15s ease, box-shadow .15s ease;
     }
-
     textarea{ min-height:44px; resize:vertical; }
-
     input:focus-visible,
     textarea:focus-visible,
     select:focus-visible{
@@ -112,7 +96,6 @@
       box-shadow:0 0 0 4px var(--primary-soft);
     }
 
-    /* ===== Buttons ===== */
     button{
       padding:12px 16px;
       border-radius:var(--radius-lg);
@@ -129,7 +112,6 @@
     button:active{ transform:scale(.98); }
     button:disabled{ opacity:.5; cursor:not-allowed; }
 
-    /* ===== Chevron ===== */
     .chev{
       width:18px; height:18px;
       display:inline-flex;
@@ -158,7 +140,6 @@
     .panel{ margin-top:10px; animation:panelIn .18s ease; }
     @keyframes panelIn{ from{opacity:.4; transform:translateY(-4px)} to{opacity:1; transform:translateY(0)} }
 
-    /* ===== Month Top Bar ===== */
     .topMonthBar{
       display:flex;
       justify-content:space-between;
@@ -192,7 +173,6 @@
       position:relative;
     }
     .iconCircle svg{ width:20px; height:20px; opacity:.85; }
-
     #monthPick{
       position:absolute;
       inset:0;
@@ -202,7 +182,6 @@
       -webkit-appearance:none;
     }
 
-    /* ===== Calendar ===== */
     .calGrid{
       display:grid;
       grid-template-columns:repeat(7,1fr);
@@ -215,7 +194,6 @@
       padding:2px 0;
     }
 
-    /* ===== Kafle dnia ===== */
     .dayCell{
       border-radius:16px;
       border:1px solid var(--outline-soft);
@@ -248,7 +226,6 @@
       line-height:1.05;
       margin-top:2px;
     }
-
     .dayNum.saturday{ color:var(--sat); font-weight:650; }
     .dayNum.sunday{ color:var(--sun); }
     .dayNum.holiday{ color:var(--holiday); }
@@ -286,7 +263,6 @@
     @media (min-width:900px){ .dayCell, .blankCell{ aspect-ratio: 1 / 1; min-height:74px; } }
     @supports not (aspect-ratio: 1 / 1){ .dayCell, .blankCell{ min-height:74px; } }
 
-    /* ===== Summary ===== */
     .statBox{
       background:var(--primary-soft);
       border-radius:16px;
@@ -294,8 +270,8 @@
     }
     .statValue{ font-size:22px; font-weight:900; margin-top:4px; }
 
-    /* ===== MODAL (pełny ekran + poprawki) ===== */
-    dialog{
+    /* ===== MODAL DNIA (pełny ekran) ===== */
+    dialog#dayDialog{
       border:none;
       padding:0;
       width:100vw;
@@ -307,13 +283,25 @@
       box-shadow:0 18px 60px rgba(0,0,0,.25);
       overflow:hidden;
     }
-    dialog::backdrop{ background:rgba(17,17,17,.45); }
+    dialog#dayDialog::backdrop{ background:rgba(17,17,17,.45); }
+
+    /* ===== MODAL URLOPU (pływający) ===== */
+    dialog#vacDialog{
+      border:none;
+      padding:0;
+      width:min(560px, calc(100vw - 28px));
+      max-width:560px;
+      margin:auto;
+      border-radius:22px;
+      box-shadow:0 18px 60px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    dialog#vacDialog::backdrop{ background:rgba(17,17,17,.45); }
 
     .modalHead,.modalBody{
       background:var(--bg);
       padding:18px;
     }
-
     .modalHead{
       border-bottom:1px solid var(--outline-soft);
       position:sticky;
@@ -322,7 +310,7 @@
       padding:16px 16px 14px;
     }
 
-    /* strzałka "wstecz" po PRAWEJ */
+    /* back button (wspólne) */
     .backBtn{
       width:44px;
       height:44px;
@@ -339,13 +327,14 @@
       right:12px;
       left:auto;
     }
+    .backBtn.blue{
+      background:var(--bar-vac);
+      border:1px solid rgba(26,115,232,.18);
+    }
     .backBtn svg{ width:20px; height:20px; opacity:.92; }
 
-    .modalHeadInner{
-      padding-right:58px;
-    }
+    .modalHeadInner{ padding-right:58px; }
 
-    /* Suma + dniówka obok siebie (zawsze) */
     .modalStats{
       display:flex;
       justify-content:space-between;
@@ -371,7 +360,6 @@
     }
     @media(max-width:380px){ .statMiniValue{ font-size:18px; } }
 
-    /* Układ: godziny -> notatka -> przycisk Dodaj na środku */
     .modalStack{
       display:flex;
       flex-direction:column;
@@ -386,14 +374,12 @@
     @media(max-width:520px){
       .timeGrid{ grid-template-columns:1fr 1fr; gap:10px; }
     }
-
     .addBtnCenter{
       width:min(320px, 100%);
       margin:4px auto 0;
       display:block;
     }
 
-    /* Lista zakresów */
     .shiftList{
       display:flex;
       flex-direction:column;
@@ -441,14 +427,20 @@
     .delIcon::before{ transform:translate(-50%,-50%) rotate(45deg); }
     .delIcon::after{ transform:translate(-50%,-50%) rotate(-45deg); }
 
-    /* blokuj scroll tła */
     body.modal-open{
       overflow:hidden;
       height:100vh;
       touch-action:none;
     }
 
-    /* ===== Urlop panel pod kalendarzem ===== */
+    .vacBtn{
+      width:100%;
+      background:rgba(26,115,232,.10);
+      border:1px solid rgba(26,115,232,.18);
+      color:#0b2d64;
+      font-weight:800;
+    }
+
     .vacBox{
       background:rgba(26,115,232,.10);
       border:1px solid rgba(26,115,232,.18);
@@ -461,17 +453,8 @@
       flex-wrap:wrap;
       align-items:flex-end;
     }
-    .vacRow > *{ flex:1; min-width:150px; }
-    .vacToggleBtn{
-      width:100%;
-      background:rgba(26,115,232,.10);
-      border:1px solid rgba(26,115,232,.18);
-      color:#0b2d64;
-      font-weight:700;
-    }
-    .vacPanelHidden{ display:none; }
+    .vacRow > *{ flex:1; min-width:160px; }
 
-    /* ===== FAB ===== */
     .fab{
       position:fixed;
       right:16px;
@@ -490,7 +473,6 @@
     .fab:active{ transform:scale(.98); }
     .fab svg{ width:22px;height:22px; }
 
-    /* focus */
     *{-webkit-tap-highlight-color:transparent}
     :focus{outline:none}
     :focus-visible{
@@ -507,7 +489,6 @@
       <h1>Czas pracy <span class="emoji">⏱️</span></h1>
     </header>
 
-    <!-- TOP: miesiąc + akcje -->
     <div class="section">
       <div class="topMonthBar">
         <div class="monthTitle" id="monthLabelText">—</div>
@@ -524,7 +505,6 @@
         </div>
       </div>
 
-      <!-- podsumowanie -->
       <div class="twoCols" style="margin-top:12px;">
         <div class="statBox">
           <div class="muted">Suma godzin w miesiącu</div>
@@ -539,43 +519,15 @@
       <div class="muted" id="status" style="margin-top:10px;"></div>
     </div>
 
-    <!-- KALENDARZ -->
     <div class="section">
       <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
       <div class="calGrid" id="calGrid"></div>
 
-      <!-- Urlop: przycisk + wysuwany panel -->
-      <div style="margin-top:14px;">
-        <button id="vacToggleBtn" class="vacToggleBtn" type="button">Dodaj urlop</button>
-
-        <div id="vacPanel" class="vacBox vacPanelHidden" style="margin-top:10px;">
-          <div style="font-weight:800; margin-bottom:8px;">Urlop (zakres dat)</div>
-          <div class="vacRow">
-            <div>
-              <label>Od</label>
-              <input id="vacFrom" type="date" />
-            </div>
-            <div>
-              <label>Do</label>
-              <input id="vacTo" type="date" />
-            </div>
-            <div>
-              <label>&nbsp;</label>
-              <button id="setVacationRange" type="button" style="background:var(--bar-vac);">Ustaw urlop</button>
-            </div>
-            <div>
-              <label>&nbsp;</label>
-              <button class="danger" id="clearVacationRange" type="button">Usuń urlop (od–do)</button>
-            </div>
-          </div>
-          <div class="muted" style="margin-top:8px;">
-            Po ustawieniu urlopu panel się zwinie.
-          </div>
-        </div>
+      <div class="row" style="margin-top:14px;">
+        <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
       </div>
     </div>
 
-    <!-- Ustawienia -->
     <div class="section">
       <details id="extrasPanel">
         <summary>
@@ -593,7 +545,6 @@
       </details>
     </div>
 
-    <!-- Narzędzia -->
     <div class="section">
       <details id="toolsPanel">
         <summary>
@@ -620,7 +571,49 @@
     </svg>
   </button>
 
-  <!-- MODAL DNIA -->
+  <!-- MODAL URLOPU (pływający) -->
+  <dialog id="vacDialog">
+    <div class="modalHead">
+      <div class="modalHeadInner">
+        <h3 style="margin:0;">Urlop (zakres dat)</h3>
+        <div class="muted" style="margin-top:3px;">Ustaw urlop od–do. Dni w kalendarzu oznaczą się na niebiesko.</div>
+      </div>
+
+      <button class="backBtn blue" id="vacBack" aria-label="Zamknij" type="button" title="Zamknij">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modalBody">
+      <div class="vacBox">
+        <div class="vacRow">
+          <div>
+            <label>Od</label>
+            <input id="vacFrom" type="date" />
+          </div>
+          <div>
+            <label>Do</label>
+            <input id="vacTo" type="date" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button id="setVacationRange" type="button" style="flex:1; background:var(--bar-vac); font-weight:800;">Ustaw urlop</button>
+          <button class="danger" id="clearVacationRange" type="button" style="flex:1; font-weight:700;">Usuń urlop (od–do)</button>
+        </div>
+
+        <div class="muted" style="margin-top:10px;">
+          Tip: jeśli chcesz usunąć urlop z jednego dnia, zrób to w modalu dnia (przycisk „Usuń urlop”).
+        </div>
+      </div>
+
+      <div style="height:6px;"></div>
+    </div>
+  </dialog>
+
+  <!-- MODAL DNIA (pełny ekran) -->
   <dialog id="dayDialog">
     <div class="modalHead">
       <div class="modalHeadInner">
@@ -636,7 +629,6 @@
     </div>
 
     <div class="modalBody">
-      <!-- Suma + dniówka obok siebie -->
       <div class="modalStats">
         <div class="statMini">
           <div class="muted">Suma godzin</div>
@@ -648,7 +640,7 @@
         </div>
       </div>
 
-      <!-- Blok pracy (ukrywany przy urlopie) -->
+      <!-- Blok pracy -->
       <div class="modalStack" id="dlgWorkBlock">
         <div class="timeGrid">
           <div>
@@ -670,9 +662,15 @@
         <button id="dlgAddShift" type="button" class="addBtnCenter">Dodaj</button>
       </div>
 
+      <!-- Blok statusu / zakresów -->
       <div style="margin-top:16px;" id="dlgShiftsBlock">
         <strong id="dlgShiftsTitle">Godziny pracy w ciągu dnia</strong>
         <div class="shiftList" id="dlgShifts"></div>
+
+        <!-- przycisk tylko dla urlopu -->
+        <button id="dlgRemoveVacation" type="button" class="danger" style="width:100%; margin-top:12px; display:none;">
+          Usuń urlop
+        </button>
       </div>
 
       <div style="height:14px;"></div>
@@ -998,7 +996,7 @@
       }
     }
 
-    // ===== MODAL =====
+    // ===== MODAL DNIA =====
     const dlg = $("dayDialog");
     let dlgDate = null;
 
@@ -1006,14 +1004,10 @@
       dlgDate = dateISO;
 
       const weekday = fmtWeekdayPL(dateISO);
-      const dlgTitle = $("dlgTitle");
-      const dlgMeta = $("dlgMeta");
-      if (dlgTitle) dlgTitle.textContent = `${fmtDMYText(dateISO)}`;
-      if (dlgMeta) dlgMeta.textContent = weekday;
+      if ($("dlgTitle")) $("dlgTitle").textContent = `${fmtDMYText(dateISO)}`;
+      if ($("dlgMeta")) $("dlgMeta").textContent = weekday;
 
       const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[], vacation:false };
-
-      // czyść pola
       if ($("dlgStart")) $("dlgStart").value = "";
       if ($("dlgEnd")) $("dlgEnd").value = "";
       if ($("dlgNote")) $("dlgNote").value = day.note || "";
@@ -1044,23 +1038,24 @@
       const workBlock = $("dlgWorkBlock");
       const shiftsTitle = $("dlgShiftsTitle");
       const shiftsBox = $("dlgShifts");
+      const removeVacBtn = $("dlgRemoveVacation");
 
-      // urlop -> ukryj wej/wyj + notatkę, pokaż "Urlop"
       if (day.vacation){
         if (workBlock) workBlock.style.display = "none";
         if (shiftsTitle) shiftsTitle.textContent = "Status dnia";
-        if (shiftsBox) shiftsBox.innerHTML = `<div class="muted" style="font-size:16px; font-weight:800; color:#0b2d64;">Urlop</div>`;
+        if (shiftsBox) shiftsBox.innerHTML =
+          `<div class="muted" style="font-size:16px; font-weight:900; color:#0b2d64;">Urlop</div>`;
+        if (removeVacBtn) removeVacBtn.style.display = "block";
 
         if ($("dlgSumHM")) $("dlgSumHM").textContent = "0:00";
         if ($("dlgSumPay")) $("dlgSumPay").textContent = pln(0);
         return;
       }
 
-      // praca -> normalnie
+      if (removeVacBtn) removeVacBtn.style.display = "none";
       if (workBlock) workBlock.style.display = "";
       if (shiftsTitle) shiftsTitle.textContent = "Godziny pracy w ciągu dnia";
 
-      // zawsze chronologicznie
       day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
 
       const mins = computeDayMinutes(day);
@@ -1123,9 +1118,51 @@
       renderTotals(monthYM);
     }
 
+    // ===== MODAL URLOPU =====
+    const vacDlg = $("vacDialog");
+    function openVac(){
+      if (!vacDlg) return;
+      const t = todayISO();
+      if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
+      if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
+
+      if (typeof vacDlg.showModal === "function") vacDlg.showModal();
+      else vacDlg.setAttribute("open","");
+    }
+    function closeVac(){
+      if (!vacDlg) return;
+      if (typeof vacDlg.close === "function") vacDlg.close();
+      else vacDlg.removeAttribute("open");
+    }
+    if (vacDlg){
+      vacDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeVac(); });
+    }
+
     // ===== UI =====
     const dlgBackBtn = $("dlgBack");
     if (dlgBackBtn) dlgBackBtn.onclick = closeDay;
+
+    const openVacDialogBtn = $("openVacDialog");
+    if (openVacDialogBtn) openVacDialogBtn.onclick = openVac;
+
+    const vacBackBtn = $("vacBack");
+    if (vacBackBtn) vacBackBtn.onclick = closeVac;
+
+    // usuwanie urlopu z dnia w modalu dnia
+    const dlgRemoveVacationBtn = $("dlgRemoveVacation");
+    if (dlgRemoveVacationBtn){
+      dlgRemoveVacationBtn.onclick = ()=>{
+        if (!dlgDate) return;
+        if (!confirm("Usunąć urlop z tego dnia?")) return;
+        const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
+        day.vacation = false;
+        upsertDay(dlgDate, day);
+        save();
+        renderAll();
+        renderDayDialog();
+        setStatus("Usunięto urlop z dnia.");
+      };
+    }
 
     // Dodawanie zakresu
     const dlgAddShiftBtn = $("dlgAddShift");
@@ -1134,7 +1171,7 @@
         if (!dlgDate) return;
 
         const dayNow = getDay(dlgDate);
-        if (dayNow?.vacation) return; // dla pewności
+        if (dayNow?.vacation) return; // safety
 
         const start = $("dlgStart")?.value;
         const end = $("dlgEnd")?.value;
@@ -1211,26 +1248,14 @@
       };
     }
 
-    // Urlop panel toggle
-    const vacToggleBtn = $("vacToggleBtn");
-    const vacPanel = $("vacPanel");
-    function setVacPanel(open){
-      if (!vacPanel) return;
-      vacPanel.classList.toggle("vacPanelHidden", !open);
-      if (vacToggleBtn) vacToggleBtn.textContent = open ? "Schowaj urlop" : "Dodaj urlop";
-    }
-    if (vacToggleBtn && vacPanel){
-      vacToggleBtn.onclick = ()=> setVacPanel(vacPanel.classList.contains("vacPanelHidden"));
-    }
-
-    // urlop: zakres
+    // urlop: zakres (w modalu urlopu)
     const setVacationRangeBtn = $("setVacationRange");
     if (setVacationRangeBtn){
       setVacationRangeBtn.onclick = ()=>{
         const from = $("vacFrom")?.value;
         const to = $("vacTo")?.value;
         const res = applyVacationRange(from, to, true);
-        if (res.ok) setVacPanel(false); // po ustawieniu zwinąć
+        if (res.ok) closeVac();
       };
     }
     const clearVacationRangeBtn = $("clearVacationRange");
@@ -1306,11 +1331,8 @@
 
       const t = todayISO();
       if (monthPick) monthPick.value = ym(t);
-
-      const vf = $("vacFrom");
-      const vt = $("vacTo");
-      if (vf && !vf.value) vf.value = t;
-      if (vt && !vt.value) vt.value = t;
+      if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
+      if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
 
       renderAll();
     } catch(err){
