@@ -286,7 +286,7 @@
     dialog#dayDialog::backdrop{ background:rgba(17,17,17,.45); }
 
     /* ===== MODAL URLOPU (pływający) ===== */
-    dialog#vacDialog{
+    dialog#vacDialog, dialog#bulkDialog{
       border:none;
       padding:0;
       width:min(560px, calc(100vw - 28px));
@@ -296,7 +296,7 @@
       box-shadow:0 18px 60px rgba(0,0,0,.25);
       overflow:hidden;
     }
-    dialog#vacDialog::backdrop{ background:rgba(17,17,17,.45); }
+    dialog#vacDialog::backdrop, dialog#bulkDialog::backdrop{ background:rgba(17,17,17,.45); }
 
     .modalHead,.modalBody{
       background:var(--bg);
@@ -447,13 +447,28 @@
       border-radius:16px;
       padding:12px 14px;
     }
+
+    /* (1) Od/Do obok siebie, nie na całość */
     .vacRow{
       display:flex;
       gap:10px;
-      flex-wrap:wrap;
+      flex-wrap:nowrap;
       align-items:flex-end;
     }
-    .vacRow > *{ flex:1; min-width:160px; }
+    .vacRow > *{ flex:0 0 auto; min-width:0; }
+    .vacRow input[type="date"]{
+      width:200px;
+      max-width:44vw;
+    }
+    @media(max-width:420px){
+      .vacRow input[type="date"]{ width:46vw; }
+    }
+
+    /* (2) Niebieskie tło modala (body) */
+    dialog#vacDialog .modalBody,
+    dialog#bulkDialog .modalBody{
+      background:rgba(26,115,232,.06);
+    }
 
     .fab{
       position:fixed;
@@ -523,7 +538,9 @@
       <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
       <div class="calGrid" id="calGrid"></div>
 
+      <!-- (3) nowy przycisk: wiele godzin -->
       <div class="row" style="margin-top:14px;">
+        <button class="vacBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
         <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
       </div>
     </div>
@@ -571,7 +588,7 @@
     </svg>
   </button>
 
-  <!-- MODAL URLOPU (pływający) -->
+  <!-- MODAL: DODAJ URLOP -->
   <dialog id="vacDialog">
     <div class="modalHead">
       <div class="modalHeadInner">
@@ -602,6 +619,63 @@
         <div class="row" style="margin-top:12px;">
           <button id="setVacationRange" type="button" style="flex:1; background:var(--bar-vac); font-weight:800;">Dodaj</button>
           <button class="danger" id="clearVacationRange" type="button" style="flex:1; font-weight:700;">Usuń</button>
+        </div>
+      </div>
+
+      <div style="height:6px;"></div>
+    </div>
+  </dialog>
+
+  <!-- MODAL: DODAJ WIELE GODZIN -->
+  <dialog id="bulkDialog">
+    <div class="modalHead">
+      <div class="modalHeadInner">
+        <h3 style="margin:0;">Dodaj wiele godzin</h3>
+        <div class="muted" style="margin-top:3px;">Ustaw zakres dat i jedną parę godzin wejścia/wyjścia dla wszystkich dni.</div>
+      </div>
+
+      <button class="backBtn blue" id="bulkBack" aria-label="Zamknij" type="button" title="Zamknij">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modalBody">
+      <div class="vacBox" style="margin-bottom:12px;">
+        <div class="vacRow">
+          <div>
+            <label>Od</label>
+            <input id="bulkFrom" type="date" />
+          </div>
+          <div>
+            <label>Do</label>
+            <input id="bulkTo" type="date" />
+          </div>
+        </div>
+      </div>
+
+      <div class="vacBox">
+        <div class="timeGrid" style="margin-top:2px;">
+          <div>
+            <label>Godzina wejścia</label>
+            <input id="bulkStart" type="time" />
+          </div>
+          <div>
+            <label>Godzina wyjścia</label>
+            <input id="bulkEnd" type="time" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button id="applyBulkHours" type="button" style="flex:1; background:var(--bar-vac); font-weight:800;">Dodaj</button>
+          <button class="danger" id="removeBulkHours" type="button" style="flex:1; font-weight:700;">Usuń godziny</button>
+        </div>
+
+        <div class="muted" style="margin-top:10px;">
+          Uwaga: „Dodaj” dopisuje zakres do każdego dnia (nie nadpisuje istniejących).
+          „Usuń godziny” usuwa w tych dniach dokładnie ten sam zakres (jeśli istnieje).
+          Dni z urlopem są pomijane.
         </div>
       </div>
 
@@ -806,7 +880,7 @@
       return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
     }
 
-    // ===== Urlop: zakres dat =====
+    // ===== zakres dat helpers =====
     function parseISODate(s){
       if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
       const [Y,M,D] = s.split("-").map(Number);
@@ -822,17 +896,25 @@
       x.setDate(x.getDate() + n);
       return x;
     }
-
-    function applyVacationRange(fromISO, toISO, enable){
+    function forEachDateInRange(fromISO, toISO, cb){
       const a = parseISODate(fromISO);
       const b = parseISODate(toISO);
-      if (!a || !b) { alert("Uzupełnij poprawnie daty 'Od' i 'Do'."); return {ok:false}; }
-      if (b < a) { alert("Data 'Do' nie może być wcześniejsza niż 'Od'."); return {ok:false}; }
+      if (!a || !b) return {ok:false, msg:"Uzupełnij poprawnie daty 'Od' i 'Do'."};
+      if (b < a) return {ok:false, msg:"Data 'Do' nie może być wcześniejsza niż 'Od'."};
 
       let cur = a;
       let count = 0;
       while (cur <= b){
-        const dISO = isoFromDate(cur);
+        cb(isoFromDate(cur));
+        count++;
+        cur = addDays(cur, 1);
+      }
+      return {ok:true, count};
+    }
+
+    // ===== Urlop: zakres dat =====
+    function applyVacationRange(fromISO, toISO, enable){
+      const res = forEachDateInRange(fromISO, toISO, (dISO)=>{
         const day = getDay(dISO) || { date:dISO, note:"", shifts:[], vacation:false };
         if (enable){
           day.vacation = true;
@@ -841,14 +923,66 @@
           day.vacation = false;
         }
         upsertDay(dISO, day);
-        count++;
-        cur = addDays(cur, 1);
-      }
+      });
+      if (!res.ok){ alert(res.msg); return {ok:false}; }
+
       save();
       renderAll();
       if (dlgDate) renderDayDialog();
-      setStatus(enable ? (`Ustawiono urlop: ${count} dni.`) : (`Usunięto urlop: ${count} dni.`));
-      return {ok:true, count};
+      setStatus(enable ? (`Ustawiono urlop: ${res.count} dni.`) : (`Usunięto urlop: ${res.count} dni.`));
+      return {ok:true, count:res.count};
+    }
+
+    // ===== Dodaj/Usuń wiele godzin =====
+    function applyBulkHours(fromISO, toISO, start, end){
+      if (!start || !end) return {ok:false, msg:"Uzupełnij godzinę wejścia i wyjścia."};
+
+      let added = 0;
+      let skippedVac = 0;
+
+      const res = forEachDateInRange(fromISO, toISO, (dISO)=>{
+        const day = getDay(dISO) || { date:dISO, note:"", shifts:[], vacation:false };
+        if (day.vacation){ skippedVac++; return; }
+        day.shifts = Array.isArray(day.shifts) ? day.shifts : [];
+        day.shifts.push({ start, end });
+        day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
+        upsertDay(dISO, day);
+        added++;
+      });
+
+      if (!res.ok) return res;
+
+      save();
+      renderAll();
+      if (dlgDate) renderDayDialog();
+      return {ok:true, msg:`Dodano zakres do ${added} dni${skippedVac ? ` (pominięto urlop: ${skippedVac})` : ""}.`};
+    }
+
+    function removeBulkHours(fromISO, toISO, start, end){
+      if (!start || !end) return {ok:false, msg:"Uzupełnij godzinę wejścia i wyjścia (żeby wiedzieć co usuwać)."};
+
+      let removed = 0;
+      let skippedVac = 0;
+
+      const res = forEachDateInRange(fromISO, toISO, (dISO)=>{
+        const day = getDay(dISO);
+        if (!day) return;
+        if (day.vacation){ skippedVac++; return; }
+
+        const before = day.shifts.length;
+        day.shifts = (day.shifts || []).filter(s => !(s?.start === start && s?.end === end));
+        if (day.shifts.length !== before){
+          removed += (before - day.shifts.length);
+          upsertDay(dISO, day);
+        }
+      });
+
+      if (!res.ok) return res;
+
+      save();
+      renderAll();
+      if (dlgDate) renderDayDialog();
+      return {ok:true, msg:`Usunięto ${removed} zakres(ów)${skippedVac ? ` (pominięto urlop: ${skippedVac})` : ""}.`};
     }
 
     // ===== ŚWIĘTA PL =====
@@ -1114,14 +1248,15 @@
       renderTotals(monthYM);
     }
 
-    // ===== MODAL URLOPU =====
+    // ===== MODALE: urlop & bulk =====
     const vacDlg = $("vacDialog");
+    const bulkDlg = $("bulkDialog");
+
     function openVac(){
       if (!vacDlg) return;
       const t = todayISO();
       if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
       if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
-
       if (typeof vacDlg.showModal === "function") vacDlg.showModal();
       else vacDlg.setAttribute("open","");
     }
@@ -1134,6 +1269,23 @@
       vacDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeVac(); });
     }
 
+    function openBulk(){
+      if (!bulkDlg) return;
+      const t = todayISO();
+      if ($("bulkFrom") && !$("bulkFrom").value) $("bulkFrom").value = t;
+      if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
+      if (typeof bulkDlg.showModal === "function") bulkDlg.showModal();
+      else bulkDlg.setAttribute("open","");
+    }
+    function closeBulk(){
+      if (!bulkDlg) return;
+      if (typeof bulkDlg.close === "function") bulkDlg.close();
+      else bulkDlg.removeAttribute("open");
+    }
+    if (bulkDlg){
+      bulkDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeBulk(); });
+    }
+
     // ===== UI =====
     const dlgBackBtn = $("dlgBack");
     if (dlgBackBtn) dlgBackBtn.onclick = closeDay;
@@ -1141,8 +1293,14 @@
     const openVacDialogBtn = $("openVacDialog");
     if (openVacDialogBtn) openVacDialogBtn.onclick = openVac;
 
+    const openBulkDialogBtn = $("openBulkDialog");
+    if (openBulkDialogBtn) openBulkDialogBtn.onclick = openBulk;
+
     const vacBackBtn = $("vacBack");
     if (vacBackBtn) vacBackBtn.onclick = closeVac;
+
+    const bulkBackBtn = $("bulkBack");
+    if (bulkBackBtn) bulkBackBtn.onclick = closeBulk;
 
     // usuwanie urlopu z dnia w modalu dnia
     const dlgRemoveVacationBtn = $("dlgRemoveVacation");
@@ -1160,14 +1318,14 @@
       };
     }
 
-    // Dodawanie zakresu
+    // Dodawanie zakresu (pojedynczy dzień)
     const dlgAddShiftBtn = $("dlgAddShift");
     if (dlgAddShiftBtn){
       dlgAddShiftBtn.onclick = ()=>{
         if (!dlgDate) return;
 
         const dayNow = getDay(dlgDate);
-        if (dayNow?.vacation) return; // safety
+        if (dayNow?.vacation) return;
 
         const start = $("dlgStart")?.value;
         const end = $("dlgEnd")?.value;
@@ -1176,7 +1334,6 @@
         const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
         day.shifts.push({ start, end });
         day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
-
         upsertDay(dlgDate, day);
 
         if ($("dlgStart")) $("dlgStart").value = "";
@@ -1259,7 +1416,37 @@
       clearVacationRangeBtn.onclick = ()=>{
         const from = $("vacFrom")?.value;
         const to = $("vacTo")?.value;
-        applyVacationRange(from, to, false);
+        const res = applyVacationRange(from, to, false);
+        if (res.ok) closeVac();
+      };
+    }
+
+    // bulk: dodaj/usuń godziny w zakresie
+    const applyBulkHoursBtn = $("applyBulkHours");
+    if (applyBulkHoursBtn){
+      applyBulkHoursBtn.onclick = ()=>{
+        const from = $("bulkFrom")?.value;
+        const to = $("bulkTo")?.value;
+        const start = $("bulkStart")?.value;
+        const end = $("bulkEnd")?.value;
+        const res = applyBulkHours(from, to, start, end);
+        if (!res.ok){ alert(res.msg); return; }
+        setStatus(res.msg);
+        closeBulk();
+      };
+    }
+
+    const removeBulkHoursBtn = $("removeBulkHours");
+    if (removeBulkHoursBtn){
+      removeBulkHoursBtn.onclick = ()=>{
+        const from = $("bulkFrom")?.value;
+        const to = $("bulkTo")?.value;
+        const start = $("bulkStart")?.value;
+        const end = $("bulkEnd")?.value;
+        const res = removeBulkHours(from, to, start, end);
+        if (!res.ok){ alert(res.msg); return; }
+        setStatus(res.msg);
+        closeBulk();
       };
     }
 
@@ -1327,8 +1514,12 @@
 
       const t = todayISO();
       if (monthPick) monthPick.value = ym(t);
+
       if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
       if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
+
+      if ($("bulkFrom") && !$("bulkFrom").value) $("bulkFrom").value = t;
+      if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
 
       renderAll();
     } catch(err){
