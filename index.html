@@ -36,6 +36,10 @@
       --radius-lg:20px;
       --radius-md:16px;
       --radius-sm:12px;
+
+      /* zielony pod "Dodaj wiele godzin" */
+      --bulk-green:#1e8e3e;
+      --bulk-green-soft:rgba(30,142,62,.12);
     }
 
     html,body{ width:100%; overflow-x:hidden; }
@@ -285,7 +289,7 @@
     }
     dialog#dayDialog::backdrop{ background:rgba(17,17,17,.45); }
 
-    /* ===== MODAL URLOPU (pływający) ===== */
+    /* ===== MODALE PŁYWAJĄCE ===== */
     dialog#vacDialog, dialog#bulkDialog{
       border:none;
       padding:0;
@@ -299,7 +303,7 @@
     dialog#vacDialog::backdrop, dialog#bulkDialog::backdrop{ background:rgba(17,17,17,.45); }
 
     .modalHead,.modalBody{
-      background:var(--bg);
+      background:#f6f7fb;
       padding:18px;
     }
     .modalHead{
@@ -310,13 +314,13 @@
       padding:16px 16px 14px;
     }
 
-    /* back button (wspólne) */
+    /* back button */
     .backBtn{
       width:44px;
       height:44px;
       padding:0;
       border-radius:18px;
-      border:1px solid var(--outline-soft);
+      border:1px solid rgba(0,0,0,.06);
       background:var(--primary);
       color:#fff;
       cursor:pointer;
@@ -335,104 +339,13 @@
 
     .modalHeadInner{ padding-right:58px; }
 
-    .modalStats{
-      display:flex;
-      justify-content:space-between;
-      align-items:stretch;
-      gap:12px;
-      margin-bottom:14px;
-      flex-wrap:nowrap;
-    }
-    .statMini{
-      flex:1;
-      min-width:0;
-      background:var(--primary-soft);
-      border-radius:16px;
-      padding:12px 14px;
-    }
-    .statMiniValue{
-      font-size:20px;
-      font-weight:900;
-      margin-top:4px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    @media(max-width:380px){ .statMiniValue{ font-size:18px; } }
-
-    .modalStack{
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
-
-    .timeGrid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-    @media(max-width:520px){
-      .timeGrid{ grid-template-columns:1fr 1fr; gap:10px; }
-    }
-    .addBtnCenter{
-      width:min(320px, 100%);
-      margin:4px auto 0;
-      display:block;
-    }
-
-    .shiftList{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      margin-top:10px;
-    }
-    .shiftItem{
-      border:none;
-      background:var(--primary-soft);
-      border-radius:16px;
-      padding:12px 12px;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:flex-start;
-    }
-    .shiftItem .times{ font-weight:650; font-size:16px; }
-    .shiftItem .mins{
-      font-size:12.5px;
-      color:rgba(17,17,17,.6);
-      margin-top:4px;
-    }
-
-    .delIcon{
-      width:36px;
-      height:36px;
-      border-radius:18px;
-      border:1px solid rgba(217,45,32,.22);
-      background:rgba(217,45,32,.10);
-      cursor:pointer;
-      position:relative;
-      flex:0 0 auto;
-    }
-    .delIcon::before,.delIcon::after{
-      content:"";
-      position:absolute;
-      top:50%;
-      left:50%;
-      width:14px;
-      height:2px;
-      background:#7a1410;
-      border-radius:2px;
-      transform-origin:center;
-    }
-    .delIcon::before{ transform:translate(-50%,-50%) rotate(45deg); }
-    .delIcon::after{ transform:translate(-50%,-50%) rotate(-45deg); }
-
     body.modal-open{
       overflow:hidden;
       height:100vh;
       touch-action:none;
     }
 
+    /* przyciski pod kalendarzem */
     .vacBtn{
       width:100%;
       background:rgba(26,115,232,.10);
@@ -440,34 +353,34 @@
       color:#0b2d64;
       font-weight:800;
     }
-
-    .vacBox{
-      background:rgba(26,115,232,.10);
-      border:1px solid rgba(26,115,232,.18);
-      border-radius:16px;
-      padding:12px 14px;
+    .bulkBtn{
+      width:100%;
+      background:var(--bulk-green-soft);
+      border:1px solid rgba(30,142,62,.18);
+      color:#0b3a18;
+      font-weight:900;
     }
 
-    /* (1) Od/Do obok siebie, nie na całość */
-    .vacRow{
-      display:flex;
-      gap:10px;
-      flex-wrap:nowrap;
-      align-items:flex-end;
-    }
-    .vacRow > *{ flex:0 0 auto; min-width:0; }
-    .vacRow input[type="date"]{
-      width:200px;
-      max-width:44vw;
-    }
-    @media(max-width:420px){
-      .vacRow input[type="date"]{ width:46vw; }
-    }
-
-    /* (2) Niebieskie tło modala (body) */
-    dialog#vacDialog .modalBody,
-    dialog#bulkDialog .modalBody{
+    /* UJEDNOLICONY środek modali + pełna szerokość */
+    dialog#vacDialog .modalBody{
       background:rgba(26,115,232,.06);
+    }
+    dialog#bulkDialog .modalBody{
+      background:rgba(30,142,62,.06);
+    }
+
+    /* (usunięcie “ramek” wokoło i rozciągnięcie) */
+    .flatBox{
+      background:transparent;
+      border:none;
+      border-radius:0;
+      padding:0;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
     }
 
     .fab{
@@ -538,9 +451,8 @@
       <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
       <div class="calGrid" id="calGrid"></div>
 
-      <!-- (3) nowy przycisk: wiele godzin -->
       <div class="row" style="margin-top:14px;">
-        <button class="vacBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
+        <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
         <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
       </div>
     </div>
@@ -604,8 +516,8 @@
     </div>
 
     <div class="modalBody">
-      <div class="vacBox">
-        <div class="vacRow">
+      <div class="flatBox">
+        <div class="grid2">
           <div>
             <label>Od</label>
             <input id="vacFrom" type="date" />
@@ -616,12 +528,11 @@
           </div>
         </div>
 
-        <div class="row" style="margin-top:12px;">
-          <button id="setVacationRange" type="button" style="flex:1; background:var(--bar-vac); font-weight:800;">Dodaj</button>
-          <button class="danger" id="clearVacationRange" type="button" style="flex:1; font-weight:700;">Usuń</button>
+        <div class="grid2" style="margin-top:12px;">
+          <button id="setVacationRange" type="button" style="background:var(--bar-vac); font-weight:900;">Dodaj</button>
+          <button class="danger" id="clearVacationRange" type="button" style="font-weight:800;">Usuń</button>
         </div>
       </div>
-
       <div style="height:6px;"></div>
     </div>
   </dialog>
@@ -642,8 +553,8 @@
     </div>
 
     <div class="modalBody">
-      <div class="vacBox" style="margin-bottom:12px;">
-        <div class="vacRow">
+      <div class="flatBox">
+        <div class="grid2">
           <div>
             <label>Od</label>
             <input id="bulkFrom" type="date" />
@@ -653,10 +564,8 @@
             <input id="bulkTo" type="date" />
           </div>
         </div>
-      </div>
 
-      <div class="vacBox">
-        <div class="timeGrid" style="margin-top:2px;">
+        <div class="grid2" style="margin-top:12px;">
           <div>
             <label>Godzina wejścia</label>
             <input id="bulkStart" type="time" />
@@ -667,18 +576,15 @@
           </div>
         </div>
 
-        <div class="row" style="margin-top:12px;">
-          <button id="applyBulkHours" type="button" style="flex:1; background:var(--bar-vac); font-weight:800;">Dodaj</button>
-          <button class="danger" id="removeBulkHours" type="button" style="flex:1; font-weight:700;">Usuń godziny</button>
+        <div class="grid2" style="margin-top:12px;">
+          <button id="applyBulkHours" type="button" style="background:var(--bulk-green); font-weight:900;">Dodaj</button>
+          <button class="danger" id="removeBulkHours" type="button" style="font-weight:800;">Usuń godziny</button>
         </div>
 
         <div class="muted" style="margin-top:10px;">
-          Uwaga: „Dodaj” dopisuje zakres do każdego dnia (nie nadpisuje istniejących).
-          „Usuń godziny” usuwa w tych dniach dokładnie ten sam zakres (jeśli istnieje).
-          Dni z urlopem są pomijane.
+          Uwaga: „Dodaj” dopisuje zakres do każdego dnia (nie nadpisuje istniejących). „Usuń godziny” usuwa w tych dniach dokładnie ten sam zakres (jeśli istnieje). Dni z urlopem są pomijane.
         </div>
       </div>
-
       <div style="height:6px;"></div>
     </div>
   </dialog>
@@ -699,20 +605,19 @@
     </div>
 
     <div class="modalBody">
-      <div class="modalStats">
-        <div class="statMini">
+      <div class="modalStats" style="display:flex; gap:12px; margin-bottom:14px;">
+        <div class="statBox" style="flex:1;">
           <div class="muted">Suma godzin</div>
-          <div class="statMiniValue" id="dlgSumHM">0:00</div>
+          <div class="statValue" id="dlgSumHM">0:00</div>
         </div>
-        <div class="statMini">
+        <div class="statBox" style="flex:1;">
           <div class="muted">Dniówka</div>
-          <div class="statMiniValue" id="dlgSumPay">0,00 zł</div>
+          <div class="statValue" id="dlgSumPay">0,00 zł</div>
         </div>
       </div>
 
-      <!-- Blok pracy -->
-      <div class="modalStack" id="dlgWorkBlock">
-        <div class="timeGrid">
+      <div class="modalStack" id="dlgWorkBlock" style="display:flex; flex-direction:column; gap:14px;">
+        <div class="grid2">
           <div>
             <label>Godzina wejścia</label>
             <input id="dlgStart" type="time" />
@@ -729,15 +634,13 @@
           <div class="muted" style="margin-top:6px;">Notatka zapisuje się automatycznie.</div>
         </div>
 
-        <button id="dlgAddShift" type="button" class="addBtnCenter">Dodaj</button>
+        <button id="dlgAddShift" type="button" class="addBtnCenter" style="width:min(320px,100%); margin:4px auto 0;">Dodaj</button>
       </div>
 
-      <!-- Blok statusu / zakresów -->
       <div style="margin-top:16px;" id="dlgShiftsBlock">
         <strong id="dlgShiftsTitle">Godziny pracy w ciągu dnia</strong>
         <div class="shiftList" id="dlgShifts"></div>
 
-        <!-- przycisk tylko dla urlopu -->
         <button id="dlgRemoveVacation" type="button" class="danger" style="width:100%; margin-top:12px; display:none;">
           Usuń urlop
         </button>
@@ -880,7 +783,6 @@
       return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
     }
 
-    // ===== zakres dat helpers =====
     function parseISODate(s){
       if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
       const [Y,M,D] = s.split("-").map(Number);
@@ -912,7 +814,6 @@
       return {ok:true, count};
     }
 
-    // ===== Urlop: zakres dat =====
     function applyVacationRange(fromISO, toISO, enable){
       const res = forEachDateInRange(fromISO, toISO, (dISO)=>{
         const day = getDay(dISO) || { date:dISO, note:"", shifts:[], vacation:false };
@@ -933,7 +834,6 @@
       return {ok:true, count:res.count};
     }
 
-    // ===== Dodaj/Usuń wiele godzin =====
     function applyBulkHours(fromISO, toISO, start, end){
       if (!start || !end) return {ok:false, msg:"Uzupełnij godzinę wejścia i wyjścia."};
 
@@ -962,12 +862,11 @@
       if (!start || !end) return {ok:false, msg:"Uzupełnij godzinę wejścia i wyjścia (żeby wiedzieć co usuwać)."};
 
       let removed = 0;
-      let skippedVac = 0;
 
       const res = forEachDateInRange(fromISO, toISO, (dISO)=>{
         const day = getDay(dISO);
         if (!day) return;
-        if (day.vacation){ skippedVac++; return; }
+        if (day.vacation) return;
 
         const before = day.shifts.length;
         day.shifts = (day.shifts || []).filter(s => !(s?.start === start && s?.end === end));
@@ -982,10 +881,9 @@
       save();
       renderAll();
       if (dlgDate) renderDayDialog();
-      return {ok:true, msg:`Usunięto ${removed} zakres(ów)${skippedVac ? ` (pominięto urlop: ${skippedVac})` : ""}.`};
+      return {ok:true, msg:`Usunięto ${removed} zakres(ów).`};
     }
 
-    // ===== ŚWIĘTA PL =====
     function easterSunday(year){
       const a = year % 19;
       const b = Math.floor(year / 100);
@@ -1036,7 +934,6 @@
       return holidayCache.get(year);
     }
 
-    // ===== KALENDARZ =====
     const DOW = ["Pn","Wt","Śr","Czw","Pt","Sb","Nd"];
     function mondayIndex(jsDay){ return (jsDay + 6) % 7; }
     function daysInMonth(year, month1){ return new Date(year, month1, 0).getDate(); }
@@ -1126,7 +1023,6 @@
       }
     }
 
-    // ===== MODAL DNIA =====
     const dlg = $("dayDialog");
     let dlgDate = null;
 
@@ -1138,9 +1034,9 @@
       if ($("dlgMeta")) $("dlgMeta").textContent = weekday;
 
       const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[], vacation:false };
-      if ($("dlgStart")) $("dlgStart").value = "";
-      if ($("dlgEnd")) $("dlgEnd").value = "";
-      if ($("dlgNote")) $("dlgNote").value = day.note || "";
+      $("dlgStart").value = "";
+      $("dlgEnd").value = "";
+      $("dlgNote").value = day.note || "";
 
       renderDayDialog();
 
@@ -1171,28 +1067,26 @@
       const removeVacBtn = $("dlgRemoveVacation");
 
       if (day.vacation){
-        if (workBlock) workBlock.style.display = "none";
-        if (shiftsTitle) shiftsTitle.textContent = "Status dnia";
-        if (shiftsBox) shiftsBox.innerHTML =
-          `<div class="muted" style="font-size:16px; font-weight:900; color:#0b2d64;">Urlop</div>`;
-        if (removeVacBtn) removeVacBtn.style.display = "block";
-
-        if ($("dlgSumHM")) $("dlgSumHM").textContent = "0:00";
-        if ($("dlgSumPay")) $("dlgSumPay").textContent = pln(0);
+        workBlock.style.display = "none";
+        shiftsTitle.textContent = "Status dnia";
+        shiftsBox.innerHTML = `<div class="muted" style="font-size:16px; font-weight:900; color:#0b2d64;">Urlop</div>`;
+        removeVacBtn.style.display = "block";
+        $("dlgSumHM").textContent = "0:00";
+        $("dlgSumPay").textContent = pln(0);
         return;
       }
 
-      if (removeVacBtn) removeVacBtn.style.display = "none";
-      if (workBlock) workBlock.style.display = "";
-      if (shiftsTitle) shiftsTitle.textContent = "Godziny pracy w ciągu dnia";
+      removeVacBtn.style.display = "none";
+      workBlock.style.display = "";
+      shiftsTitle.textContent = "Godziny pracy w ciągu dnia";
 
       day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
 
       const mins = computeDayMinutes(day);
       const pay = (mins/60) * (db.settings.rate||0);
 
-      if ($("dlgSumHM")) $("dlgSumHM").textContent = fmtHM(mins);
-      if ($("dlgSumPay")) $("dlgSumPay").textContent = pln(pay);
+      $("dlgSumHM").textContent = fmtHM(mins);
+      $("dlgSumPay").textContent = pln(pay);
 
       const items = (day.shifts || []).map((s, idx)=>{
         const a = s.start || "—";
@@ -1200,19 +1094,17 @@
         const m = (s.start && s.end) ? Math.max(0, minutesBetween(day.date, s.start, s.end)) : 0;
 
         return `
-          <div class="shiftItem">
+          <div class="statBox" style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
             <div>
-              <div class="times">${a} – ${b}</div>
-              <div class="mins">${m ? ("Ilość godzin: " + fmtHM(m)) : "-"}</div>
+              <div style="font-weight:800;">${a} – ${b}</div>
+              <div class="muted" style="margin-top:4px;">${m ? ("Ilość godzin: " + fmtHM(m)) : "-"}</div>
             </div>
-            <button class="delIcon" data-delshift="${idx}" aria-label="Usuń zakres" type="button"></button>
+            <button class="danger" data-delshift="${idx}" type="button" style="padding:10px 12px;">Usuń</button>
           </div>
         `;
       }).join("");
 
-      if (shiftsBox){
-        shiftsBox.innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
-      }
+      shiftsBox.innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
 
       document.querySelectorAll("[data-delshift]").forEach(btn=>{
         btn.onclick = ()=>{
@@ -1228,11 +1120,10 @@
       });
     }
 
-    // ===== TOTALS =====
     function renderTotals(monthYM){
       const sumMin = computeMonthMinutes(monthYM);
-      if ($("sumHours")) $("sumHours").textContent = fmtHM(sumMin);
-      if ($("sumPay")) $("sumPay").textContent = pln((sumMin/60) * (db.settings.rate||0));
+      $("sumHours").textContent = fmtHM(sumMin);
+      $("sumPay").textContent = pln((sumMin/60) * (db.settings.rate||0));
     }
 
     function renderAll(){
@@ -1248,263 +1139,163 @@
       renderTotals(monthYM);
     }
 
-    // ===== MODALE: urlop & bulk =====
     const vacDlg = $("vacDialog");
     const bulkDlg = $("bulkDialog");
 
     function openVac(){
-      if (!vacDlg) return;
       const t = todayISO();
-      if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
-      if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
-      if (typeof vacDlg.showModal === "function") vacDlg.showModal();
-      else vacDlg.setAttribute("open","");
+      if (!$("vacFrom").value) $("vacFrom").value = t;
+      if (!$("vacTo").value) $("vacTo").value = t;
+      vacDlg.showModal();
     }
-    function closeVac(){
-      if (!vacDlg) return;
-      if (typeof vacDlg.close === "function") vacDlg.close();
-      else vacDlg.removeAttribute("open");
-    }
-    if (vacDlg){
-      vacDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeVac(); });
-    }
+    function closeVac(){ vacDlg.close(); }
 
     function openBulk(){
-      if (!bulkDlg) return;
       const t = todayISO();
-      if ($("bulkFrom") && !$("bulkFrom").value) $("bulkFrom").value = t;
-      if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
-      if (typeof bulkDlg.showModal === "function") bulkDlg.showModal();
-      else bulkDlg.setAttribute("open","");
+      if (!$("bulkFrom").value) $("bulkFrom").value = t;
+      if (!$("bulkTo").value) $("bulkTo").value = t;
+      bulkDlg.showModal();
     }
-    function closeBulk(){
-      if (!bulkDlg) return;
-      if (typeof bulkDlg.close === "function") bulkDlg.close();
-      else bulkDlg.removeAttribute("open");
-    }
-    if (bulkDlg){
-      bulkDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeBulk(); });
-    }
+    function closeBulk(){ bulkDlg.close(); }
 
-    // ===== UI =====
-    const dlgBackBtn = $("dlgBack");
-    if (dlgBackBtn) dlgBackBtn.onclick = closeDay;
+    $("dlgBack").onclick = closeDay;
+    $("openVacDialog").onclick = openVac;
+    $("openBulkDialog").onclick = openBulk;
+    $("vacBack").onclick = closeVac;
+    $("bulkBack").onclick = closeBulk;
 
-    const openVacDialogBtn = $("openVacDialog");
-    if (openVacDialogBtn) openVacDialogBtn.onclick = openVac;
+    $("setVacationRange").onclick = ()=>{
+      const res = applyVacationRange($("vacFrom").value, $("vacTo").value, true);
+      if (res.ok) closeVac();
+    };
+    $("clearVacationRange").onclick = ()=>{
+      const res = applyVacationRange($("vacFrom").value, $("vacTo").value, false);
+      if (res.ok) closeVac();
+    };
 
-    const openBulkDialogBtn = $("openBulkDialog");
-    if (openBulkDialogBtn) openBulkDialogBtn.onclick = openBulk;
+    $("applyBulkHours").onclick = ()=>{
+      const res = applyBulkHours($("bulkFrom").value, $("bulkTo").value, $("bulkStart").value, $("bulkEnd").value);
+      if (!res.ok){ alert(res.msg); return; }
+      setStatus(res.msg);
+      closeBulk();
+    };
+    $("removeBulkHours").onclick = ()=>{
+      const res = removeBulkHours($("bulkFrom").value, $("bulkTo").value, $("bulkStart").value, $("bulkEnd").value);
+      if (!res.ok){ alert(res.msg); return; }
+      setStatus(res.msg);
+      closeBulk();
+    };
 
-    const vacBackBtn = $("vacBack");
-    if (vacBackBtn) vacBackBtn.onclick = closeVac;
+    $("dlgAddShift").onclick = ()=>{
+      if (!dlgDate) return;
+      const start = $("dlgStart").value;
+      const end = $("dlgEnd").value;
+      if (!start || !end) return alert("Uzupełnij godzinę wejścia i wyjścia.");
+      const dayNow = getDay(dlgDate);
+      if (dayNow?.vacation) return;
 
-    const bulkBackBtn = $("bulkBack");
-    if (bulkBackBtn) bulkBackBtn.onclick = closeBulk;
+      const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
+      day.shifts.push({ start, end });
+      day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
+      upsertDay(dlgDate, day);
 
-    // usuwanie urlopu z dnia w modalu dnia
-    const dlgRemoveVacationBtn = $("dlgRemoveVacation");
-    if (dlgRemoveVacationBtn){
-      dlgRemoveVacationBtn.onclick = ()=>{
-        if (!dlgDate) return;
-        if (!confirm("Usunąć urlop z tego dnia?")) return;
-        const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
-        day.vacation = false;
-        upsertDay(dlgDate, day);
-        save();
-        renderAll();
-        renderDayDialog();
-        setStatus("Usunięto urlop z dnia.");
-      };
-    }
+      $("dlgStart").value = "";
+      $("dlgEnd").value = "";
+      save();
+      renderAll();
+      renderDayDialog();
+      setStatus("Dodano zakres.");
+    };
 
-    // Dodawanie zakresu (pojedynczy dzień)
-    const dlgAddShiftBtn = $("dlgAddShift");
-    if (dlgAddShiftBtn){
-      dlgAddShiftBtn.onclick = ()=>{
-        if (!dlgDate) return;
-
-        const dayNow = getDay(dlgDate);
-        if (dayNow?.vacation) return;
-
-        const start = $("dlgStart")?.value;
-        const end = $("dlgEnd")?.value;
-        if (!start || !end) return alert("Uzupełnij godzinę wejścia i wyjścia.");
-
-        const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
-        day.shifts.push({ start, end });
-        day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
-        upsertDay(dlgDate, day);
-
-        if ($("dlgStart")) $("dlgStart").value = "";
-        if ($("dlgEnd")) $("dlgEnd").value = "";
-        save();
-        renderAll();
-        renderDayDialog();
-        setStatus("Dodano zakres.");
-      };
-    }
-
-    // Autosave notatki
-    const dlgNoteEl = $("dlgNote");
     let noteTimer = null;
-    if (dlgNoteEl){
-      dlgNoteEl.addEventListener("input", ()=>{
-        if (!dlgDate) return;
-        clearTimeout(noteTimer);
-        noteTimer = setTimeout(()=>{
-          const note = (dlgNoteEl.value || "").trim();
-          const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
-          day.note = note;
-          upsertDay(dlgDate, day);
-          save();
-          renderAll();
-          renderDayDialog();
-          setStatus("Zapisano notatkę.");
-        }, 250);
-      });
-    }
-
-    // miesiąc picker
-    const monthBar = $("monthBar");
-    const monthPick = $("monthPick");
-    if (monthBar && monthPick){
-      monthBar.onclick = ()=>{
-        if (typeof monthPick.showPicker === "function") monthPick.showPicker();
-        else monthPick.focus();
-      };
-      monthPick.addEventListener("change", renderAll);
-    }
-
-    // Dzisiaj
-    const todayBtn = $("todayBtn");
-    if (todayBtn && monthPick){
-      todayBtn.onclick = ()=>{
-        const t = todayISO();
-        monthPick.value = ym(t);
-        shouldScrollToToday = true;
-        renderAll();
-      };
-    }
-
-    // FAB: otwórz dzisiaj
-    const fabAdd = $("fabAdd");
-    if (fabAdd){
-      fabAdd.onclick = ()=>{
-        const t = todayISO();
-        if (monthPick){
-          monthPick.value = ym(t);
-          shouldScrollToToday = false;
-          renderAll();
-        }
-        openDay(t);
-      };
-    }
-
-    // urlop: zakres (w modalu urlopu)
-    const setVacationRangeBtn = $("setVacationRange");
-    if (setVacationRangeBtn){
-      setVacationRangeBtn.onclick = ()=>{
-        const from = $("vacFrom")?.value;
-        const to = $("vacTo")?.value;
-        const res = applyVacationRange(from, to, true);
-        if (res.ok) closeVac();
-      };
-    }
-    const clearVacationRangeBtn = $("clearVacationRange");
-    if (clearVacationRangeBtn){
-      clearVacationRangeBtn.onclick = ()=>{
-        const from = $("vacFrom")?.value;
-        const to = $("vacTo")?.value;
-        const res = applyVacationRange(from, to, false);
-        if (res.ok) closeVac();
-      };
-    }
-
-    // bulk: dodaj/usuń godziny w zakresie
-    const applyBulkHoursBtn = $("applyBulkHours");
-    if (applyBulkHoursBtn){
-      applyBulkHoursBtn.onclick = ()=>{
-        const from = $("bulkFrom")?.value;
-        const to = $("bulkTo")?.value;
-        const start = $("bulkStart")?.value;
-        const end = $("bulkEnd")?.value;
-        const res = applyBulkHours(from, to, start, end);
-        if (!res.ok){ alert(res.msg); return; }
-        setStatus(res.msg);
-        closeBulk();
-      };
-    }
-
-    const removeBulkHoursBtn = $("removeBulkHours");
-    if (removeBulkHoursBtn){
-      removeBulkHoursBtn.onclick = ()=>{
-        const from = $("bulkFrom")?.value;
-        const to = $("bulkTo")?.value;
-        const start = $("bulkStart")?.value;
-        const end = $("bulkEnd")?.value;
-        const res = removeBulkHours(from, to, start, end);
-        if (!res.ok){ alert(res.msg); return; }
-        setStatus(res.msg);
-        closeBulk();
-      };
-    }
-
-    // narzędzia
-    const backupBtn = $("backupJson");
-    if (backupBtn){
-      backupBtn.onclick = ()=>{
-        const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-      };
-    }
-
-    const restoreBtn = $("restoreBtn");
-    const restoreInput = $("restoreJson");
-    if (restoreBtn && restoreInput){
-      restoreBtn.onclick = ()=> restoreInput.click();
-      restoreInput.onchange = async (ev)=>{
-        const f = ev.target.files?.[0];
-        if (!f) return;
-        try{
-          const txt = await f.text();
-          const obj = JSON.parse(txt);
-          db = obj;
-          normalize();
-          migrateIfNeeded();
-          save();
-          hydrateSettingsUI();
-          renderAll();
-          if (dlgDate) renderDayDialog();
-          setStatus("Przywrócono dane z pliku JSON.");
-        }catch{
-          alert("Nie udało się wczytać pliku JSON.");
-        }
-      };
-    }
-
-    const clearMonthBtn = $("clearMonth");
-    if (clearMonthBtn){
-      clearMonthBtn.onclick = ()=>{
-        const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
-        if (!confirm("Usunąć wszystkie wpisy z tego miesiąca?")) return;
-        db.entries = db.entries.filter(e => ym(e.date) !== monthYM);
+    $("dlgNote").addEventListener("input", ()=>{
+      if (!dlgDate) return;
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(()=>{
+        const note = ($("dlgNote").value || "").trim();
+        const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
+        day.note = note;
+        upsertDay(dlgDate, day);
         save();
         renderAll();
-        setStatus("Wyczyszczono miesiąc.");
-      };
-    }
+        renderDayDialog();
+        setStatus("Zapisano notatkę.");
+      }, 250);
+    });
 
-    const rateEl = $("rate");
-    if (rateEl){
-      rateEl.addEventListener("input", renderAll);
-      rateEl.addEventListener("change", renderAll);
-    }
+    $("dlgRemoveVacation").onclick = ()=>{
+      if (!dlgDate) return;
+      if (!confirm("Usunąć urlop z tego dnia?")) return;
+      const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
+      day.vacation = false;
+      upsertDay(dlgDate, day);
+      save();
+      renderAll();
+      renderDayDialog();
+      setStatus("Usunięto urlop z dnia.");
+    };
+
+    $("monthBar").onclick = ()=>{
+      const mp = $("monthPick");
+      if (typeof mp.showPicker === "function") mp.showPicker();
+      else mp.focus();
+    };
+    $("monthPick").addEventListener("change", renderAll);
+
+    $("todayBtn").onclick = ()=>{
+      const t = todayISO();
+      $("monthPick").value = ym(t);
+      shouldScrollToToday = true;
+      renderAll();
+    };
+
+    $("fabAdd").onclick = ()=>{
+      const t = todayISO();
+      $("monthPick").value = ym(t);
+      renderAll();
+      openDay(t);
+    };
+
+    $("clearMonth").onclick = ()=>{
+      const monthYM = $("monthPick").value || ym(todayISO());
+      if (!confirm("Usunąć wszystkie wpisy z tego miesiąca?")) return;
+      db.entries = db.entries.filter(e => ym(e.date) !== monthYM);
+      save();
+      renderAll();
+      setStatus("Wyczyszczono miesiąc.");
+    };
+
+    $("backupJson").onclick = ()=>{
+      const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    $("restoreBtn").onclick = ()=> $("restoreJson").click();
+    $("restoreJson").onchange = async (ev)=>{
+      const f = ev.target.files?.[0];
+      if (!f) return;
+      try{
+        const txt = await f.text();
+        const obj = JSON.parse(txt);
+        db = obj;
+        normalize();
+        migrateIfNeeded();
+        save();
+        hydrateSettingsUI();
+        renderAll();
+        if (dlgDate) renderDayDialog();
+        setStatus("Przywrócono dane z pliku JSON.");
+      }catch{
+        alert("Nie udało się wczytać pliku JSON.");
+      }
+    };
+
+    $("rate").addEventListener("input", render Clearwater=renderAll);
 
     // INIT
     try{
@@ -1513,19 +1304,10 @@
       hydrateSettingsUI();
 
       const t = todayISO();
-      if (monthPick) monthPick.value = ym(t);
-
-      if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
-      if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
-
-      if ($("bulkFrom") && !$("bulkFrom").value) $("bulkFrom").value = t;
-      if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
-
+      $("monthPick").value = ym(t);
       renderAll();
     } catch(err){
-      const msg = (err && err.message) ? err.message : String(err);
-      const el = document.getElementById("status");
-      if (el) el.textContent = "BŁĄD INIT: " + msg;
+      showErr(err?.message || String(err));
     }
   })();
   </script>
