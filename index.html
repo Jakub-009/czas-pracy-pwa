@@ -689,6 +689,7 @@
     </div>
   </dialog>
 
+  
   <!-- MODAL DNIA (pełny ekran) -->
   <dialog id="dayDialog">
     <div class="modalHead" style="position:relative;">
@@ -701,4 +702,824 @@
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
         </svg>
-  
+      </button>
+    </div>
+
+    <div class="modalBody">
+      <div class="modalStats">
+        <div class="statMini">
+          <div class="muted">Suma godzin</div>
+          <div class="statMiniValue" id="dlgSumHM">0:00</div>
+        </div>
+        <div class="statMini">
+          <div class="muted">Dniówka</div>
+          <div class="statMiniValue" id="dlgSumPay">0,00 zł</div>
+        </div>
+      </div>
+
+      <!-- Blok pracy -->
+      <div class="modalStack" id="dlgWorkBlock">
+        <div class="timeGrid">
+          <div>
+            <label>Godzina wejścia</label>
+            <input id="dlgStart" type="time" />
+          </div>
+          <div>
+            <label>Godzina wyjścia</label>
+            <input id="dlgEnd" type="time" />
+          </div>
+        </div>
+
+        <div>
+          <label>Notatka</label>
+          <textarea id="dlgNote"></textarea>
+          <div class="muted" style="margin-top:6px;">Notatka zapisuje się automatycznie.</div>
+        </div>
+
+        <button id="dlgAddShift" type="button" class="addBtnCenter">Dodaj</button>
+      </div>
+
+      <!-- Blok statusu / zakresów -->
+      <div style="margin-top:16px;" id="dlgShiftsBlock">
+        <strong id="dlgShiftsTitle">Godziny pracy w ciągu dnia</strong>
+        <div class="shiftList" id="dlgShifts"></div>
+
+        <button id="dlgRemoveVacation" type="button" class="danger" style="width:100%; margin-top:12px; display:none;">
+          Usuń urlop
+        </button>
+      </div>
+
+      <div style="height:14px;"></div>
+    </div>
+  </dialog>
+
+  <script>
+  (() => {
+    const showErr = (msg) => {
+      const el = document.getElementById("status");
+      if (el) el.textContent = "BŁĄD: " + msg;
+    };
+    window.addEventListener("error", (e) => showErr(e.message || "Nieznany błąd JS"));
+    window.addEventListener("unhandledrejection", (e) => {
+      showErr((e.reason && e.reason.message) ? e.reason.message : String(e.reason || "Promise error"));
+    });
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/czas-pracy-pwa/sw.js", { scope: "/czas-pracy-pwa/" });
+    }
+
+    const $ = (id) => document.getElementById(id);
+    const pad2 = (n) => String(n).padStart(2,"0");
+
+    const todayISO = () => {
+      const d = new Date();
+      return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+    };
+    const ym = (dateISO) => dateISO.slice(0,7);
+
+    const MON = ["sty","lut","mar","kwi","maj","cze","lip","sie","wrz","paź","lis","gru"];
+    const fmtDMYText = (dateISO) => {
+      if (!dateISO) return "";
+      const [y,m,d] = dateISO.split("-").map(Number);
+      return `${pad2(d)}-${MON[m-1]}-${y}`;
+    };
+
+    const fmtMonthPL = (monthYM) => {
+      const [Y, M] = monthYM.split("-").map(Number);
+      const dt = new Date(Y, M-1, 1);
+      const s = new Intl.DateTimeFormat("pl-PL", { month:"long", year:"numeric" }).format(dt);
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    };
+
+    const fmtWeekdayPL = (dateISO) => {
+      const [Y, M, D] = dateISO.split("-").map(Number);
+      const dt = new Date(Y, M-1, D);
+      const s = new Intl.DateTimeFormat("pl-PL", { weekday:"long" }).format(dt);
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    };
+
+    const STORAGE_KEY = "worktime_pwa_v1";
+    let db = load() || { settings:{ rate:40 }, entries:[] };
+
+    function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+    function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; } }
+
+    function migrateIfNeeded(){
+      let changed = false;
+      db.entries = (Array.isArray(db.entries) ? db.entries : []).map(e=>{
+        if (!e) return e;
+        if (Array.isArray(e.shifts)) {
+          if (typeof e.vacation !== "boolean"){ e.vacation = false; changed = true; }
+          return e;
+        }
+        const shifts = [];
+        if (e.start && e.end) shifts.push({ start:e.start, end:e.end });
+        const ne = { date:e.date, note:e.note || "", shifts, vacation:false };
+        changed = true;
+        return ne;
+      });
+      if (changed) save();
+    }
+
+    function normalize(){
+      db.settings = db.settings || {};
+      db.settings.rate = Number(db.settings.rate ?? 40);
+      db.entries = Array.isArray(db.entries) ? db.entries : [];
+      for (const e of db.entries){
+        e.shifts = Array.isArray(e.shifts) ? e.shifts : [];
+        e.note = e.note || "";
+        e.vacation = !!e.vacation;
+      }
+    }
+
+    function setStatus(t){ const el = $("status"); if (el) el.textContent = t || ""; }
+
+    function minutesBetween(dateISO, start, end) {
+      const [y,m,d] = dateISO.split("-").map(Number);
+      const [sh,sm] = start.split(":").map(Number);
+      const [eh,em] = end.split(":").map(Number);
+      const a = new Date(y,m-1,d,sh,sm,0,0);
+      let b = new Date(y,m-1,d,eh,em,0,0);
+      if (b < a) b = new Date(y,m-1,d+1,eh,em,0,0);
+      return Math.round((b-a)/60000);
+    }
+
+    function fmtHM(mins){
+      const h = Math.floor(mins/60);
+      const m = mins%60;
+      return `${h}:${pad2(m)}`;
+    }
+    function pln(x){ return x.toLocaleString("pl-PL",{style:"currency",currency:"PLN"}); }
+
+    function readSettingsFromUI(){
+      const rateEl = $("rate");
+      if (!rateEl) return;
+      db.settings.rate = Number(rateEl.value || 0);
+    }
+    function hydrateSettingsUI(){
+      const rateEl = $("rate");
+      if (!rateEl) return;
+      rateEl.value = db.settings.rate;
+    }
+
+    function getDay(date){ return db.entries.find(e => e.date === date) || null; }
+
+    function upsertDay(date, patch){
+      const i = db.entries.findIndex(e => e.date === date);
+      if (i >= 0) db.entries[i] = { ...db.entries[i], ...patch };
+      else db.entries.push({ date, note:"", shifts:[], vacation:false, ...patch });
+      db.entries.sort((a,b)=>a.date.localeCompare(b.date));
+    }
+
+    function computeDayMinutes(day){
+      if (day.vacation) return 0;
+      let total = 0;
+      for (const s of day.shifts){
+        if (!s?.start || !s?.end) continue;
+        total += Math.max(0, minutesBetween(day.date, s.start, s.end));
+      }
+      return total;
+    }
+
+    function computeMonthMinutes(monthYM){
+      const days = db.entries.filter(e => ym(e.date) === monthYM);
+      return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
+    }
+
+    // ===== Daty pomocnicze =====
+    function parseISODate(s){
+      if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+      const [Y,M,D] = s.split("-").map(Number);
+      const dt = new Date(Y, M-1, D);
+      if (dt.getFullYear() !== Y || dt.getMonth() !== (M-1) || dt.getDate() !== D) return null;
+      return dt;
+    }
+    function isoFromDate(dt){
+      return `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
+    }
+    function addDays(dt, n){
+      const x = new Date(dt);
+      x.setDate(x.getDate() + n);
+      return x;
+    }
+
+    // ===== Urlop: zakres =====
+    function applyVacationRange(fromISO, toISO, enable){
+      const a = parseISODate(fromISO);
+      const b = parseISODate(toISO);
+      if (!a || !b) { alert("Uzupełnij poprawnie daty 'Od' i 'Do'."); return {ok:false}; }
+      if (b < a) { alert("Data 'Do' nie może być wcześniejsza niż 'Od'."); return {ok:false}; }
+
+      let cur = a;
+      let count = 0;
+      while (cur <= b){
+        const dISO = isoFromDate(cur);
+        const day = getDay(dISO) || { date:dISO, note:"", shifts:[], vacation:false };
+        if (enable){
+          day.vacation = true;
+          day.shifts = [];
+        } else {
+          day.vacation = false;
+        }
+        upsertDay(dISO, day);
+        count++;
+        cur = addDays(cur, 1);
+      }
+      save();
+      renderAll();
+      if (dlgDate) renderDayDialog();
+      setStatus(enable ? (`Ustawiono urlop: ${count} dni.`) : (`Usunięto urlop: ${count} dni.`));
+      return {ok:true, count};
+    }
+
+    // ===== Wiele godzin: zakres =====
+    function applyBulkHours(fromISO, toISO, start, end, mode){
+      const a = parseISODate(fromISO);
+      const b = parseISODate(toISO);
+      if (!a || !b) { alert("Uzupełnij poprawnie daty 'Od' i 'Do'."); return {ok:false}; }
+      if (b < a) { alert("Data 'Do' nie może być wcześniejsza niż 'Od'."); return {ok:false}; }
+      if (!start || !end) { alert("Uzupełnij godzinę wejścia i wyjścia."); return {ok:false}; }
+
+      let cur = a;
+      let changedDays = 0;
+
+      while (cur <= b){
+        const dISO = isoFromDate(cur);
+        const day = getDay(dISO) || { date:dISO, note:"", shifts:[], vacation:false };
+
+        // pomijamy urlop
+        if (day.vacation){
+          cur = addDays(cur, 1);
+          continue;
+        }
+
+        day.shifts = Array.isArray(day.shifts) ? day.shifts : [];
+
+        if (mode === "add"){
+          day.shifts.push({ start, end });
+          day.shifts.sort((x,y)=> (x.start||"").localeCompare(y.start||""));
+          upsertDay(dISO, day);
+          changedDays++;
+        }
+
+        if (mode === "remove"){
+          const before = day.shifts.length;
+          day.shifts = day.shifts.filter(s => !(s && s.start === start && s.end === end));
+          if (day.shifts.length !== before){
+            upsertDay(dISO, day);
+            changedDays++;
+          }
+        }
+
+        cur = addDays(cur, 1);
+      }
+
+      save();
+      renderAll();
+      if (dlgDate) renderDayDialog();
+
+      setStatus(
+        mode === "add"
+          ? `Dodano godziny (zakres) w ${changedDays} dniach.`
+          : `Usunięto godziny (zakres) w ${changedDays} dniach.`
+      );
+
+      return {ok:true, changedDays};
+    }
+
+    // ===== ŚWIĘTA PL =====
+    function easterSunday(year){
+      const a = year % 19;
+      const b = Math.floor(year / 100);
+      const c = year % 100;
+      const d = Math.floor(b / 4);
+      const e = b % 4;
+      const f = Math.floor((b + 8) / 25);
+      const g = Math.floor((b - f + 1) / 3);
+      const h = (19 * a + b - d - g + 15) % 30;
+      const i = Math.floor(c / 4);
+      const k = c % 4;
+      const l = (32 + 2 * e + 2 * i - h - k) % 7;
+      const m = Math.floor((a + 11 * h + 22 * l) / 451);
+      const month = Math.floor((h + l - 7 * m + 114) / 31);
+      const day = ((h + l - 7 * m + 114) % 31) + 1;
+      return new Date(year, month - 1, day);
+    }
+
+    function polishHolidays(year){
+      const map = new Map();
+      map.set(`${year}-01-01`, "Nowy Rok");
+      map.set(`${year}-01-06`, "Święto Trzech Króli");
+      map.set(`${year}-05-01`, "Święto Pracy");
+      map.set(`${year}-05-03`, "Święto Konstytucji 3 Maja");
+      map.set(`${year}-08-15`, "Wniebowzięcie NMP");
+      map.set(`${year}-11-01`, "Wszystkich Świętych");
+      map.set(`${year}-11-11`, "Narodowe Święto Niepodległości");
+      map.set(`${year}-12-24`, "Wigilia");
+      map.set(`${year}-12-25`, "Boże Narodzenie (1. dzień)");
+      map.set(`${year}-12-26`, "Boże Narodzenie (2. dzień)");
+
+      const easter = easterSunday(year);
+      map.set(isoFromDate(easter), "Wielkanoc");
+      map.set(isoFromDate(addDays(easter, 1)), "Poniedziałek Wielkanocny");
+      map.set(isoFromDate(addDays(easter, 49)), "Zielone Świątki");
+      map.set(isoFromDate(addDays(easter, 60)), "Boże Ciało");
+
+      return map;
+    }
+
+    const holidayCache = new Map();
+    function getHolidayMap(year){
+      if (!holidayCache.has(year)) holidayCache.set(year, polishHolidays(year));
+      return holidayCache.get(year);
+    }
+
+    // ===== KALENDARZ =====
+    const DOW = ["Pn","Wt","Śr","Czw","Pt","Sb","Nd"];
+    function mondayIndex(jsDay){ return (jsDay + 6) % 7; }
+    function daysInMonth(year, month1){ return new Date(year, month1, 0).getDate(); }
+
+    let shouldScrollToToday = false;
+
+    function renderDow(){
+      const dowRow = $("dowRow");
+      if (!dowRow) return;
+      dowRow.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
+    }
+
+    function renderCalendar(monthYM){
+      const monthLabel = $("monthLabelText");
+      const calGrid = $("calGrid");
+      if (!monthLabel || !calGrid) return;
+
+      monthLabel.textContent = fmtMonthPL(monthYM);
+
+      const [Y, M] = monthYM.split("-").map(Number);
+      const first = new Date(Y, M-1, 1);
+      const firstIdx = mondayIndex(first.getDay());
+      const dim = daysInMonth(Y, M);
+
+      const holidays = getHolidayMap(Y);
+      const cells = [];
+      const today = todayISO();
+
+      for (let i=0;i<firstIdx;i++) cells.push(`<div class="blankCell"></div>`);
+
+      for (let d=1; d<=dim; d++){
+        const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
+        const jsDow = new Date(Y, M-1, d).getDay();
+
+        const day = getDay(dateISO);
+        const isVacation = !!day?.vacation;
+        const hasShifts = !isVacation && ((day?.shifts || []).length > 0);
+        const hasNote = !!(day?.note && day.note.trim());
+
+        const holidayName = holidays.get(dateISO) || "";
+        const isHoliday = !!holidayName;
+
+        const numClass = [
+          "dayNum",
+          jsDow === 6 ? "saturday" : "",
+          jsDow === 0 ? "sunday" : "",
+          isHoliday ? "holiday" : ""
+        ].filter(Boolean).join(" ");
+
+        const tileTitle = isVacation ? "Urlop" : (isHoliday ? holidayName : "");
+        const isToday = (dateISO === today);
+        const dayCellClass = ["dayCell", isToday ? "today" : ""].filter(Boolean).join(" ");
+
+        cells.push(`
+          <div class="${dayCellClass}" data-date="${dateISO}" ${tileTitle ? `title="${tileTitle}"` : ""}>
+            <div class="dayTop">
+              <div class="${numClass}">${d}</div>
+            </div>
+            <div class="indRow" aria-hidden="true">
+              <span class="bar vacation ${isVacation ? "" : "hidden"}"></span>
+              <span class="bar shift ${hasShifts ? "" : "hidden"}"></span>
+              <span class="bar note ${hasNote ? "" : "hidden"}"></span>
+            </div>
+          </div>
+        `);
+      }
+
+      const mod = cells.length % 7;
+      if (mod !== 0){
+        const need = 7 - mod;
+        for (let i=0;i<need;i++) cells.push(`<div class="blankCell"></div>`);
+      }
+
+      calGrid.innerHTML = cells.join("");
+
+      document.querySelectorAll(".dayCell[data-date]").forEach(el=>{
+        el.onclick = ()=>{
+          const date = el.getAttribute("data-date");
+          openDay(date);
+        };
+      });
+
+      if (shouldScrollToToday){
+        shouldScrollToToday = false;
+        const el = document.querySelector(`.dayCell[data-date="${today}"]`);
+        if (el) el.scrollIntoView({behavior:"smooth", block:"center"});
+      }
+    }
+
+    // ===== MODAL DNIA =====
+    const dlg = $("dayDialog");
+    let dlgDate = null;
+
+    function openDay(dateISO){
+      dlgDate = dateISO;
+
+      const weekday = fmtWeekdayPL(dateISO);
+      if ($("dlgTitle")) $("dlgTitle").textContent = `${fmtDMYText(dateISO)}`;
+      if ($("dlgMeta")) $("dlgMeta").textContent = weekday;
+
+      const day = getDay(dateISO) || { date: dateISO, note:"", shifts:[], vacation:false };
+      if ($("dlgStart")) $("dlgStart").value = "";
+      if ($("dlgEnd")) $("dlgEnd").value = "";
+      if ($("dlgNote")) $("dlgNote").value = day.note || "";
+
+      renderDayDialog();
+
+      if (dlg && typeof dlg.showModal === "function") dlg.showModal();
+      else if (dlg) dlg.setAttribute("open","");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeDay(){
+      dlgDate = null;
+      if (dlg && typeof dlg.close === "function") dlg.close();
+      else if (dlg) dlg.removeAttribute("open");
+      document.body.classList.remove("modal-open");
+    }
+
+    if (dlg){
+      dlg.addEventListener("close", ()=> document.body.classList.remove("modal-open"));
+      dlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeDay(); });
+    }
+
+    function renderDayDialog(){
+      if (!dlgDate) return;
+      const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
+
+      const workBlock = $("dlgWorkBlock");
+      const shiftsTitle = $("dlgShiftsTitle");
+      const shiftsBox = $("dlgShifts");
+      const removeVacBtn = $("dlgRemoveVacation");
+
+      if (day.vacation){
+        if (workBlock) workBlock.style.display = "none";
+        if (shiftsTitle) shiftsTitle.textContent = "Status dnia";
+        if (shiftsBox) shiftsBox.innerHTML =
+          `<div class="muted" style="font-size:16px; font-weight:900; color:#0b2d64;">Urlop</div>`;
+        if (removeVacBtn) removeVacBtn.style.display = "block";
+
+        if ($("dlgSumHM")) $("dlgSumHM").textContent = "0:00";
+        if ($("dlgSumPay")) $("dlgSumPay").textContent = pln(0);
+        return;
+      }
+
+      if (removeVacBtn) removeVacBtn.style.display = "none";
+      if (workBlock) workBlock.style.display = "";
+      if (shiftsTitle) shiftsTitle.textContent = "Godziny pracy w ciągu dnia";
+
+      day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
+
+      const mins = computeDayMinutes(day);
+      const pay = (mins/60) * (db.settings.rate||0);
+
+      if ($("dlgSumHM")) $("dlgSumHM").textContent = fmtHM(mins);
+      if ($("dlgSumPay")) $("dlgSumPay").textContent = pln(pay);
+
+      const items = (day.shifts || []).map((s, idx)=>{
+        const a = s.start || "—";
+        const b = s.end || "—";
+        const m = (s.start && s.end) ? Math.max(0, minutesBetween(day.date, s.start, s.end)) : 0;
+
+        return `
+          <div class="shiftItem">
+            <div>
+              <div class="times">${a} – ${b}</div>
+              <div class="mins">${m ? ("Ilość godzin: " + fmtHM(m)) : "-"}</div>
+            </div>
+            <button class="delIcon" data-delshift="${idx}" aria-label="Usuń zakres" type="button"></button>
+          </div>
+        `;
+      }).join("");
+
+      if (shiftsBox){
+        shiftsBox.innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
+      }
+
+      document.querySelectorAll("[data-delshift]").forEach(btn=>{
+        btn.onclick = ()=>{
+          const idx = Number(btn.getAttribute("data-delshift"));
+          if (!confirm("Usunąć ten zakres?")) return;
+          const d = getDay(dlgDate);
+          if (!d) return;
+          d.shifts.splice(idx, 1);
+          save();
+          renderAll();
+          renderDayDialog();
+        };
+      });
+    }
+
+    // ===== TOTALS =====
+    function renderTotals(monthYM){
+      const sumMin = computeMonthMinutes(monthYM);
+      if ($("sumHours")) $("sumHours").textContent = fmtHM(sumMin);
+      if ($("sumPay")) $("sumPay").textContent = pln((sumMin/60) * (db.settings.rate||0));
+    }
+
+    function renderAll(){
+      normalize();
+      readSettingsFromUI();
+      save();
+
+      const monthPick = $("monthPick");
+      const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
+
+      renderDow();
+      renderCalendar(monthYM);
+      renderTotals(monthYM);
+    }
+
+    // ===== MODAL URLOPU =====
+    const vacDlg = $("vacDialog");
+    function openVac(){
+      if (!vacDlg) return;
+      const t = todayISO();
+      if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
+      if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
+      if (typeof vacDlg.showModal === "function") vacDlg.showModal();
+      else vacDlg.setAttribute("open","");
+    }
+    function closeVac(){
+      if (!vacDlg) return;
+      if (typeof vacDlg.close === "function") vacDlg.close();
+      else vacDlg.removeAttribute("open");
+    }
+    if (vacDlg){
+      vacDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeVac(); });
+    }
+
+    // ===== MODAL WIELE GODZIN =====
+    const bulkDlg = $("bulkDialog");
+    function openBulk(){
+      if (!bulkDlg) return;
+      const t = todayISO();
+      if ($("bulkFrom") && !$("bulkFrom").value) $("bulkFrom").value = t;
+      if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
+      if (typeof bulkDlg.showModal === "function") bulkDlg.showModal();
+      else bulkDlg.setAttribute("open","");
+    }
+    function closeBulk(){
+      if (!bulkDlg) return;
+      if (typeof bulkDlg.close === "function") bulkDlg.close();
+      else bulkDlg.removeAttribute("open");
+    }
+    if (bulkDlg){
+      bulkDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeBulk(); });
+    }
+
+    // ===== UI =====
+    const dlgBackBtn = $("dlgBack");
+    if (dlgBackBtn) dlgBackBtn.onclick = closeDay;
+
+    const openVacDialogBtn = $("openVacDialog");
+    if (openVacDialogBtn) openVacDialogBtn.onclick = openVac;
+
+    const openBulkDialogBtn = $("openBulkDialog");
+    if (openBulkDialogBtn) openBulkDialogBtn.onclick = openBulk;
+
+    const vacBackBtn = $("vacBack");
+    if (vacBackBtn) vacBackBtn.onclick = closeVac;
+
+    const bulkBackBtn = $("bulkBack");
+    if (bulkBackBtn) bulkBackBtn.onclick = closeBulk;
+
+    // usuwanie urlopu z dnia w modalu dnia
+    const dlgRemoveVacationBtn = $("dlgRemoveVacation");
+    if (dlgRemoveVacationBtn){
+      dlgRemoveVacationBtn.onclick = ()=>{
+        if (!dlgDate) return;
+        if (!confirm("Usunąć urlop z tego dnia?")) return;
+        const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
+        day.vacation = false;
+        upsertDay(dlgDate, day);
+        save();
+        renderAll();
+        renderDayDialog();
+        setStatus("Usunięto urlop z dnia.");
+      };
+    }
+
+    // Dodawanie zakresu w dniu
+    const dlgAddShiftBtn = $("dlgAddShift");
+    if (dlgAddShiftBtn){
+      dlgAddShiftBtn.onclick = ()=>{
+        if (!dlgDate) return;
+
+        const dayNow = getDay(dlgDate);
+        if (dayNow?.vacation) return;
+
+        const start = $("dlgStart")?.value;
+        const end = $("dlgEnd")?.value;
+        if (!start || !end) return alert("Uzupełnij godzinę wejścia i wyjścia.");
+
+        const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
+        day.shifts.push({ start, end });
+        day.shifts.sort((a,b)=> (a.start || "").localeCompare(b.start || ""));
+
+        upsertDay(dlgDate, day);
+
+        if ($("dlgStart")) $("dlgStart").value = "";
+        if ($("dlgEnd")) $("dlgEnd").value = "";
+        save();
+        renderAll();
+        renderDayDialog();
+        setStatus("Dodano zakres.");
+      };
+    }
+
+    // Autosave notatki
+    const dlgNoteEl = $("dlgNote");
+    let noteTimer = null;
+    if (dlgNoteEl){
+      dlgNoteEl.addEventListener("input", ()=>{
+        if (!dlgDate) return;
+        clearTimeout(noteTimer);
+        noteTimer = setTimeout(()=>{
+          const note = (dlgNoteEl.value || "").trim();
+          const day = getDay(dlgDate) || { date: dlgDate, note:"", shifts:[], vacation:false };
+          day.note = note;
+          upsertDay(dlgDate, day);
+          save();
+          renderAll();
+          renderDayDialog();
+          setStatus("Zapisano notatkę.");
+        }, 250);
+      });
+    }
+
+    // miesiąc picker
+    const monthBar = $("monthBar");
+    const monthPick = $("monthPick");
+    if (monthBar && monthPick){
+      monthBar.onclick = ()=>{
+        if (typeof monthPick.showPicker === "function") monthPick.showPicker();
+        else monthPick.focus();
+      };
+      monthPick.addEventListener("change", renderAll);
+    }
+
+    // Dzisiaj
+    const todayBtn = $("todayBtn");
+    if (todayBtn && monthPick){
+      todayBtn.onclick = ()=>{
+        const t = todayISO();
+        monthPick.value = ym(t);
+        shouldScrollToToday = true;
+        renderAll();
+      };
+    }
+
+    // FAB: otwórz dzisiaj
+    const fabAdd = $("fabAdd");
+    if (fabAdd){
+      fabAdd.onclick = ()=>{
+        const t = todayISO();
+        if (monthPick){
+          monthPick.value = ym(t);
+          shouldScrollToToday = false;
+          renderAll();
+        }
+        openDay(t);
+      };
+    }
+
+    // urlop: zakres
+    const setVacationRangeBtn = $("setVacationRange");
+    if (setVacationRangeBtn){
+      setVacationRangeBtn.onclick = ()=>{
+        const from = $("vacFrom")?.value;
+        const to = $("vacTo")?.value;
+        const res = applyVacationRange(from, to, true);
+        if (res.ok) closeVac();
+      };
+    }
+    const clearVacationRangeBtn = $("clearVacationRange");
+    if (clearVacationRangeBtn){
+      clearVacationRangeBtn.onclick = ()=>{
+        const from = $("vacFrom")?.value;
+        const to = $("vacTo")?.value;
+        applyVacationRange(from, to, false);
+      };
+    }
+
+    // wiele godzin: dodaj / usuń
+    const bulkApplyBtn = $("bulkApply");
+    if (bulkApplyBtn){
+      bulkApplyBtn.onclick = ()=>{
+        const from = $("bulkFrom")?.value;
+        const to = $("bulkTo")?.value;
+        const start = $("bulkStart")?.value;
+        const end = $("bulkEnd")?.value;
+        const res = applyBulkHours(from, to, start, end, "add");
+        if (res.ok) closeBulk();
+      };
+    }
+    const bulkRemoveBtn = $("bulkRemove");
+    if (bulkRemoveBtn){
+      bulkRemoveBtn.onclick = ()=>{
+        const from = $("bulkFrom")?.value;
+        const to = $("bulkTo")?.value;
+        const start = $("bulkStart")?.value;
+        const end = $("bulkEnd")?.value;
+        applyBulkHours(from, to, start, end, "remove");
+      };
+    }
+
+    // narzędzia
+    const backupBtn = $("backupJson");
+    if (backupBtn){
+      backupBtn.onclick = ()=>{
+        const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+    }
+
+    const restoreBtn = $("restoreBtn");
+    const restoreInput = $("restoreJson");
+    if (restoreBtn && restoreInput){
+      restoreBtn.onclick = ()=> restoreInput.click();
+      restoreInput.onchange = async (ev)=>{
+        const f = ev.target.files?.[0];
+        if (!f) return;
+        try{
+          const txt = await f.text();
+          const obj = JSON.parse(txt);
+          db = obj;
+          normalize();
+          migrateIfNeeded();
+          save();
+          hydrateSettingsUI();
+          renderAll();
+          if (dlgDate) renderDayDialog();
+          setStatus("Przywrócono dane z pliku JSON.");
+        }catch{
+          alert("Nie udało się wczytać pliku JSON.");
+        }
+      };
+    }
+
+    const clearMonthBtn = $("clearMonth");
+    if (clearMonthBtn){
+      clearMonthBtn.onclick = ()=>{
+        const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
+        if (!confirm("Usunąć wszystkie wpisy z tego miesiąca?")) return;
+        db.entries = db.entries.filter(e => ym(e.date) !== monthYM);
+        save();
+        renderAll();
+        setStatus("Wyczyszczono miesiąc.");
+      };
+    }
+
+    const rateEl = $("rate");
+    if (rateEl){
+      rateEl.addEventListener("input", renderAll);
+      rateEl.addEventListener("change", renderAll);
+    }
+
+    // INIT
+    try{
+      normalize();
+      migrateIfNeeded();
+      hydrateSettingsUI();
+
+      const t = todayISO();
+      if (monthPick) monthPick.value = ym(t);
+
+      if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
+      if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
+
+      if ($("bulkFrom") && !$("bulkFrom").value) $("bulkFrom").value = t;
+      if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
+
+      renderAll();
+    } catch(err){
+      const msg = (err && err.message) ? err.message : String(err);
+      const el = document.getElementById("status");
+      if (el) el.textContent = "BŁĄD INIT: " + msg;
+    }
+  })();
+  </script>
+</body>
+</html>
