@@ -507,6 +507,92 @@
       outline-offset:2px;
       border-radius:12px;
     }
+
+    /* ===== RAPORT PDF ===== */
+    .reportRoot{ display:none; }
+
+    .reportPage{
+      background:#fff;
+      padding:18mm 14mm;
+      color:#111;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    }
+
+    .reportHeader{
+      border-bottom:2px solid #111;
+      padding-bottom:10px;
+      margin-bottom:12px;
+    }
+    .reportTitle{
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .reportMeta{
+      margin-top:4px;
+      font-size:13px;
+      color:#333;
+    }
+
+    .reportSummary{
+      margin:10px 0 14px;
+      display:grid;
+      gap:6px;
+    }
+    .sumRow{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      font-size:14px;
+    }
+    .sumLabel{ font-weight:700; color:#222; }
+    .sumValue{ font-weight:900; }
+
+    .reportTable{
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+    .reportTable th,
+    .reportTable td{
+      border:1px solid #222;
+      padding:8px 8px;
+      vertical-align:top;
+    }
+    .reportTable th{
+      font-weight:900;
+      text-align:left;
+      background:#f3f4f6;
+    }
+
+    .noteBox{
+      min-height:44px;
+      border:1px solid #777;
+      border-radius:8px;
+      padding:6px 8px;
+      white-space:pre-wrap;
+      line-height:1.25;
+    }
+
+    .badgeVacation{
+      display:inline-block;
+      padding:2px 8px;
+      border:1px solid #1f4fd6;
+      border-radius:999px;
+      font-weight:800;
+      font-size:12px;
+    }
+
+    @media print{
+      body{ background:#fff !important; }
+      body > .wrap{ display:none !important; }
+      dialog{ display:none !important; }
+      .fab{ display:none !important; }
+
+      .reportRoot{
+        display:block !important;
+      }
+    }
   </style>
 </head>
 
@@ -583,7 +669,14 @@
           <span class="chev" aria-hidden="true"></span>
         </summary>
         <div class="panel">
+          <!-- RAPORT (nad "Usuń cały miesiąc") -->
           <div class="row" style="margin-top:12px;">
+            <button class="secondary" id="printPdfBtn" type="button" style="flex:1; min-width:240px;">
+              Raport PDF
+            </button>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
             <button class="danger" id="clearMonth" type="button" style="flex:1; min-width:240px;">Usuń cały miesiąc</button>
             <button class="secondary" id="backupJson" type="button" style="flex:1; min-width:180px;">Kopia zapasowa</button>
 
@@ -689,7 +782,6 @@
     </div>
   </dialog>
 
-  
   <!-- MODAL DNIA (pełny ekran) -->
   <dialog id="dayDialog">
     <div class="modalHead" style="position:relative;">
@@ -752,6 +844,44 @@
       <div style="height:14px;"></div>
     </div>
   </dialog>
+
+  <!-- RAPORT PDF (ukryty szablon do druku) -->
+  <section id="reportRoot" class="reportRoot" aria-hidden="true">
+    <div class="reportPage">
+      <div class="reportHeader">
+        <div class="reportTitle">RAPORT GODZIN PRACY</div>
+        <div class="reportMeta" id="reportMonth">Miesiąc: —</div>
+      </div>
+
+      <div class="reportSummary">
+        <div class="sumRow">
+          <div class="sumLabel">Łączna liczba godzin:</div>
+          <div class="sumValue" id="reportSumHours">0:00</div>
+        </div>
+        <div class="sumRow">
+          <div class="sumLabel">Wynagrodzenie:</div>
+          <div class="sumValue" id="reportSumPay">0,00 zł</div>
+        </div>
+      </div>
+
+      <table class="reportTable" id="reportTable">
+        <thead>
+          <tr>
+            <th style="width:110px;">Data</th>
+            <th style="width:120px;">Dzień</th>
+            <th>Zakresy</th>
+            <th style="width:90px;">Razem</th>
+            <th style="width:240px;">Notatka</th>
+          </tr>
+        </thead>
+        <tbody id="reportTbody"></tbody>
+      </table>
+
+      <div class="reportFooter" id="reportFooter" style="margin-top:10px; font-size:12px; color:#333;">
+        Wygenerowano: —
+      </div>
+    </div>
+  </section>
 
   <script>
   (() => {
@@ -884,6 +1014,92 @@
     function computeMonthMinutes(monthYM){
       const days = db.entries.filter(e => ym(e.date) === monthYM);
       return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
+    }
+
+    // ===== RAPORT PDF =====
+    const isVacation = (day) => !!day?.vacation;
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function fmtDatePL(dateISO){
+      const [y,m,d] = dateISO.split("-").map(Number);
+      return `${pad2(d)}.${pad2(m)}.${y}`;
+    }
+
+    function listReportDays(monthYM){
+      return db.entries
+        .filter(e => ym(e.date) === monthYM)
+        .filter(e => (e.shifts?.length || 0) > 0 || (e.note && e.note.trim()) || isVacation(e))
+        .sort((a,b)=>a.date.localeCompare(b.date));
+    }
+
+    function buildRangesText(day){
+      if (isVacation(day)) return "Urlop";
+      const shifts = Array.isArray(day.shifts) ? day.shifts : [];
+      if (!shifts.length) return "—";
+      return shifts
+        .map(s => (s?.start && s?.end) ? `${s.start}–${s.end}` : "—")
+        .join(" / ");
+    }
+
+    function renderReport(monthYM){
+      const monthEl = $("reportMonth");
+      const sumHoursEl = $("reportSumHours");
+      const sumPayEl = $("reportSumPay");
+      const tbody = $("reportTbody");
+      const footer = $("reportFooter");
+
+      if (monthEl) monthEl.textContent = `Miesiąc: ${fmtMonthPL(monthYM)}`;
+
+      const sumMin = computeMonthMinutes(monthYM);
+      if (sumHoursEl) sumHoursEl.textContent = fmtHM(sumMin);
+      if (sumPayEl) sumPayEl.textContent = pln((sumMin/60) * (db.settings.rate||0));
+
+      const days = listReportDays(monthYM);
+
+      const rows = days.map(day => {
+        const weekday = fmtWeekdayPL(day.date);
+        const ranges = buildRangesText(day);
+
+        const mins = computeDayMinutes(day);
+        const totalCell = isVacation(day)
+          ? `<span class="badgeVacation">Urlop</span>`
+          : `<strong>${fmtHM(mins)}</strong>`;
+
+        const note = (day.note || "").trim();
+        const noteBox = `<div class="noteBox">${note ? escapeHtml(note) : ""}</div>`;
+
+        return `
+          <tr>
+            <td>${fmtDatePL(day.date)}</td>
+            <td>${weekday}</td>
+            <td>${ranges}</td>
+            <td>${totalCell}</td>
+            <td>${noteBox}</td>
+          </tr>
+        `;
+      }).join("");
+
+      if (tbody){
+        tbody.innerHTML = rows || `
+          <tr>
+            <td colspan="5" style="text-align:center; padding:14px;">
+              Brak danych do raportu w tym miesiącu.
+            </td>
+          </tr>
+        `;
+      }
+
+      const now = new Date();
+      const stamp = `${pad2(now.getDate())}.${pad2(now.getMonth()+1)}.${now.getFullYear()} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+      if (footer) footer.textContent = `Wygenerowano: ${stamp}`;
     }
 
     // ===== Daty pomocnicze =====
@@ -1070,8 +1286,8 @@
         const jsDow = new Date(Y, M-1, d).getDay();
 
         const day = getDay(dateISO);
-        const isVacation = !!day?.vacation;
-        const hasShifts = !isVacation && ((day?.shifts || []).length > 0);
+        const isVac = !!day?.vacation;
+        const hasShifts = !isVac && ((day?.shifts || []).length > 0);
         const hasNote = !!(day?.note && day.note.trim());
 
         const holidayName = holidays.get(dateISO) || "";
@@ -1084,7 +1300,7 @@
           isHoliday ? "holiday" : ""
         ].filter(Boolean).join(" ");
 
-        const tileTitle = isVacation ? "Urlop" : (isHoliday ? holidayName : "");
+        const tileTitle = isVac ? "Urlop" : (isHoliday ? holidayName : "");
         const isToday = (dateISO === today);
         const dayCellClass = ["dayCell", isToday ? "today" : ""].filter(Boolean).join(" ");
 
@@ -1094,7 +1310,7 @@
               <div class="${numClass}">${d}</div>
             </div>
             <div class="indRow" aria-hidden="true">
-              <span class="bar vacation ${isVacation ? "" : "hidden"}"></span>
+              <span class="bar vacation ${isVac ? "" : "hidden"}"></span>
               <span class="bar shift ${hasShifts ? "" : "hidden"}"></span>
               <span class="bar note ${hasNote ? "" : "hidden"}"></span>
             </div>
@@ -1439,6 +1655,16 @@
         const start = $("bulkStart")?.value;
         const end = $("bulkEnd")?.value;
         applyBulkHours(from, to, start, end, "remove");
+      };
+    }
+
+    // RAPORT PDF
+    const printPdfBtn = $("printPdfBtn");
+    if (printPdfBtn){
+      printPdfBtn.onclick = ()=>{
+        const m = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
+        renderReport(m);
+        window.print();
       };
     }
 
