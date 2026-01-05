@@ -199,17 +199,20 @@
       padding:2px 0;
     }
 
+    /* ===== KAFELKI (wariant "Google-like" + pigułki) ===== */
     .dayCell{
       border-radius:16px;
       border:1px solid var(--outline-soft);
       background:var(--surface-soft);
-      padding:4px 10px 10px;
+      padding:8px 8px 10px;
       cursor:pointer;
       position:relative;
       display:flex;
       flex-direction:column;
       justify-content:flex-start;
       align-items:stretch;
+      gap:6px;
+      overflow:hidden;
     }
     .blankCell{
       border:none;
@@ -217,24 +220,26 @@
       box-shadow:none;
       pointer-events:none;
     }
+
+    /* numer dnia: mniejszy i bardziej "u góry" */
     .dayTop{
       width:100%;
       display:flex;
-      justify-content:center;
+      justify-content:flex-start;
       align-items:flex-start;
+      padding-left:2px;
     }
     .dayNum{
-      width:100%;
-      text-align:center;
-      font-size:16px;
-      font-weight:750;
-      line-height:1.05;
-      margin-top:2px;
+      font-size:13px;
+      font-weight:800;
+      line-height:1;
+      letter-spacing:.2px;
+      color:#111;
     }
-    .dayNum.saturday{ color:var(--sat); font-weight:650; }
+    .dayNum.saturday{ color:var(--sat); font-weight:750; }
     .dayNum.sunday{ color:var(--sun); }
     .dayNum.holiday{ color:var(--holiday); }
-    .dayNum.saturday.holiday{ color:var(--holiday); font-weight:750; }
+    .dayNum.saturday.holiday{ color:var(--holiday); font-weight:850; }
 
     .dayCell.today{
       border-color:rgba(26,115,232,.35);
@@ -242,31 +247,72 @@
       background:rgba(255,255,255,.85);
     }
 
-    .indRow{
-      position:absolute;
-      left:0; right:0;
-      bottom:10px;
+    /* pigułki pod numerem dnia */
+    .pillStack{
       display:flex;
       flex-direction:column;
       gap:4px;
+      min-height:0;
+      flex:1;
+    }
+    .pill{
+      height:18px;
+      border-radius:999px;
+      padding:0 8px;
+      display:flex;
       align-items:center;
+      font-size:11px;
+      font-weight:750;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      border:1px solid rgba(17,17,17,.08);
+      background:rgba(80,130,124,.12);
+      color:#0f2f2b;
+    }
+    .pill.work{
+      background:rgba(30,142,62,.12);
+      border-color:rgba(30,142,62,.18);
+      color:#0f2f2b;
+    }
+    .pill.vac{
+      background:rgba(26,115,232,.14);
+      border-color:rgba(26,115,232,.20);
+      color:#0b2d64;
+      font-weight:900;
+    }
+    .pill.more{
+      background:rgba(17,17,17,.06);
+      border-color:rgba(17,17,17,.10);
+      color:rgba(17,17,17,.72);
+      font-weight:850;
+      justify-content:center;
+      padding:0 10px;
+    }
+
+    /* notatka = żółta kropka (dyskretna, prawy górny róg) */
+    .noteDot{
+      position:absolute;
+      top:8px;
+      right:8px;
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--bar-note);
+      box-shadow:0 0 0 3px rgba(249,171,0,.18);
       pointer-events:none;
     }
-    .bar{ display:block; height:4px; width:64%; border-radius:999px; }
-    .bar.shift{ background:var(--bar-work); }
-    .bar.note{ background:var(--bar-note); }
-    .bar.vacation{ background:var(--bar-vac); }
-    .bar.hidden{ display:none; }
+
+    /* proporcje kafelków – dajemy trochę więcej pionu na pigułki */
+    .dayCell, .blankCell{ aspect-ratio: 1 / 1.30; min-height:0; }
+    @media (min-width:520px){ .dayCell, .blankCell{ aspect-ratio: 1 / 1.15; } }
+    @media (min-width:900px){ .dayCell, .blankCell{ aspect-ratio: 1 / 1.05; min-height:86px; } }
+    @supports not (aspect-ratio: 1 / 1){ .dayCell, .blankCell{ min-height:86px; } }
 
     @media(max-width:420px){
-      .indRow{ bottom:8px; gap:3px; }
-      .bar{ height:3px; width:66%; }
+      .pill{ height:17px; font-size:10.5px; }
+      .noteDot{ top:7px; right:7px; width:7px; height:7px; }
     }
-
-    .dayCell, .blankCell{ aspect-ratio: 1 / 1.15; min-height:0; }
-    @media (min-width:520px){ .dayCell, .blankCell{ aspect-ratio: 1 / 1.05; } }
-    @media (min-width:900px){ .dayCell, .blankCell{ aspect-ratio: 1 / 1; min-height:74px; } }
-    @supports not (aspect-ratio: 1 / 1){ .dayCell, .blankCell{ min-height:74px; } }
 
     .statBox{
       background:var(--primary-soft);
@@ -446,28 +492,22 @@
     }
 
     /* Przyciski pod kalendarzem (obok siebie) */
-.row.calBtns{
-  flex-wrap:nowrap;
-}
-
-.bulkBtn,
-.vacBtn{
-  width:auto;      /* zamiast 100% */
-  flex:1;          /* po ~50% każdy */
-  margin-bottom:40px;
-}
-
-.bulkBtn{
-  background:rgba(80,130,124,.14);
-  color:#0f2f2b;
-  font-weight:500;
-}
-
-.vacBtn{
-  background:rgba(26,115,232,.12);
-  color:#0b2d64;
-  font-weight:500;
-}
+    .row.calBtns{ flex-wrap:nowrap; }
+    .bulkBtn, .vacBtn{
+      width:auto;
+      flex:1;
+      margin-bottom:40px;
+    }
+    .bulkBtn{
+      background:rgba(80,130,124,.14);
+      color:#0f2f2b;
+      font-weight:500;
+    }
+    .vacBtn{
+      background:rgba(26,115,232,.12);
+      color:#0b2d64;
+      font-weight:500;
+    }
 
     /* Układ w modalach: od/do obok siebie + bez ramek wokół */
     .rangeRow{
@@ -559,10 +599,11 @@
       <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
       <div class="calGrid" id="calGrid"></div>
 
-<div class="row calBtns" style="margin-top:14px;">
-  <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
-  <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
-</div>
+      <div class="row calBtns" style="margin-top:14px;">
+        <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
+        <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
+      </div>
+    </div>
 
     <div class="section">
       <details id="extrasPanel">
@@ -1054,6 +1095,31 @@
       dowRow.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
     }
 
+    // render pigułek: max 3 + ewentualne "+N"
+    function buildPillsHTML(day){
+      const isVacation = !!day?.vacation;
+      const shifts = (day?.shifts || []).slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
+      if (isVacation){
+        return `<div class="pillStack">
+          <div class="pill vac">Urlop</div>
+        </div>`;
+      }
+
+      const maxVisible = 3;
+      const visible = shifts.slice(0, maxVisible);
+      const extra = Math.max(0, shifts.length - maxVisible);
+
+      const pills = visible.map(s=>{
+        const a = (s && s.start) ? s.start : "—";
+        const b = (s && s.end) ? s.end : "—";
+        return `<div class="pill work">${a}–${b}</div>`;
+      });
+
+      if (extra > 0) pills.push(`<div class="pill more">+${extra}</div>`);
+
+      return `<div class="pillStack">${pills.join("")}</div>`;
+    }
+
     function renderCalendar(monthYM){
       const monthLabel = $("monthLabelText");
       const calGrid = $("calGrid");
@@ -1076,10 +1142,9 @@
         const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
         const jsDow = new Date(Y, M-1, d).getDay();
 
-        const day = getDay(dateISO);
-        const isVacation = !!day?.vacation;
-        const hasShifts = !isVacation && ((day?.shifts || []).length > 0);
-        const hasNote = !!(day?.note && day.note.trim());
+        const day = getDay(dateISO) || { date:dateISO, note:"", shifts:[], vacation:false };
+        const isVacation = !!day.vacation;
+        const hasNote = !!(day.note && day.note.trim());
 
         const holidayName = holidays.get(dateISO) || "";
         const isHoliday = !!holidayName;
@@ -1095,16 +1160,15 @@
         const isToday = (dateISO === today);
         const dayCellClass = ["dayCell", isToday ? "today" : ""].filter(Boolean).join(" ");
 
+        const pillsHTML = buildPillsHTML(day);
+
         cells.push(`
           <div class="${dayCellClass}" data-date="${dateISO}" ${tileTitle ? `title="${tileTitle}"` : ""}>
+            ${hasNote ? `<span class="noteDot" aria-hidden="true"></span>` : ``}
             <div class="dayTop">
               <div class="${numClass}">${d}</div>
             </div>
-            <div class="indRow" aria-hidden="true">
-              <span class="bar vacation ${isVacation ? "" : "hidden"}"></span>
-              <span class="bar shift ${hasShifts ? "" : "hidden"}"></span>
-              <span class="bar note ${hasNote ? "" : "hidden"}"></span>
-            </div>
+            ${pillsHTML}
           </div>
         `);
       }
@@ -1126,10 +1190,7 @@
 
       if (shouldScrollToToday){
         shouldScrollToToday = false;
-
-        /* ✅ POPRAWKA: bez backslashy / bez template-literal */
         const el = document.querySelector('.dayCell[data-date="'+today+'"]');
-
         if (el) el.scrollIntoView({behavior:"smooth", block:"center"});
       }
     }
@@ -1304,61 +1365,54 @@
         .replaceAll("'","&#039;");
     }
 
-    function fmtHoursHuman(mins){
-      const h = Math.floor(mins/60);
-      const m = mins%60;
-      if (!m) return `${h} h`;
-      return `${h} h ${m} min`;
-    }
-
     function buildReportHTML(monthYM){
-  const [Y, M] = monthYM.split("-").map(Number);
-  const dim = new Date(Y, M, 0).getDate();
+      const [Y, M] = monthYM.split("-").map(Number);
+      const dim = new Date(Y, M, 0).getDate();
 
-  const monthLabelReminder = fmtMonthPL(monthYM);
-  const sumMin = computeMonthMinutes(monthYM);
+      const monthLabelReminder = fmtMonthPL(monthYM);
+      const sumMin = computeMonthMinutes(monthYM);
 
-  const rows = [];
+      const rows = [];
 
-  for (let d=1; d<=dim; d++){
-    const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
-    const dow = fmtWeekdayPL(dateISO);
-    const day = getDay(dateISO) || { date:dateISO, note:"", shifts:[], vacation:false };
+      for (let d=1; d<=dim; d++){
+        const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
+        const dow = fmtWeekdayPL(dateISO);
+        const day = getDay(dateISO) || { date:dateISO, note:"", shifts:[], vacation:false };
 
-    const isVacation = !!day.vacation;
-    const mins = computeDayMinutes(day);
+        const isVacation = !!day.vacation;
+        const mins = computeDayMinutes(day);
 
-    // ✅ 4) Dni z 0 godzin nie pokazujemy (ALE urlop zostaje)
-    if (!isVacation && mins === 0) continue;
+        // ✅ Dni z 0 godzin nie pokazujemy (ALE urlop zostaje)
+        if (!isVacation && mins === 0) continue;
 
-    const shifts = (day.shifts || []).slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
-    let ranges = "";
-    if (isVacation) ranges = "Urlop";
-    else if (shifts.length){
-      ranges = shifts
-        .map(s => (s?.start && s?.end) ? `${s.start}-${s.end}` : "")
-        .filter(Boolean)
-        .join(", ");
-    }
+        const shifts = (day.shifts || []).slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
+        let ranges = "";
+        if (isVacation) ranges = "Urlop";
+        else if (shifts.length){
+          ranges = shifts
+            .map(s => (s?.start && s?.end) ? `${s.start}-${s.end}` : "")
+            .filter(Boolean)
+            .join(", ");
+        }
 
-    const note = (day.note || "").trim();
-    const noteShort = note.length > 44 ? (note.slice(0,44) + "…") : note;
+        const note = (day.note || "").trim();
+        const noteShort = note.length > 44 ? (note.slice(0,44) + "…") : note;
 
-    rows.push(`
-      <tr>
-        <td class="c-date">${pad2(d)}.${pad2(M)}.${Y}</td>
-        <td class="c-dow">${dow}</td>
-        <td class="c-ranges">${escapeHtml(ranges)}</td>
-        <td class="c-sum">${fmtHM(mins)}</td>
-        <td class="c-note">${escapeHtml(noteShort)}</td>
-      </tr>
-    `);
-  }
+        rows.push(`
+          <tr>
+            <td class="c-date">${pad2(d)}.${pad2(M)}.${Y}</td>
+            <td class="c-dow">${dow}</td>
+            <td class="c-ranges">${escapeHtml(ranges)}</td>
+            <td class="c-sum">${fmtHM(mins)}</td>
+            <td class="c-note">${escapeHtml(noteShort)}</td>
+          </tr>
+        `);
+      }
 
-  const gen = new Date();
-  const genText = `${gen.getFullYear()}-${pad2(gen.getMonth()+1)}-${pad2(gen.getDate())} ${pad2(gen.getHours())}:${pad2(gen.getMinutes())}`;
+      const gen = new Date();
+      const genText = `${gen.getFullYear()}-${pad2(gen.getMonth()+1)}-${pad2(gen.getDate())} ${pad2(gen.getHours())}:${pad2(gen.getMinutes())}`;
 
-  return `<!doctype html>
+      return `<!doctype html>
 <html lang="pl">
 <head>
   <meta charset="utf-8" />
@@ -1374,7 +1428,6 @@
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
-
     .head{
       display:flex;
       align-items:flex-start;
@@ -1394,8 +1447,6 @@
       text-align:right;
       white-space:nowrap;
     }
-
-    /* ✅ 3) Jedna linia sumy, bez ramek */
     .sumLine{
       margin:8px 0 10px;
       font-size:12px;
@@ -1405,7 +1456,6 @@
       font-weight:900;
       font-size:13px;
     }
-
     table{
       width:100%;
       border-collapse:collapse;
@@ -1465,7 +1515,7 @@
   </table>
 </body>
 </html>`;
-}
+    }
 
     function openReportPdf(){
       const monthPick = $("monthPick");
