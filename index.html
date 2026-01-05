@@ -42,7 +42,7 @@
       --radius-sm:12px;
 
       /* kontrola marginesów “jak Google” */
-      --wrapPad:14px;
+      --wrapPad:18px;
       --calEdgePad:2px; /* minimalny oddech kalendarza przy krawędzi */
     }
 
@@ -205,20 +205,20 @@
 
     /* ===== KAFELKI (wariant "Google-like" + pigułki) ===== */
     .dayCell{
-      border-radius:10px;
-      background:var(--surface-soft);
-      padding:7px 7px 8px;
-      gap:5px;
-      cursor:pointer;
-      position:relative;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-start;
-      align-items:stretch;
-      overflow:hidden;
-      aspect-ratio: 1 / 1.55;
-      min-height:0;
-    }
+  border-radius:10px;
+  background:var(--surface-soft);
+  padding:6px 0 7px;   /* BYŁO: 6px / 7px z bokami -> TERAZ boki 0 */
+  gap:5px;
+  cursor:pointer;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-items:stretch;
+  overflow:hidden;
+  aspect-ratio: 1 / 1.55;
+  min-height:0;
+}
     .blankCell{
       border:none;
       background:transparent;
@@ -231,7 +231,7 @@
       display:flex;
       justify-content:flex-start;
       align-items:flex-start;
-      padding-left:2px;
+      padding-left:6px;
     }
     .dayNum{
       font-size:10px;
@@ -261,23 +261,21 @@
 
     /* ✅ pigułka na maks szerokość, z ~0.2px oddechu */
     .pill{
-      height:10px;
-      width:calc(100% - 0.4px);
-      margin:0 0.2px;
-      padding:0 3px 0 2px;
-      font-size:5px;
-      font-weight:650;
-      line-height:1;
-      border-radius:5px;
-      display:flex;
-      align-items:center;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      border:none;
-      background:rgba(80,130,124,.12);
-      color:#0f2f2b;
-    }
+  height:10px;
+  width:100%;
+  margin:0 0.2px;      /* Twój mikro-oddech */
+  padding:0 3px 0 2px;
+  font-size:6px;
+  font-weight:650;
+  line-height:1;
+  border-radius:2px;
+  display:flex;
+  align-items:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  border:none;
+}
     .pill.work{
       background:rgba(30,142,62,.12);
       border-color:rgba(30,142,62,.18);
