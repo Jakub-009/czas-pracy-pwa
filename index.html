@@ -445,19 +445,34 @@
       touch-action:none;
     }
 
-    /* Przyciski pod kalendarzem */
-    .bulkBtn{
-      width:100%;
-      background:rgba(80,130,124,.14);
-      color:#0f2f2b;
-      font-weight:650;
-    }
-    .vacBtn{
-      width:100%;
-      background:rgba(26,115,232,.12);
-      color:#0b2d64;
-      font-weight:650;
-    }
+    /* Przyciski pod kalendarzem (obok siebie) */
+.row.calBtns{
+  flex-wrap:nowrap;
+}
+
+.bulkBtn,
+.vacBtn{
+  width:auto;      /* zamiast 100% */
+  flex:1;          /* po ~50% każdy */
+}
+
+.bulkBtn{
+  background:rgba(80,130,124,.14);
+  color:#0f2f2b;
+  font-weight:500;
+}
+
+.vacBtn{
+  background:rgba(26,115,232,.12);
+  color:#0b2d64;
+  font-weight:500;
+}
+
+/* na bardzo wąskich ekranach możesz zwinąć do 2 rzędów */
+@media (max-width:420px){
+  .row.calBtns{ flex-wrap:wrap; }
+  .bulkBtn, .vacBtn{ flex:1 1 100%; }
+}
 
     /* Układ w modalach: od/do obok siebie + bez ramek wokół */
     .rangeRow{
@@ -549,13 +564,10 @@
       <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
       <div class="calGrid" id="calGrid"></div>
 
-      <div class="row" style="margin-top:14px;">
-        <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
-      </div>
-      <div class="row" style="margin-top:10px;">
-        <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
-      </div>
-    </div>
+<div class="row calBtns" style="margin-top:14px;">
+  <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
+  <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
+</div>
 
     <div class="section">
       <details id="extrasPanel">
