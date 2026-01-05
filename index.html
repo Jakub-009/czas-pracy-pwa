@@ -187,11 +187,11 @@
     }
 
     /* KALENDARZ */
-    .calGrid{
-      display:grid;
-      grid-template-columns:repeat(7,1fr);
-      gap:8px;
-    }
+.calGrid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:5px;                 /* było 8px -> kafelki rosną */
+}
     .calDow{
       text-align:center;
       font-size:12px;
@@ -204,15 +204,17 @@
       border-radius:16px;
       border:1px solid var(--outline-soft);
       background:var(--surface-soft);
-      padding:8px 8px 10px;
+        padding:7px 7px 8px;     /* było 8/8/10 */
+  gap:5px; 
       cursor:pointer;
       position:relative;
       display:flex;
       flex-direction:column;
       justify-content:flex-start;
       align-items:stretch;
-      gap:6px;
       overflow:hidden;
+        aspect-ratio: 1 / 1.55;  /* było ok. 1/1.30 -> teraz wyraźnie większe */
+        min-height:0;
     }
     .blankCell{
       border:none;
@@ -230,8 +232,8 @@
       padding-left:2px;
     }
     .dayNum{
-      font-size:13px;
-      font-weight:800;
+        font-size:12px;          /* było 13 */
+  font-weight:850;
       line-height:1;
       letter-spacing:.2px;
       color:#111;
@@ -256,13 +258,13 @@
       flex:1;
     }
     .pill{
-      height:18px;
+        height:16px;             /* było 18 */
+  padding:0 7px;           /* było 0 8px */
+  font-size:10px;          /* było 11 */
+  font-weight:750;
       border-radius:999px;
-      padding:0 8px;
       display:flex;
       align-items:center;
-      font-size:11px;
-      font-weight:750;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
@@ -293,14 +295,15 @@
     /* notatka = żółta kropka (dyskretna, prawy górny róg) */
     .noteDot{
       position:absolute;
-      top:8px;
-      right:8px;
-      width:8px;
-      height:8px;
       border-radius:999px;
       background:var(--bar-note);
-      box-shadow:0 0 0 3px rgba(249,171,0,.18);
-      pointer-events:none;
+      pointer-events:none;.noteDot{
+  width:7px;
+  height:7px;
+  top:7px;
+  right:7px;
+  box-shadow:0 0 0 2.5px rgba(249,171,0,.18);
+}
     }
 
     /* proporcje kafelków – dajemy trochę więcej pionu na pigułki */
