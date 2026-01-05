@@ -256,21 +256,24 @@
       min-height:0;
       flex:1;
     }
-    .pill{
-        height:16px;             /* było 18 */
-  padding:0 7px;           /* było 0 8px */
-  font-size:10px;          /* było 11 */
+    /* pigułki pod numerem dnia — ciaśniej, mniejszy font, bez bordera, mniejszy radius */
+.pill{
+  height:15px;            /* było 16 — minimalnie niżej */
+  padding:0 6px 0 5px;    /* lewa minimalna, ale nie 0 */
+  font-size:9px;          /* było 10 */
   font-weight:750;
-      border-radius:999px;
-      display:flex;
-      align-items:center;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      border:1px solid rgba(17,17,17,.08);
-      background:rgba(80,130,124,.12);
-      color:#0f2f2b;
-    }
+  line-height:1;          /* ważne: mniej “ucina” optycznie */
+  border-radius:10px;     /* było 999px */
+  display:flex;
+  align-items:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  border:none;            /* było 1px — usuwamy */
+  background:rgba(80,130,124,.12);
+  color:#0f2f2b;
+}
     .pill.work{
       background:rgba(30,142,62,.12);
       border-color:rgba(30,142,62,.18);
@@ -304,6 +307,13 @@
   box-shadow:0 0 0 2.5px rgba(249,171,0,.18);
 }
     }
+
+    .statBox{
+      background:var(--primary-soft);
+      border-radius:16px;
+      padding:12px 14px;
+    }
+    .statValue{ font-size:22px; font-weight:900; margin-top:4px; }
 
     /* ===== MODAL DNIA (pełny ekran) ===== */
     dialog#dayDialog{
