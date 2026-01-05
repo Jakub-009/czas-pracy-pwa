@@ -792,6 +792,7 @@
       return s.charAt(0).toUpperCase() + s.slice(1);
     };
 
+    // skróty dni tygodnia: Nd/Pn/Wt/Śr/Czw/Pt/Sb
     const DOW_SHORT = ["Nd","Pn","Wt","Śr","Czw","Pt","Sb"];
     const fmtWeekdayPL = (dateISO) => {
       const [Y, M, D] = dateISO.split("-").map(Number);
@@ -1120,7 +1121,7 @@
 
       if (shouldScrollToToday){
         shouldScrollToToday = false;
-        const el = document.querySelector(`.dayCell[data-date="${today}"]`);
+        const el = document.querySelector(\`.dayCell[data-date="\${today}"]\`);
         if (el) el.scrollIntoView({behavior:"smooth", block:"center"});
       }
     }
@@ -1463,7 +1464,7 @@
     }
   </style>
 </head>
-<body>
+<body onload="setTimeout(function(){window.print();}, 250)">
   <div class="head">
     <div>
       <h1>RAPORT GODZIN PRACY</h1>
@@ -1510,12 +1511,6 @@
     <div>Jeśli zapisujesz do PDF: w oknie drukowania wybierz „Zapisz jako PDF”.</div>
     <div>${escapeHtml(monthYM)}</div>
   </div>
-
-  <script>
-    window.addEventListener("load", () => {
-      setTimeout(() => { window.print(); }, 250);
-    });
-  </script>
 </body>
 </html>`;
     }
