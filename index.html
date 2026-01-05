@@ -1307,63 +1307,53 @@
     }
 
     function buildReportHTML(monthYM){
-      const [Y, M] = monthYM.split("-").map(Number);
-      const dim = new Date(Y, M, 0).getDate();
+  const [Y, M] = monthYM.split("-").map(Number);
+  const dim = new Date(Y, M, 0).getDate();
 
-      const monthLabel = fmtMonthPL(monthYM);
-      const sumMin = computeMonthMinutes(monthYM);
-      const sumPay = (sumMin/60) * (db.settings.rate||0);
+  const monthLabelReminder = fmtMonthPL(monthYM);
+  const sumMin = computeMonthMinutes(monthYM);
 
-      const notes = [];
-      const rows = [];
+  const rows = [];
 
-      for (let d=1; d<=dim; d++){
-        const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
-        const dow = fmtWeekdayPL(dateISO);
-        const day = getDay(dateISO) || { date:dateISO, note:"", shifts:[], vacation:false };
+  for (let d=1; d<=dim; d++){
+    const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
+    const dow = fmtWeekdayPL(dateISO);
+    const day = getDay(dateISO) || { date:dateISO, note:"", shifts:[], vacation:false };
 
-        const isVacation = !!day.vacation;
-        const mins = computeDayMinutes(day);
+    const isVacation = !!day.vacation;
+    const mins = computeDayMinutes(day);
 
-        const shifts = (day.shifts || []).slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
-        let ranges = "";
-        if (isVacation) ranges = "Urlop";
-        else if (shifts.length){
-          ranges = shifts
-            .map(s => (s?.start && s?.end) ? `${s.start}-${s.end}` : "")
-            .filter(Boolean)
-            .join(", ");
-        }
+    // ✅ 4) Dni z 0 godzin nie pokazujemy (ALE urlop zostaje)
+    if (!isVacation && mins === 0) continue;
 
-        const note = (day.note || "").trim();
-        const noteShort = note.length > 44 ? (note.slice(0,44) + "…") : note;
+    const shifts = (day.shifts || []).slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
+    let ranges = "";
+    if (isVacation) ranges = "Urlop";
+    else if (shifts.length){
+      ranges = shifts
+        .map(s => (s?.start && s?.end) ? `${s.start}-${s.end}` : "")
+        .filter(Boolean)
+        .join(", ");
+    }
 
-        if (note) notes.push({ dateISO, dow, note });
+    const note = (day.note || "").trim();
+    const noteShort = note.length > 44 ? (note.slice(0,44) + "…") : note;
 
-        rows.push(`
-          <tr>
-            <td class="c-date">${pad2(d)}.${pad2(M)}.${Y}</td>
-            <td class="c-dow">${dow}</td>
-            <td class="c-ranges">${escapeHtml(ranges)}</td>
-            <td class="c-sum">${fmtHM(mins)}</td>
-            <td class="c-note">${escapeHtml(noteShort)}</td>
-          </tr>
-        `);
-      }
+    rows.push(`
+      <tr>
+        <td class="c-date">${pad2(d)}.${pad2(M)}.${Y}</td>
+        <td class="c-dow">${dow}</td>
+        <td class="c-ranges">${escapeHtml(ranges)}</td>
+        <td class="c-sum">${fmtHM(mins)}</td>
+        <td class="c-note">${escapeHtml(noteShort)}</td>
+      </tr>
+    `);
+  }
 
-      const notesHtml = notes.length
-        ? notes.map(n => `
-            <div class="noteRow">
-              <span class="noteDate">${escapeHtml(`${n.dateISO} (${n.dow})`)}</span>
-              <span class="noteText">${escapeHtml(n.note)}</span>
-            </div>
-          `).join("")
-        : `<div class="muted">Brak notatek w tym miesiącu.</div>`;
+  const gen = new Date();
+  const genText = `${gen.getFullYear()}-${pad2(gen.getMonth()+1)}-${pad2(gen.getDate())} ${pad2(gen.getHours())}:${pad2(gen.getMinutes())}`;
 
-      const gen = new Date();
-      const genText = `${gen.getFullYear()}-${pad2(gen.getMonth()+1)}-${pad2(gen.getDate())} ${pad2(gen.getHours())}:${pad2(gen.getMinutes())}`;
-
-      return `<!doctype html>
+  return `<!doctype html>
 <html lang="pl">
 <head>
   <meta charset="utf-8" />
@@ -1379,9 +1369,13 @@
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
+
     .head{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
-      margin-bottom:10px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:8px;
     }
     h1{
       margin:0;
@@ -1395,18 +1389,18 @@
       text-align:right;
       white-space:nowrap;
     }
-    .kpi{
-      display:flex; gap:10px; flex-wrap:wrap;
-      margin:10px 0 10px;
+
+    /* ✅ 3) Jedna linia sumy, bez ramek */
+    .sumLine{
+      margin:8px 0 10px;
+      font-size:12px;
+      color:#111;
     }
-    .kpiBox{
-      border:1px solid #e6e8ef;
-      border-radius:10px;
-      padding:8px 10px;
-      min-width:180px;
+    .sumLine strong{
+      font-weight:900;
+      font-size:13px;
     }
-    .kpiLabel{ font-size:10px; color:#555; }
-    .kpiVal{ font-size:14px; font-weight:800; margin-top:2px; }
+
     table{
       width:100%;
       border-collapse:collapse;
@@ -1433,61 +1427,21 @@
     .c-sum{ width:52px; text-align:right; }
     .c-note{ width:170px; }
     .c-ranges{ width:auto; }
-    .sectionTitle{
-      margin:12px 0 6px;
-      font-size:12px;
-      font-weight:900;
-    }
-    .notes{
-      border:1px solid #e6e8ef;
-      border-radius:10px;
-      padding:8px 10px;
-      font-size:10px;
-    }
-    .noteRow{
-      display:flex;
-      gap:10px;
-      padding:3px 0;
-      border-bottom:1px dashed #edf0f6;
-    }
-    .noteRow:last-child{ border-bottom:none; }
-    .noteDate{ flex:0 0 auto; width:130px; color:#333; font-weight:700; }
-    .noteText{ flex:1; color:#111; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .muted{ color:#666; }
-    .foot{
-      margin-top:10px;
-      font-size:9px;
-      color:#666;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-    }
-    @media print{
-      .noteText{ white-space:nowrap; }
-    }
   </style>
 </head>
 <body onload="setTimeout(function(){window.print();}, 250)">
   <div class="head">
     <div>
       <h1>RAPORT GODZIN PRACY</h1>
-      <div style="font-size:11px; color:#333; margin-top:2px;">Miesiąc: <strong>${escapeHtml(monthLabel)}</strong></div>
+      <div style="font-size:11px; color:#333; margin-top:2px;">Miesiąc: <strong>${escapeHtml(monthLabelReminder)}</strong></div>
     </div>
     <div class="meta">
-      Wygenerowano: ${escapeHtml(genText)}<br/>
-      Stawka: ${escapeHtml(pln(db.settings.rate||0))} / h
+      Wygenerowano: ${escapeHtml(genText)}
     </div>
   </div>
 
-  <div class="kpi">
-    <div class="kpiBox">
-      <div class="kpiLabel">Łączna liczba godzin</div>
-      <div class="kpiVal">${escapeHtml(fmtHoursHuman(sumMin))} <span style="font-size:11px; font-weight:700; color:#333;">(${escapeHtml(fmtHM(sumMin))})</span></div>
-    </div>
-    <div class="kpiBox">
-      <div class="kpiLabel">Wynagrodzenie</div>
-      <div class="kpiVal">${escapeHtml(pln(sumPay))}</div>
-    </div>
+  <div class="sumLine">
+    Łączna liczba godzin: <strong>${escapeHtml(fmtHM(sumMin))}</strong>
   </div>
 
   <table>
@@ -1501,22 +1455,12 @@
       </tr>
     </thead>
     <tbody>
-      ${rows.join("")}
+      ${rows.length ? rows.join("") : `<tr><td colspan="5" style="padding:8px 6px; color:#666;">Brak wpisów do wyświetlenia (same dni 0:00).</td></tr>`}
     </tbody>
   </table>
-
-  <div class="sectionTitle">Notatki</div>
-  <div class="notes">
-    ${notesHtml}
-  </div>
-
-  <div class="foot">
-    <div>Jeśli zapisujesz do PDF: w oknie drukowania wybierz „Zapisz jako PDF”.</div>
-    <div>${escapeHtml(monthYM)}</div>
-  </div>
 </body>
 </html>`;
-    }
+}
 
     function openReportPdf(){
       const monthPick = $("monthPick");
