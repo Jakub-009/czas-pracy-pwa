@@ -1306,6 +1306,7 @@ function fmtWeekdayLongPL(dateISO){
       const sumMin = computeMonthMinutes(monthYM);
       if ($("sumHours")) $("sumHours").textContent = fmtHM(sumMin);
       if ($("sumPay")) $("sumPay").textContent = pln((sumMin/60) * (db.settings.rate||0));
+      const round2 = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
     }
 
     function renderAll(){
