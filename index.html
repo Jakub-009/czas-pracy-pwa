@@ -507,92 +507,6 @@
       outline-offset:2px;
       border-radius:12px;
     }
-
-    /* ===== RAPORT PDF ===== */
-    .reportRoot{ display:none; }
-
-    .reportPage{
-      background:#fff;
-      padding:18mm 14mm;
-      color:#111;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    }
-
-    .reportHeader{
-      border-bottom:2px solid #111;
-      padding-bottom:10px;
-      margin-bottom:12px;
-    }
-    .reportTitle{
-      font-size:18px;
-      font-weight:900;
-      letter-spacing:.2px;
-    }
-    .reportMeta{
-      margin-top:4px;
-      font-size:13px;
-      color:#333;
-    }
-
-    .reportSummary{
-      margin:10px 0 14px;
-      display:grid;
-      gap:6px;
-    }
-    .sumRow{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      font-size:14px;
-    }
-    .sumLabel{ font-weight:700; color:#222; }
-    .sumValue{ font-weight:900; }
-
-    .reportTable{
-      width:100%;
-      border-collapse:collapse;
-      font-size:12px;
-    }
-    .reportTable th,
-    .reportTable td{
-      border:1px solid #222;
-      padding:8px 8px;
-      vertical-align:top;
-    }
-    .reportTable th{
-      font-weight:900;
-      text-align:left;
-      background:#f3f4f6;
-    }
-
-    .noteBox{
-      min-height:44px;
-      border:1px solid #777;
-      border-radius:8px;
-      padding:6px 8px;
-      white-space:pre-wrap;
-      line-height:1.25;
-    }
-
-    .badgeVacation{
-      display:inline-block;
-      padding:2px 8px;
-      border:1px solid #1f4fd6;
-      border-radius:999px;
-      font-weight:800;
-      font-size:12px;
-    }
-
-    @media print{
-      body{ background:#fff !important; }
-      body > .wrap{ display:none !important; }
-      dialog{ display:none !important; }
-      .fab{ display:none !important; }
-
-      .reportRoot{
-        display:block !important;
-      }
-    }
   </style>
 </head>
 
@@ -669,14 +583,9 @@
           <span class="chev" aria-hidden="true"></span>
         </summary>
         <div class="panel">
-          <!-- RAPORT (nad "Usuń cały miesiąc") -->
           <div class="row" style="margin-top:12px;">
-            <button class="secondary" id="printPdfBtn" type="button" style="flex:1; min-width:240px;">
-              Raport PDF
-            </button>
-          </div>
+            <button class="secondary" id="reportPdf" type="button" style="flex:1; min-width:180px;">Raport PDF</button>
 
-          <div class="row" style="margin-top:10px;">
             <button class="danger" id="clearMonth" type="button" style="flex:1; min-width:240px;">Usuń cały miesiąc</button>
             <button class="secondary" id="backupJson" type="button" style="flex:1; min-width:180px;">Kopia zapasowa</button>
 
@@ -845,44 +754,6 @@
     </div>
   </dialog>
 
-  <!-- RAPORT PDF (ukryty szablon do druku) -->
-  <section id="reportRoot" class="reportRoot" aria-hidden="true">
-    <div class="reportPage">
-      <div class="reportHeader">
-        <div class="reportTitle">RAPORT GODZIN PRACY</div>
-        <div class="reportMeta" id="reportMonth">Miesiąc: —</div>
-      </div>
-
-      <div class="reportSummary">
-        <div class="sumRow">
-          <div class="sumLabel">Łączna liczba godzin:</div>
-          <div class="sumValue" id="reportSumHours">0:00</div>
-        </div>
-        <div class="sumRow">
-          <div class="sumLabel">Wynagrodzenie:</div>
-          <div class="sumValue" id="reportSumPay">0,00 zł</div>
-        </div>
-      </div>
-
-      <table class="reportTable" id="reportTable">
-        <thead>
-          <tr>
-            <th style="width:110px;">Data</th>
-            <th style="width:120px;">Dzień</th>
-            <th>Zakresy</th>
-            <th style="width:90px;">Razem</th>
-            <th style="width:240px;">Notatka</th>
-          </tr>
-        </thead>
-        <tbody id="reportTbody"></tbody>
-      </table>
-
-      <div class="reportFooter" id="reportFooter" style="margin-top:10px; font-size:12px; color:#333;">
-        Wygenerowano: —
-      </div>
-    </div>
-  </section>
-
   <script>
   (() => {
     const showErr = (msg) => {
@@ -921,11 +792,11 @@
       return s.charAt(0).toUpperCase() + s.slice(1);
     };
 
+    const DOW_SHORT = ["Nd","Pn","Wt","Śr","Czw","Pt","Sb"];
     const fmtWeekdayPL = (dateISO) => {
       const [Y, M, D] = dateISO.split("-").map(Number);
       const dt = new Date(Y, M-1, D);
-      const s = new Intl.DateTimeFormat("pl-PL", { weekday:"long" }).format(dt);
-      return s.charAt(0).toUpperCase() + s.slice(1);
+      return DOW_SHORT[dt.getDay()];
     };
 
     const STORAGE_KEY = "worktime_pwa_v1";
@@ -1014,92 +885,6 @@
     function computeMonthMinutes(monthYM){
       const days = db.entries.filter(e => ym(e.date) === monthYM);
       return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
-    }
-
-    // ===== RAPORT PDF =====
-    const isVacation = (day) => !!day?.vacation;
-
-    function escapeHtml(str){
-      return String(str)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    function fmtDatePL(dateISO){
-      const [y,m,d] = dateISO.split("-").map(Number);
-      return `${pad2(d)}.${pad2(m)}.${y}`;
-    }
-
-    function listReportDays(monthYM){
-      return db.entries
-        .filter(e => ym(e.date) === monthYM)
-        .filter(e => (e.shifts?.length || 0) > 0 || (e.note && e.note.trim()) || isVacation(e))
-        .sort((a,b)=>a.date.localeCompare(b.date));
-    }
-
-    function buildRangesText(day){
-      if (isVacation(day)) return "Urlop";
-      const shifts = Array.isArray(day.shifts) ? day.shifts : [];
-      if (!shifts.length) return "—";
-      return shifts
-        .map(s => (s?.start && s?.end) ? `${s.start}–${s.end}` : "—")
-        .join(" / ");
-    }
-
-    function renderReport(monthYM){
-      const monthEl = $("reportMonth");
-      const sumHoursEl = $("reportSumHours");
-      const sumPayEl = $("reportSumPay");
-      const tbody = $("reportTbody");
-      const footer = $("reportFooter");
-
-      if (monthEl) monthEl.textContent = `Miesiąc: ${fmtMonthPL(monthYM)}`;
-
-      const sumMin = computeMonthMinutes(monthYM);
-      if (sumHoursEl) sumHoursEl.textContent = fmtHM(sumMin);
-      if (sumPayEl) sumPayEl.textContent = pln((sumMin/60) * (db.settings.rate||0));
-
-      const days = listReportDays(monthYM);
-
-      const rows = days.map(day => {
-        const weekday = fmtWeekdayPL(day.date);
-        const ranges = buildRangesText(day);
-
-        const mins = computeDayMinutes(day);
-        const totalCell = isVacation(day)
-          ? `<span class="badgeVacation">Urlop</span>`
-          : `<strong>${fmtHM(mins)}</strong>`;
-
-        const note = (day.note || "").trim();
-        const noteBox = `<div class="noteBox">${note ? escapeHtml(note) : ""}</div>`;
-
-        return `
-          <tr>
-            <td>${fmtDatePL(day.date)}</td>
-            <td>${weekday}</td>
-            <td>${ranges}</td>
-            <td>${totalCell}</td>
-            <td>${noteBox}</td>
-          </tr>
-        `;
-      }).join("");
-
-      if (tbody){
-        tbody.innerHTML = rows || `
-          <tr>
-            <td colspan="5" style="text-align:center; padding:14px;">
-              Brak danych do raportu w tym miesiącu.
-            </td>
-          </tr>
-        `;
-      }
-
-      const now = new Date();
-      const stamp = `${pad2(now.getDate())}.${pad2(now.getMonth()+1)}.${now.getFullYear()} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
-      if (footer) footer.textContent = `Wygenerowano: ${stamp}`;
     }
 
     // ===== Daty pomocnicze =====
@@ -1286,8 +1071,8 @@
         const jsDow = new Date(Y, M-1, d).getDay();
 
         const day = getDay(dateISO);
-        const isVac = !!day?.vacation;
-        const hasShifts = !isVac && ((day?.shifts || []).length > 0);
+        const isVacation = !!day?.vacation;
+        const hasShifts = !isVacation && ((day?.shifts || []).length > 0);
         const hasNote = !!(day?.note && day.note.trim());
 
         const holidayName = holidays.get(dateISO) || "";
@@ -1300,7 +1085,7 @@
           isHoliday ? "holiday" : ""
         ].filter(Boolean).join(" ");
 
-        const tileTitle = isVac ? "Urlop" : (isHoliday ? holidayName : "");
+        const tileTitle = isVacation ? "Urlop" : (isHoliday ? holidayName : "");
         const isToday = (dateISO === today);
         const dayCellClass = ["dayCell", isToday ? "today" : ""].filter(Boolean).join(" ");
 
@@ -1310,7 +1095,7 @@
               <div class="${numClass}">${d}</div>
             </div>
             <div class="indRow" aria-hidden="true">
-              <span class="bar vacation ${isVac ? "" : "hidden"}"></span>
+              <span class="bar vacation ${isVacation ? "" : "hidden"}"></span>
               <span class="bar shift ${hasShifts ? "" : "hidden"}"></span>
               <span class="bar note ${hasNote ? "" : "hidden"}"></span>
             </div>
@@ -1500,6 +1285,257 @@
       bulkDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeBulk(); });
     }
 
+    // ===== RAPORT PDF (druk do PDF) =====
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function fmtHoursHuman(mins){
+      const h = Math.floor(mins/60);
+      const m = mins%60;
+      if (!m) return `${h} h`;
+      return `${h} h ${m} min`;
+    }
+
+    function buildReportHTML(monthYM){
+      const [Y, M] = monthYM.split("-").map(Number);
+      const dim = new Date(Y, M, 0).getDate();
+
+      const monthLabel = fmtMonthPL(monthYM);
+      const sumMin = computeMonthMinutes(monthYM);
+      const sumPay = (sumMin/60) * (db.settings.rate||0);
+
+      const notes = [];
+      const rows = [];
+
+      for (let d=1; d<=dim; d++){
+        const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
+        const dow = fmtWeekdayPL(dateISO);
+        const day = getDay(dateISO) || { date:dateISO, note:"", shifts:[], vacation:false };
+
+        const isVacation = !!day.vacation;
+        const mins = computeDayMinutes(day);
+
+        const shifts = (day.shifts || []).slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
+        let ranges = "";
+        if (isVacation) ranges = "Urlop";
+        else if (shifts.length){
+          ranges = shifts
+            .map(s => (s?.start && s?.end) ? `${s.start}-${s.end}` : "")
+            .filter(Boolean)
+            .join(", ");
+        }
+
+        const note = (day.note || "").trim();
+        const noteShort = note.length > 44 ? (note.slice(0,44) + "…") : note;
+
+        if (note) notes.push({ dateISO, dow, note });
+
+        rows.push(`
+          <tr>
+            <td class="c-date">${pad2(d)}.${pad2(M)}.${Y}</td>
+            <td class="c-dow">${dow}</td>
+            <td class="c-ranges">${escapeHtml(ranges)}</td>
+            <td class="c-sum">${fmtHM(mins)}</td>
+            <td class="c-note">${escapeHtml(noteShort)}</td>
+          </tr>
+        `);
+      }
+
+      const notesHtml = notes.length
+        ? notes.map(n => `
+            <div class="noteRow">
+              <span class="noteDate">${escapeHtml(`${n.dateISO} (${n.dow})`)}</span>
+              <span class="noteText">${escapeHtml(n.note)}</span>
+            </div>
+          `).join("")
+        : `<div class="muted">Brak notatek w tym miesiącu.</div>`;
+
+      const gen = new Date();
+      const genText = `${gen.getFullYear()}-${pad2(gen.getMonth()+1)}-${pad2(gen.getDate())} ${pad2(gen.getHours())}:${pad2(gen.getMinutes())}`;
+
+      return `<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Raport godzin pracy</title>
+  <style>
+    @page { size: A4; margin: 10mm; }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:#111;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .head{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      margin-bottom:10px;
+    }
+    h1{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.2px;
+    }
+    .meta{
+      font-size:11px;
+      line-height:1.35;
+      color:#333;
+      text-align:right;
+      white-space:nowrap;
+    }
+    .kpi{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin:10px 0 10px;
+    }
+    .kpiBox{
+      border:1px solid #e6e8ef;
+      border-radius:10px;
+      padding:8px 10px;
+      min-width:180px;
+    }
+    .kpiLabel{ font-size:10px; color:#555; }
+    .kpiVal{ font-size:14px; font-weight:800; margin-top:2px; }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+      font-size:10px;
+    }
+    thead th{
+      text-align:left;
+      padding:6px 6px;
+      border-bottom:1px solid #cfd5e3;
+      background:#f3f5fb;
+      font-weight:800;
+    }
+    tbody td{
+      padding:4px 6px;
+      border-bottom:1px solid #eef1f6;
+      vertical-align:top;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .c-date{ width:72px; }
+    .c-dow{ width:34px; }
+    .c-sum{ width:52px; text-align:right; }
+    .c-note{ width:170px; }
+    .c-ranges{ width:auto; }
+    .sectionTitle{
+      margin:12px 0 6px;
+      font-size:12px;
+      font-weight:900;
+    }
+    .notes{
+      border:1px solid #e6e8ef;
+      border-radius:10px;
+      padding:8px 10px;
+      font-size:10px;
+    }
+    .noteRow{
+      display:flex;
+      gap:10px;
+      padding:3px 0;
+      border-bottom:1px dashed #edf0f6;
+    }
+    .noteRow:last-child{ border-bottom:none; }
+    .noteDate{ flex:0 0 auto; width:130px; color:#333; font-weight:700; }
+    .noteText{ flex:1; color:#111; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .muted{ color:#666; }
+    .foot{
+      margin-top:10px;
+      font-size:9px;
+      color:#666;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+    }
+    @media print{
+      .noteText{ white-space:nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="head">
+    <div>
+      <h1>RAPORT GODZIN PRACY</h1>
+      <div style="font-size:11px; color:#333; margin-top:2px;">Miesiąc: <strong>${escapeHtml(monthLabel)}</strong></div>
+    </div>
+    <div class="meta">
+      Wygenerowano: ${escapeHtml(genText)}<br/>
+      Stawka: ${escapeHtml(pln(db.settings.rate||0))} / h
+    </div>
+  </div>
+
+  <div class="kpi">
+    <div class="kpiBox">
+      <div class="kpiLabel">Łączna liczba godzin</div>
+      <div class="kpiVal">${escapeHtml(fmtHoursHuman(sumMin))} <span style="font-size:11px; font-weight:700; color:#333;">(${escapeHtml(fmtHM(sumMin))})</span></div>
+    </div>
+    <div class="kpiBox">
+      <div class="kpiLabel">Wynagrodzenie</div>
+      <div class="kpiVal">${escapeHtml(pln(sumPay))}</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="c-date">Data</th>
+        <th class="c-dow">Dzień</th>
+        <th class="c-ranges">Godziny / status</th>
+        <th class="c-sum">Suma</th>
+        <th class="c-note">Notatka (skrót)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.join("")}
+    </tbody>
+  </table>
+
+  <div class="sectionTitle">Notatki</div>
+  <div class="notes">
+    ${notesHtml}
+  </div>
+
+  <div class="foot">
+    <div>Jeśli zapisujesz do PDF: w oknie drukowania wybierz „Zapisz jako PDF”.</div>
+    <div>${escapeHtml(monthYM)}</div>
+  </div>
+
+  <script>
+    window.addEventListener("load", () => {
+      setTimeout(() => { window.print(); }, 250);
+    });
+  </script>
+</body>
+</html>`;
+    }
+
+    function openReportPdf(){
+      const monthPick = $("monthPick");
+      const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
+
+      const html = buildReportHTML(monthYM);
+      const w = window.open("", "_blank");
+      if (!w){
+        alert("Twoja przeglądarka zablokowała nowe okno. Zezwól na pop-upy dla tej strony i spróbuj ponownie.");
+        return;
+      }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      w.focus();
+    }
+
     // ===== UI =====
     const dlgBackBtn = $("dlgBack");
     if (dlgBackBtn) dlgBackBtn.onclick = closeDay;
@@ -1658,17 +1694,12 @@
       };
     }
 
-    // RAPORT PDF
-    const printPdfBtn = $("printPdfBtn");
-    if (printPdfBtn){
-      printPdfBtn.onclick = ()=>{
-        const m = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
-        renderReport(m);
-        window.print();
-      };
+    // narzędzia
+    const reportBtn = $("reportPdf");
+    if (reportBtn){
+      reportBtn.onclick = openReportPdf;
     }
 
-    // narzędzia
     const backupBtn = $("backupJson");
     if (backupBtn){
       backupBtn.onclick = ()=>{
