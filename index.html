@@ -262,10 +262,10 @@
     /* ✅ pigułka na maks szerokość, z ~0.2px oddechu */
     .pill{
   height:10px;
-  width:100%;
-  margin:0 0.2px;      /* Twój mikro-oddech */
+  width:calc(100% - 2px);  /* 2px = 1px + 1px */
+  margin:0 1px;
   padding:0 3px 0 2px;
-  font-size:6px;
+  font-size:7px;
   font-weight:650;
   line-height:1;
   border-radius:2px;
