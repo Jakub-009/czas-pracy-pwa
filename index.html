@@ -549,6 +549,53 @@
       outline-offset:2px;
       border-radius:12px;
     }
+    /* ===== FULL-WIDTH jak Google (mobile) ===== */
+@media (max-width: 640px){
+  .wrap{
+    padding:0 8px;      /* było 14px */
+    margin:12px auto;   /* mniej "powietrza" */
+  }
+  .card{
+    padding:12px;       /* było 16px */
+    border-radius:16px;
+  }
+
+  /* kalendarz = jeszcze ciaśniej */
+  .calGrid{ gap:6px; }  /* było 8px/10px */
+  .dayCell{
+    padding:6px;        /* było 8px */
+    gap:5px;
+  }
+  .monthBar{
+    padding:10px 10px;  /* było 12px */
+  }
+}
+
+/* ===== PIGUŁKA prawie na całą szerokość kafelka ===== */
+/* Założenie: .dayCell na mobile ma padding:6px -> robimy 1px "ramki": 6px - 5px = 1px */
+.pill{
+  width:100%;
+  align-self:stretch;
+
+  /* rozciągamy pigułkę w poziomie prawie do krawędzi kafelka */
+  margin-left:-5px;
+  margin-right:-5px;
+
+  /* i zostawiamy symboliczne 1px od krawędzi */
+  padding-left:6px;
+  padding-right:6px;
+
+  border:none;
+  border-radius:9px;   /* mniej zaokrąglona niż 999px */
+}
+
+/* jeśli masz .pill.more jako "+n" to też dociągnij do szerokości */
+.pill.more{
+  margin-left:-5px;
+  margin-right:-5px;
+  padding-left:6px;
+  padding-right:6px;
+}
   </style>
 </head>
 
