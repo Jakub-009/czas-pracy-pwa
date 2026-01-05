@@ -40,6 +40,10 @@
       --radius-lg:20px;
       --radius-md:16px;
       --radius-sm:12px;
+
+      /* kontrola marginesów “jak Google” */
+      --wrapPad:14px;
+      --calEdgePad:2px; /* minimalny oddech kalendarza przy krawędzi */
     }
 
     html,body{ width:100%; overflow-x:hidden; }
@@ -48,7 +52,7 @@
     .wrap{
       max-width:980px;
       margin:18px auto;
-      padding:0 14px 90px;
+      padding:0 var(--wrapPad) 90px;
     }
 
     .section{
@@ -186,12 +190,12 @@
       -webkit-appearance:none;
     }
 
-    /* KALENDARZ */
-.calGrid{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:5px;                 /* było 8px -> kafelki rosną */
-}
+    /* ===== KALENDARZ (szerzej niż reszta na mobile) ===== */
+    .calGrid{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:5px;
+    }
     .calDow{
       text-align:center;
       font-size:12px;
@@ -203,8 +207,8 @@
     .dayCell{
       border-radius:10px;
       background:var(--surface-soft);
-        padding:7px 7px 8px;     /* było 8/8/10 */
-  gap:5px; 
+      padding:7px 7px 8px;
+      gap:5px;
       cursor:pointer;
       position:relative;
       display:flex;
@@ -212,8 +216,8 @@
       justify-content:flex-start;
       align-items:stretch;
       overflow:hidden;
-        aspect-ratio: 1 / 1.55;  /* było ok. 1/1.30 -> teraz wyraźnie większe */
-        min-height:0;
+      aspect-ratio: 1 / 1.55;
+      min-height:0;
     }
     .blankCell{
       border:none;
@@ -222,7 +226,6 @@
       pointer-events:none;
     }
 
-    /* numer dnia: mniejszy i bardziej "u góry" */
     .dayTop{
       width:100%;
       display:flex;
@@ -231,8 +234,8 @@
       padding-left:2px;
     }
     .dayNum{
-        font-size:10px;          /* było 13 */
-  font-weight:850;
+      font-size:10px;
+      font-weight:850;
       line-height:1;
       letter-spacing:.2px;
       color:#111;
@@ -248,7 +251,6 @@
       background:rgba(255,255,255,.85);
     }
 
-    /* pigułki pod numerem dnia */
     .pillStack{
       display:flex;
       flex-direction:column;
@@ -256,23 +258,26 @@
       min-height:0;
       flex:1;
     }
-    /* pigułki pod numerem dnia — ciaśniej, mniejszy font, bez bordera, mniejszy radius */
-.pill{
-  height:10px;            /* było 16 — minimalnie niżej */
-  padding:0 3px 0 2px;    /* lewa minimalna, ale nie 0 */
-  font-size:5px;          /* było 10 */
-  font-weight:650;
-  line-height:1;          /* ważne: mniej “ucina” optycznie */
-  border-radius:5px;     /* było 999px */
-  display:flex;
-  align-items:center;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  border:none;            /* było 1px — usuwamy */
-  background:rgba(80,130,124,.12);
-  color:#0f2f2b;
-}
+
+    /* ✅ pigułka na maks szerokość, z ~0.2px oddechu */
+    .pill{
+      height:10px;
+      width:calc(100% - 0.4px);
+      margin:0 0.2px;
+      padding:0 3px 0 2px;
+      font-size:5px;
+      font-weight:650;
+      line-height:1;
+      border-radius:5px;
+      display:flex;
+      align-items:center;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      border:none;
+      background:rgba(80,130,124,.12);
+      color:#0f2f2b;
+    }
     .pill.work{
       background:rgba(30,142,62,.12);
       border-color:rgba(30,142,62,.18);
@@ -293,20 +298,17 @@
       padding:0 10px;
     }
 
-    /* notatka = żółta kropka (dyskretna, prawy górny róg) */
-.noteDot{
-  position:absolute;
-  width:6px;
-  height:6px;
-  top:6px;
-  right:6px;
-
-  border-radius:999px;
-  background:var(--bar-note);
-  pointer-events:none;
-
-  box-shadow:0 0 0 2px rgba(249,171,0,.14);
-}
+    .noteDot{
+      position:absolute;
+      width:6px;
+      height:6px;
+      top:6px;
+      right:6px;
+      border-radius:999px;
+      background:var(--bar-note);
+      pointer-events:none;
+      box-shadow:0 0 0 2px rgba(249,171,0,.14);
+    }
 
     .statBox{
       background:var(--primary-soft);
@@ -330,13 +332,13 @@
     }
     dialog#dayDialog::backdrop{ background:rgba(17,17,17,.45); }
 
-    /* ===== MODALE PŁYWAJĄCE ===== */
+    /* ===== MODALE (pełna szerokość z minimalnym marginesem) ===== */
     dialog#vacDialog,
     dialog#bulkDialog{
       border:none;
       padding:0;
-      width:min(560px, calc(100vw - 28px));
-      max-width:560px;
+      width:calc(100vw - 16px);
+      max-width:980px;
       margin:auto;
       border-radius:22px;
       box-shadow:0 18px 60px rgba(0,0,0,.25);
@@ -358,11 +360,9 @@
       background:var(--bg);
     }
 
-    /* tła dla modali */
     #vacDialog .modalBody{ background:var(--vac-bg); }
     #bulkDialog .modalBody{ background:var(--bulk-bg); }
 
-    /* back button (wspólne) */
     .backBtn{
       width:44px;
       height:44px;
@@ -503,7 +503,6 @@
       font-weight:500;
     }
 
-    /* Układ w modalach: od/do obok siebie + bez ramek wokół */
     .rangeRow{
       display:flex;
       gap:10px;
@@ -523,7 +522,6 @@
     }
     .actionRow > *{ flex:1; }
 
-    /* FAB */
     .fab{
       position:fixed;
       right:16px;
@@ -549,53 +547,33 @@
       outline-offset:2px;
       border-radius:12px;
     }
-    /* ===== FULL-WIDTH jak Google (mobile) ===== */
-@media (max-width: 640px){
-  .wrap{
-    padding:0 8px;      /* było 14px */
-    margin:12px auto;   /* mniej "powietrza" */
-  }
-  .card{
-    padding:12px;       /* było 16px */
-    border-radius:16px;
-  }
 
-  /* kalendarz = jeszcze ciaśniej */
-  .calGrid{ gap:6px; }  /* było 8px/10px */
-  .dayCell{
-    padding:6px;        /* było 8px */
-    gap:5px;
-  }
-  .monthBar{
-    padding:10px 10px;  /* było 12px */
-  }
-}
+    /* ===== FULL-WIDTH jak Google (mobile) + kalendarz jeszcze szerzej ===== */
+    @media (max-width: 640px){
+      :root{
+        --wrapPad:6px;      /* minimalne marginesy dla całej appki */
+        --calEdgePad:2px;   /* kalendarz niemal do krawędzi */
+      }
 
-/* ===== PIGUŁKA prawie na całą szerokość kafelka ===== */
-/* Założenie: .dayCell na mobile ma padding:6px -> robimy 1px "ramki": 6px - 5px = 1px */
-.pill{
-  width:100%;
-  align-self:stretch;
+      .wrap{
+        padding:0 var(--wrapPad) 90px;
+        margin:12px auto;
+      }
 
-  /* rozciągamy pigułkę w poziomie prawie do krawędzi kafelka */
-  margin-left:-5px;
-  margin-right:-5px;
+      /* ✅ kalendarz “wychodzi” szerzej niż reszta sekcji */
+      .section.calSection{
+        margin-left:calc(-1 * var(--wrapPad) + var(--calEdgePad));
+        margin-right:calc(-1 * var(--wrapPad) + var(--calEdgePad));
+        padding-left:var(--calEdgePad);
+        padding-right:var(--calEdgePad);
+      }
 
-  /* i zostawiamy symboliczne 1px od krawędzi */
-  padding-left:6px;
-  padding-right:6px;
-
-  border:none;
-  border-radius:9px;   /* mniej zaokrąglona niż 999px */
-}
-
-/* jeśli masz .pill.more jako "+n" to też dociągnij do szerokości */
-.pill.more{
-  margin-left:-5px;
-  margin-right:-5px;
-  padding-left:6px;
-  padding-right:6px;
-}
+      .calGrid{ gap:4px; } /* mniejszy gap = większe kafelki */
+      .dayCell{
+        padding:6px;
+        gap:5px;
+      }
+    }
   </style>
 </head>
 
@@ -635,8 +613,8 @@
       <div class="muted" id="status" style="margin-top:10px;"></div>
     </div>
 
-    <!-- KALENDARZ (to wraca i nie może zniknąć) -->
-    <div class="section">
+    <!-- ✅ KALENDARZ: ta sekcja ma być “szersza” na mobile -->
+    <div class="section calSection">
       <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
       <div class="calGrid" id="calGrid"></div>
 
@@ -805,7 +783,6 @@
         </div>
       </div>
 
-      <!-- Blok pracy -->
       <div class="modalStack" id="dlgWorkBlock">
         <div class="timeGrid">
           <div>
@@ -827,7 +804,6 @@
         <button id="dlgAddShift" type="button" class="addBtnCenter">Dodaj</button>
       </div>
 
-      <!-- Blok statusu / zakresów -->
       <div style="margin-top:16px;" id="dlgShiftsBlock">
         <strong id="dlgShiftsTitle">Godziny pracy w ciągu dnia</strong>
         <div class="shiftList" id="dlgShifts"></div>
@@ -879,7 +855,6 @@
       return s.charAt(0).toUpperCase() + s.slice(1);
     };
 
-    // skróty dni tygodnia: Nd/Pn/Wt/Śr/Czw/Pt/Sb
     const DOW_SHORT = ["Nd","Pn","Wt","Śr","Czw","Pt","Sb"];
     const fmtWeekdayPL = (dateISO) => {
       const [Y, M, D] = dateISO.split("-").map(Number);
@@ -975,7 +950,6 @@
       return days.reduce((acc, d)=> acc + computeDayMinutes(d), 0);
     }
 
-    // ===== Daty pomocnicze =====
     function parseISODate(s){
       if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
       const [Y,M,D] = s.split("-").map(Number);
@@ -992,7 +966,6 @@
       return x;
     }
 
-    // ===== Urlop: zakres =====
     function applyVacationRange(fromISO, toISO, enable){
       const a = parseISODate(fromISO);
       const b = parseISODate(toISO);
@@ -1021,7 +994,6 @@
       return {ok:true, count};
     }
 
-    // ===== Wiele godzin: zakres =====
     function applyBulkHours(fromISO, toISO, start, end, mode){
       const a = parseISODate(fromISO);
       const b = parseISODate(toISO);
@@ -1036,7 +1008,6 @@
         const dISO = isoFromDate(cur);
         const day = getDay(dISO) || { date:dISO, note:"", shifts:[], vacation:false };
 
-        // pomijamy urlop
         if (day.vacation){
           cur = addDays(cur, 1);
           continue;
@@ -1076,7 +1047,6 @@
       return {ok:true, changedDays};
     }
 
-    // ===== ŚWIĘTA PL =====
     function easterSunday(year){
       const a = year % 19;
       const b = Math.floor(year / 100);
@@ -1123,7 +1093,6 @@
       return holidayCache.get(year);
     }
 
-    // ===== KALENDARZ =====
     const DOW = ["Pn","Wt","Śr","Czw","Pt","Sb","Nd"];
     function mondayIndex(jsDay){ return (jsDay + 6) % 7; }
     function daysInMonth(year, month1){ return new Date(year, month1, 0).getDate(); }
@@ -1136,7 +1105,6 @@
       dowRow.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
     }
 
-    // render pigułek: max 3 + ewentualne "+N"
     function buildPillsHTML(day){
       const isVacation = !!day?.vacation;
       const shifts = (day?.shifts || []).slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
@@ -1236,7 +1204,6 @@
       }
     }
 
-    // ===== MODAL DNIA =====
     const dlg = $("dayDialog");
     let dlgDate = null;
 
@@ -1338,7 +1305,6 @@
       });
     }
 
-    // ===== TOTALS =====
     function renderTotals(monthYM){
       const sumMin = computeMonthMinutes(monthYM);
       if ($("sumHours")) $("sumHours").textContent = fmtHM(sumMin);
@@ -1358,7 +1324,6 @@
       renderTotals(monthYM);
     }
 
-    // ===== MODAL URLOPU =====
     const vacDlg = $("vacDialog");
     function openVac(){
       if (!vacDlg) return;
@@ -1377,7 +1342,6 @@
       vacDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeVac(); });
     }
 
-    // ===== MODAL WIELE GODZIN =====
     const bulkDlg = $("bulkDialog");
     function openBulk(){
       if (!bulkDlg) return;
@@ -1396,7 +1360,6 @@
       bulkDlg.addEventListener("cancel", (e)=>{ e.preventDefault(); closeBulk(); });
     }
 
-    // ===== RAPORT PDF (druk do PDF) =====
     function escapeHtml(s){
       return String(s ?? "")
         .replaceAll("&","&amp;")
@@ -1423,7 +1386,6 @@
         const isVacation = !!day.vacation;
         const mins = computeDayMinutes(day);
 
-        // ✅ Dni z 0 godzin nie pokazujemy (ALE urlop zostaje)
         if (!isVacation && mins === 0) continue;
 
         const shifts = (day.shifts || []).slice().sort((a,b)=> (a.start||"").localeCompare(b.start||""));
@@ -1574,7 +1536,6 @@
       w.focus();
     }
 
-    // ===== UI =====
     const dlgBackBtn = $("dlgBack");
     if (dlgBackBtn) dlgBackBtn.onclick = closeDay;
 
@@ -1590,7 +1551,6 @@
     const bulkBackBtn = $("bulkBack");
     if (bulkBackBtn) bulkBackBtn.onclick = closeBulk;
 
-    // usuwanie urlopu z dnia w modalu dnia
     const dlgRemoveVacationBtn = $("dlgRemoveVacation");
     if (dlgRemoveVacationBtn){
       dlgRemoveVacationBtn.onclick = ()=>{
@@ -1606,7 +1566,6 @@
       };
     }
 
-    // Dodawanie zakresu w dniu
     const dlgAddShiftBtn = $("dlgAddShift");
     if (dlgAddShiftBtn){
       dlgAddShiftBtn.onclick = ()=>{
@@ -1634,7 +1593,6 @@
       };
     }
 
-    // Autosave notatki
     const dlgNoteEl = $("dlgNote");
     let noteTimer = null;
     if (dlgNoteEl){
@@ -1654,7 +1612,6 @@
       });
     }
 
-    // miesiąc picker
     const monthBar = $("monthBar");
     const monthPick = $("monthPick");
     if (monthBar && monthPick){
@@ -1665,7 +1622,6 @@
       monthPick.addEventListener("change", renderAll);
     }
 
-    // Dzisiaj
     const todayBtn = $("todayBtn");
     if (todayBtn && monthPick){
       todayBtn.onclick = ()=>{
@@ -1676,7 +1632,6 @@
       };
     }
 
-    // FAB: otwórz dzisiaj
     const fabAdd = $("fabAdd");
     if (fabAdd){
       fabAdd.onclick = ()=>{
@@ -1690,7 +1645,6 @@
       };
     }
 
-    // urlop: zakres
     const setVacationRangeBtn = $("setVacationRange");
     if (setVacationRangeBtn){
       setVacationRangeBtn.onclick = ()=>{
@@ -1709,7 +1663,6 @@
       };
     }
 
-    // wiele godzin: dodaj / usuń
     const bulkApplyBtn = $("bulkApply");
     if (bulkApplyBtn){
       bulkApplyBtn.onclick = ()=>{
@@ -1732,7 +1685,6 @@
       };
     }
 
-    // narzędzia
     const reportBtn = $("reportPdf");
     if (reportBtn){
       reportBtn.onclick = openReportPdf;
@@ -1793,7 +1745,6 @@
       rateEl.addEventListener("change", renderAll);
     }
 
-    // INIT
     try{
       normalize();
       migrateIfNeeded();
