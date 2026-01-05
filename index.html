@@ -201,8 +201,7 @@
 
     /* ===== KAFELKI (wariant "Google-like" + pigułki) ===== */
     .dayCell{
-      border-radius:16px;
-      border:1px solid var(--outline-soft);
+      border-radius:10px;
       background:var(--surface-soft);
         padding:7px 7px 8px;     /* było 8/8/10 */
   gap:5px; 
@@ -232,7 +231,7 @@
       padding-left:2px;
     }
     .dayNum{
-        font-size:12px;          /* było 13 */
+        font-size:10px;          /* było 13 */
   font-weight:850;
       line-height:1;
       letter-spacing:.2px;
@@ -305,24 +304,6 @@
   box-shadow:0 0 0 2.5px rgba(249,171,0,.18);
 }
     }
-
-    /* proporcje kafelków – dajemy trochę więcej pionu na pigułki */
-    .dayCell, .blankCell{ aspect-ratio: 1 / 1.30; min-height:0; }
-    @media (min-width:520px){ .dayCell, .blankCell{ aspect-ratio: 1 / 1.15; } }
-    @media (min-width:900px){ .dayCell, .blankCell{ aspect-ratio: 1 / 1.05; min-height:86px; } }
-    @supports not (aspect-ratio: 1 / 1){ .dayCell, .blankCell{ min-height:86px; } }
-
-    @media(max-width:420px){
-      .pill{ height:17px; font-size:10.5px; }
-      .noteDot{ top:7px; right:7px; width:7px; height:7px; }
-    }
-
-    .statBox{
-      background:var(--primary-soft);
-      border-radius:16px;
-      padding:12px 14px;
-    }
-    .statValue{ font-size:22px; font-weight:900; margin-top:4px; }
 
     /* ===== MODAL DNIA (pełny ekran) ===== */
     dialog#dayDialog{
