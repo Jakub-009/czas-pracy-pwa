@@ -1202,7 +1202,7 @@
     function openDay(dateISO){
       dlgDate = dateISO;
 
-      const weekday = fmtWeekdayPL(dateISO);
+      const weekday = fmtWeekdayLongPL(dateISO);
       if ($("dlgTitle")) $("dlgTitle").textContent = `${fmtDMYText(dateISO)}`;
       if ($("dlgMeta")) $("dlgMeta").textContent = weekday;
 
@@ -1217,7 +1217,12 @@
       else if (dlg) dlg.setAttribute("open","");
       document.body.classList.add("modal-open");
     }
-
+    
+function fmtWeekdayLongPL(dateISO){
+  const [Y, M, D] = dateISO.split("-").map(Number);
+  const dt = new Date(Y, M-1, D);
+  return new Intl.DateTimeFormat("pl-PL", { weekday:"long" }).format(dt);
+}
     function closeDay(){
       dlgDate = null;
       if (dlg && typeof dlg.close === "function") dlg.close();
