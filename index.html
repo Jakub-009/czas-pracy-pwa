@@ -1121,7 +1121,10 @@
 
       if (shouldScrollToToday){
         shouldScrollToToday = false;
-        const el = document.querySelector(\`.dayCell[data-date="\${today}"]\`);
+
+        /* ✅ POPRAWKA: bez backslashy / bez template-literal */
+        const el = document.querySelector('.dayCell[data-date="'+today+'"]');
+
         if (el) el.scrollIntoView({behavior:"smooth", block:"center"});
       }
     }
