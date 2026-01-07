@@ -569,6 +569,7 @@
 #calSwipeArea{
   touch-action: pan-y;
   overflow:hidden;              /* żeby przesunięcie nie wychodziło poza sekcję */
+  position:relative;
 }
 
 #calGrid{
@@ -578,7 +579,24 @@
 #dowRow{
   will-change: transform;
 }
+    
+/* Warstwy (aktualna + ghost) */
+.calLayer{
+  will-change: transform;
+}
+.calGhost{
+  position:absolute;
+  left:0; right:0;
+  top:0;
+  pointer-events:none;
+  opacity:1;
+}
 
+/* Subtelne przygaszenie w trakcie commit (opcjonalnie) */
+.calFading{
+  opacity:.92;
+  transition:opacity 120ms ease;
+}
   </style>
 </head>
 
@@ -622,13 +640,20 @@
 <div class="section calSection" id="calSwipeArea">
   <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
   <div class="calGrid" id="calGrid"></div>
-
+  
       <div class="row calBtns" style="margin-top:14px;">
         <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
         <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
       </div>
-    </div>
+</div>
 
+    <!-- ghost miesiąca (podpinany JS-em) -->
+    <div class="calGhost calLayer" id="calLayerGhost" style="display:none;">
+      <div class="calGrid" id="dowRowGhost" style="margin-bottom:6px;"></div>
+      <div class="calGrid" id="calGridGhost"></div>
+    </div>
+  </div>
+  
     <div class="section">
       <details id="extrasPanel">
         <summary>
@@ -1194,6 +1219,79 @@
         </div>
       `);
     }
+    // ===== Helpers do miesięcy (muszą być w tym samym IIFE) =====
+function addMonths(ymStr, delta){
+  const [Y, M] = ymStr.split("-").map(Number);
+  const dt = new Date(Y, (M-1) + delta, 1);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}`;
+}
+function getCurrentMonthYM(){
+  const mp = $("monthPick");
+  return (mp && mp.value) ? mp.value : ym(todayISO());
+}
+function setMonthYM(newYM){
+  const mp = $("monthPick");
+  if (!mp) return;
+  mp.value = newYM;            // type="month" -> "YYYY-MM"
+  shouldScrollToToday = false;
+  renderAll();
+}
+
+// ===== Render „do elementów” (ghost) =====
+// Uwaga: renderDow() u Ciebie jest stałe, ale tu robimy też ghost.
+function renderDowInto(el){
+  if (!el) return;
+  el.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
+}
+
+function renderCalendarInto(monthYM, monthLabelEl, gridEl){
+  if (monthLabelEl) monthLabelEl.textContent = fmtMonthPL(monthYM);
+  if (!gridEl) return;
+
+  const [Y, M] = monthYM.split("-").map(Number);
+  const first = new Date(Y, M-1, 1);
+  const firstIdx = mondayIndex(first.getDay());
+  const dim = daysInMonth(Y, M);
+
+  const holidays = getHolidayMap(Y);
+  const cells = [];
+  const today = todayISO();
+
+  for (let i=0;i<firstIdx;i++) cells.push(`<div class="blankCell"></div>`);
+
+  for (let d=1; d<=dim; d++){
+    const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
+    const jsDow = new Date(Y, M-1, d).getDay();
+
+    const day = getDay(dateISO) || { date:dateISO, note:"", shifts:[], vacation:false };
+    const hasNote = !!(day.note && day.note.trim());
+
+    const holidayName = holidays.get(dateISO) || "";
+    const isHoliday = !!holidayName;
+
+    const numClass = [
+      "dayNum",
+      jsDow === 6 ? "saturday" : "",
+      jsDow === 0 ? "sunday" : "",
+      isHoliday ? "holiday" : ""
+    ].filter(Boolean).join(" ");
+
+    const tileTitle = day.vacation ? "Urlop" : (isHoliday ? holidayName : "");
+    const isToday = (dateISO === today);
+    const dayCellClass = ["dayCell", isToday ? "today" : ""].filter(Boolean).join(" ");
+
+    const pillsHTML = buildPillsHTML(day);
+
+    cells.push(`
+      <div class="${dayCellClass}" data-date="${dateISO}" ${tileTitle ? `title="${tileTitle}"` : ""}>
+        ${hasNote ? `<span class="noteDot" aria-hidden="true"></span>` : ``}
+        <div class="dayTop">
+          <div class="${numClass}">${d}</div>
+        </div>
+        ${pillsHTML}
+      </div>
+    `);
+  }
 
     const mod = cells.length % 7;
     if (mod !== 0) {
@@ -1335,6 +1433,261 @@
     renderCalendar(monthYM);
     renderTotals(monthYM);
   }
+
+    // ===== Helpers do miesięcy (muszą być w tym samym IIFE) =====
+function addMonths(ymStr, delta){
+  const [Y, M] = ymStr.split("-").map(Number);
+  const dt = new Date(Y, (M-1) + delta, 1);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}`;
+}
+function getCurrentMonthYM(){
+  const mp = $("monthPick");
+  return (mp && mp.value) ? mp.value : ym(todayISO());
+}
+function setMonthYM(newYM){
+  const mp = $("monthPick");
+  if (!mp) return;
+  mp.value = newYM;            // type="month" -> "YYYY-MM"
+  shouldScrollToToday = false;
+  renderAll();
+}
+
+// ===== Render „do elementów” (ghost) =====
+// Uwaga: renderDow() u Ciebie jest stałe, ale tu robimy też ghost.
+function renderDowInto(el){
+  if (!el) return;
+  el.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
+}
+
+function renderCalendarInto(monthYM, monthLabelEl, gridEl){
+  if (monthLabelEl) monthLabelEl.textContent = fmtMonthPL(monthYM);
+  if (!gridEl) return;
+
+  const [Y, M] = monthYM.split("-").map(Number);
+  const first = new Date(Y, M-1, 1);
+  const firstIdx = mondayIndex(first.getDay());
+  const dim = daysInMonth(Y, M);
+
+  const holidays = getHolidayMap(Y);
+  const cells = [];
+  const today = todayISO();
+
+  for (let i=0;i<firstIdx;i++) cells.push(`<div class="blankCell"></div>`);
+
+  for (let d=1; d<=dim; d++){
+    const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
+    const jsDow = new Date(Y, M-1, d).getDay();
+
+    const day = getDay(dateISO) || { date:dateISO, note:"", shifts:[], vacation:false };
+    const hasNote = !!(day.note && day.note.trim());
+
+    const holidayName = holidays.get(dateISO) || "";
+    const isHoliday = !!holidayName;
+
+    const numClass = [
+      "dayNum",
+      jsDow === 6 ? "saturday" : "",
+      jsDow === 0 ? "sunday" : "",
+      isHoliday ? "holiday" : ""
+    ].filter(Boolean).join(" ");
+
+    const tileTitle = day.vacation ? "Urlop" : (isHoliday ? holidayName : "");
+    const isToday = (dateISO === today);
+    const dayCellClass = ["dayCell", isToday ? "today" : ""].filter(Boolean).join(" ");
+
+    const pillsHTML = buildPillsHTML(day);
+
+    cells.push(`
+      <div class="${dayCellClass}" data-date="${dateISO}" ${tileTitle ? `title="${tileTitle}"` : ""}>
+        ${hasNote ? `<span class="noteDot" aria-hidden="true"></span>` : ``}
+        <div class="dayTop">
+          <div class="${numClass}">${d}</div>
+        </div>
+        ${pillsHTML}
+      </div>
+    `);
+  }
+
+  const mod = cells.length % 7;
+  if (mod !== 0){
+    const need = 7 - mod;
+    for (let i=0;i<need;i++) cells.push(`<div class="blankCell"></div>`);
+  }
+
+  gridEl.innerHTML = cells.join("");
+
+  // klik w dzień działa też na ghost (ale ghost ma pointer-events:none, więc i tak klik idzie w current)
+  // jeśli kiedyś włączysz pointer-events dla ghost, dodaj tu bind jak w renderCalendar().
+}
+
+// ===== Swipe „jak Google”: live preview kolejnego miesiąca =====
+(function enableCalendarSwipe(){
+  const area = $("calSwipeArea");
+  const currentLayer = $("calLayerCurrent");
+  const ghostLayer = $("calLayerGhost");
+  const dowGhost = $("dowRowGhost");
+  const gridGhost = $("calGridGhost");
+
+  if (!area || !currentLayer || !ghostLayer || !dowGhost || !gridGhost) return;
+
+  let sx=0, sy=0;
+  let tracking=false;
+  let locked=null;            // "h" | "v"
+  let activeDelta=0;          // -1 / +1
+  let prepared=false;
+
+  const THRESH_X = 55;        // kiedy commit
+  const LOCK_START = 10;
+
+  const hasVibe = () => ("vibrate" in navigator);
+  const vibe = (ms) => { if (hasVibe()) navigator.vibrate(ms); };
+
+  function setX(el, x){
+    el.style.transform = `translateX(${x}px)`;
+  }
+
+  function resetLayers(withAnim=true){
+    if (withAnim){
+      currentLayer.style.transition = "transform 180ms ease";
+      ghostLayer.style.transition   = "transform 180ms ease";
+    }
+    setX(currentLayer, 0);
+    setX(ghostLayer, activeDelta > 0 ? window.innerWidth : -window.innerWidth);
+
+    if (withAnim){
+      setTimeout(()=>{
+        currentLayer.style.transition = "";
+        ghostLayer.style.transition   = "";
+        ghostLayer.style.display = "none";
+        prepared=false;
+        activeDelta=0;
+      }, 190);
+    } else {
+      ghostLayer.style.display = "none";
+      prepared=false;
+      activeDelta=0;
+    }
+  }
+
+  function prepareGhost(delta){
+    if (prepared && activeDelta === delta) return;
+    activeDelta = delta;
+    prepared = true;
+
+    const cur = getCurrentMonthYM();
+    const nextYM = addMonths(cur, delta);
+
+    // ghost dostaje nagłówki i siatkę
+    renderDowInto(dowGhost);
+    renderCalendarInto(nextYM, null, gridGhost);
+
+    ghostLayer.style.display = "block";
+
+    // ustawiamy ghost poza ekranem
+    const w = area.clientWidth || window.innerWidth;
+    setX(ghostLayer, delta > 0 ? w : -w);
+    setX(currentLayer, 0);
+  }
+
+  function commit(delta){
+    const w = area.clientWidth || window.innerWidth;
+
+    // haptic „klik”
+    vibe(10);
+
+    // dociągamy animacją do końca
+    currentLayer.style.transition = "transform 180ms ease";
+    ghostLayer.style.transition   = "transform 180ms ease";
+
+    setX(currentLayer, delta > 0 ? -w : w);
+    setX(ghostLayer, 0);
+
+    // opcjonalny „fade” na moment
+    currentLayer.classList.add("calFading");
+
+    setTimeout(()=>{
+      currentLayer.classList.remove("calFading");
+      const cur = getCurrentMonthYM();
+      setMonthYM(addMonths(cur, delta));  // renderAll -> podmieni miesiąc
+
+      // po renderze zerujemy transformy i chowamy ghost
+      currentLayer.style.transition = "";
+      ghostLayer.style.transition   = "";
+      setX(currentLayer, 0);
+      ghostLayer.style.display = "none";
+      prepared=false;
+      activeDelta=0;
+    }, 190);
+  }
+
+  area.addEventListener("touchstart", (e)=>{
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0];
+    sx = t.clientX;
+    sy = t.clientY;
+    tracking = true;
+    locked = null;
+    prepared = false;
+    activeDelta = 0;
+  }, { passive:true });
+
+  area.addEventListener("touchmove", (e)=>{
+    if (!tracking || e.touches.length !== 1) return;
+
+    const t = e.touches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+
+    if (!locked){
+      if (Math.abs(dx) > LOCK_START || Math.abs(dy) > LOCK_START){
+        locked = (Math.abs(dx) > Math.abs(dy)) ? "h" : "v";
+      }
+    }
+
+    if (locked !== "h") return;
+
+    // poziomo -> blokujemy scroll
+    e.preventDefault();
+
+    // przygotuj ghost zależnie od kierunku
+    if (dx < 0) prepareGhost(+1);   // w lewo -> następny miesiąc
+    else prepareGhost(-1);          // w prawo -> poprzedni
+
+    const w = area.clientWidth || window.innerWidth;
+
+    // przesuwamy oba „na żywo”
+    setX(currentLayer, dx);
+    setX(ghostLayer, (activeDelta > 0 ? w : -w) + dx);
+  }, { passive:false });
+
+  area.addEventListener("touchend", (e)=>{
+    if (!tracking) return;
+    tracking = false;
+
+    if (locked !== "h" || !prepared){
+      resetLayers(false);
+      return;
+    }
+
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx;
+
+    if (Math.abs(dx) >= THRESH_X){
+      // commit w stronę swipa
+      if (dx < 0) commit(+1);
+      else commit(-1);
+    } else {
+      // wróć na miejsce
+      resetLayers(true);
+    }
+  }, { passive:true });
+
+  area.addEventListener("touchcancel", ()=>{
+    if (!tracking) return;
+    tracking=false;
+    resetLayers(true);
+  }, { passive:true });
+})();
 
   // ===== MODALE: URL / BULK (jak u Ciebie) =====
   const vacDlg = $("vacDialog");
