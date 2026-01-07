@@ -232,23 +232,29 @@
   justify-content:center;   /* albo flex-start jeśli ma być jak Google */
   align-items:flex-start;
 }
-    .dayNum{
+       .dayNum{
       font-size:10px;
-      font-weight:850;
+      font-weight:650;
       line-height:1;
       letter-spacing:.2px;
-      color:#111;
+      color:#111;  
     }
-    .dayNum.saturday{ color:var(--sat); font-weight:750; }
+    .dayNum.saturday{ color:var(--sat); font-weight:650; }
     .dayNum.sunday{ color:var(--sun); }
     .dayNum.holiday{ color:var(--holiday); }
-    .dayNum.saturday.holiday{ color:var(--holiday); font-weight:850; }
+    .dayNum.saturday.holiday{ color:var(--holiday); font-weight:650; }
 
-    .dayCell.today .dayNum{
+.dayCell.today .dayNum{
   background: rgba(40, 44, 120, 0.9);
   color:#fff;
-  border-radius:999px;       /* pastylka */
-  padding:2px 8px;
+  border-radius:8px;
+  height:10px;              /* STAŁA wysokość */
+  min-width:20px;
+  padding:0 7px;            /* tylko poziomy */
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;            /* kluczowe */
 }
 
     .pillStack{
