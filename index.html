@@ -564,6 +564,10 @@
         padding-right:var(--calEdgePad);
       }
     }
+    
+    #calSwipeArea{
+  touch-action: pan-y;
+}
   </style>
 </head>
 
@@ -604,9 +608,10 @@
     </div>
 
     <!-- ✅ KALENDARZ: ta sekcja ma być “szersza” na mobile -->
-    <div class="section calSection">
-      <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
-      <div class="calGrid" id="calGrid"></div>
+<div class="section calSection" id="calSwipeArea">
+  <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
+  <div class="calGrid" id="calGrid"></div>
+</div>
 
       <div class="row calBtns" style="margin-top:14px;">
         <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
@@ -1761,6 +1766,86 @@ function fmtWeekdayLongPL(dateISO){
       const el = document.getElementById("status");
       if (el) el.textContent = "BŁĄD INIT: " + msg;
     }
+    
+    function addMonths(ymStr, delta){
+  // ymStr: "YYYY-MM"
+  const [Y, M] = ymStr.split("-").map(Number);
+  const dt = new Date(Y, (M-1) + delta, 1);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}`;
+}
+
+function getCurrentMonthYM(){
+  const mp = $("monthPick");
+  return (mp && mp.value) ? mp.value : ym(todayISO());
+}
+
+function setMonthYM(newYM){
+  const mp = $("monthPick");
+  if (!mp) return;
+  mp.value = newYM;       // type="month" -> "YYYY-MM"
+  shouldScrollToToday = false;
+  renderAll();
+}
+
+// Swipe na kalendarzu
+(function enableCalendarSwipe(){
+  const area = $("calSwipeArea");
+  if (!area) return;
+
+  let sx = 0, sy = 0;
+  let tracking = false;
+  let locked = null; // "h" | "v"
+
+  const THRESH_X = 45; // minimalny dystans w px
+  const THRESH_Y = 30; // tolerancja pionu
+
+  area.addEventListener("touchstart", (e)=>{
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0];
+    sx = t.clientX;
+    sy = t.clientY;
+    tracking = true;
+    locked = null;
+  }, { passive:true });
+
+  area.addEventListener("touchmove", (e)=>{
+    if (!tracking || e.touches.length !== 1) return;
+    const t = e.touches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+
+    // rozstrzygamy czy to ruch poziomy czy pionowy
+    if (!locked){
+      if (Math.abs(dx) > 12 || Math.abs(dy) > 12){
+        locked = (Math.abs(dx) > Math.abs(dy)) ? "h" : "v";
+      }
+    }
+
+    // jeśli jest poziomo, blokuj przypadkowy scroll (opcjonalnie)
+    if (locked === "h"){
+      // nie passive, więc preventDefault zadziała; ale nie rób tego agresywnie
+      e.preventDefault();
+    }
+  }, { passive:false });
+
+  area.addEventListener("touchend", (e)=>{
+    if (!tracking) return;
+    tracking = false;
+
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+
+    // jeśli użytkownik bardziej zjechał w pionie, nie zmieniamy miesiąca
+    if (Math.abs(dy) > THRESH_Y && Math.abs(dy) > Math.abs(dx)) return;
+
+    if (Math.abs(dx) >= THRESH_X){
+      const cur = getCurrentMonthYM();
+      if (dx < 0) setMonthYM(addMonths(cur, +1)); // swipe w lewo -> następny miesiąc
+      else setMonthYM(addMonths(cur, -1));        // swipe w prawo -> poprzedni miesiąc
+    }
+  }, { passive:true });
+
   })();
   </script>
 </body>
