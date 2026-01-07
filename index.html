@@ -565,9 +565,20 @@
       }
     }
     
-    #calSwipeArea{
+ /* swipe-anim dla kalendarza */
+#calSwipeArea{
   touch-action: pan-y;
+  overflow:hidden;              /* żeby przesunięcie nie wychodziło poza sekcję */
 }
+
+#calGrid{
+  will-change: transform;
+}
+
+#dowRow{
+  will-change: transform;
+}
+
   </style>
 </head>
 
@@ -608,7 +619,7 @@
     </div>
 
     <!-- ✅ KALENDARZ: ta sekcja ma być “szersza” na mobile -->
-<div class="section calSection">
+<div class="section calSection" id="calSwipeArea">
   <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
   <div class="calGrid" id="calGrid"></div>
 
@@ -1765,7 +1776,131 @@ function fmtWeekdayLongPL(dateISO){
       const el = document.getElementById("status");
       if (el) el.textContent = "BŁĄD INIT: " + msg;
     }
-    
+    // Swipe na kalendarzu + subtelna animacja + haptic
+(function enableCalendarSwipe(){
+  const area = $("calSwipeArea");
+  const grid = $("calGrid");
+  const dow = $("dowRow");
+  if (!area || !grid || !dow) return;
+
+  let sx = 0, sy = 0;
+  let tracking = false;
+  let locked = null; // "h" | "v"
+  let lastDx = 0;
+
+  const THRESH_X = 45; // minimalny dystans w px
+  const THRESH_Y = 30; // tolerancja pionu
+
+  // „Google-like” – nie przesuwamy 1:1, tylko lekko (sprężynka)
+  const DRAG_RATIO = 0.35;     // im mniejsze, tym subtelniej
+  const MAX_DRAG = 38;         // maks px przesunięcia wizualnego
+
+  const hasVibe = () => ("vibrate" in navigator);
+  const vibe = (ms) => { if (hasVibe()) navigator.vibrate(ms); };
+
+  function setDrag(px){
+    const v = Math.max(-MAX_DRAG, Math.min(MAX_DRAG, px));
+    grid.style.transform = `translateX(${v}px)`;
+    dow.style.transform  = `translateX(${v}px)`;
+  }
+
+  function animateBack(){
+    grid.style.transition = "transform 160ms ease";
+    dow.style.transition  = "transform 160ms ease";
+    setDrag(0);
+    // sprzątanie transition po animacji
+    setTimeout(()=>{
+      grid.style.transition = "";
+      dow.style.transition  = "";
+    }, 180);
+  }
+
+  function commitMonth(delta){
+    // haptic „klik”
+    vibe(10);
+
+    // mały „kick” w stronę ruchu, potem render nowego miesiąca
+    const kick = delta > 0 ? -18 : 18; // swipe w lewo (delta +1) -> kick w lewo
+    grid.style.transition = "transform 120ms ease";
+    dow.style.transition  = "transform 120ms ease";
+    setDrag(kick);
+
+    // po krótkiej animacji zmieniamy miesiąc i wracamy do 0
+    setTimeout(()=>{
+      const cur = getCurrentMonthYM();
+      setMonthYM(addMonths(cur, delta)); // renderAll w środku
+      // reset transform po renderze
+      grid.style.transition = "";
+      dow.style.transition  = "";
+      setDrag(0);
+    }, 130);
+  }
+
+  area.addEventListener("touchstart", (e)=>{
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0];
+    sx = t.clientX;
+    sy = t.clientY;
+    lastDx = 0;
+    tracking = true;
+    locked = null;
+  }, { passive:true });
+
+  area.addEventListener("touchmove", (e)=>{
+    if (!tracking || e.touches.length !== 1) return;
+
+    const t = e.touches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+    lastDx = dx;
+
+    if (!locked){
+      if (Math.abs(dx) > 12 || Math.abs(dy) > 12){
+        locked = (Math.abs(dx) > Math.abs(dy)) ? "h" : "v";
+      }
+    }
+
+    if (locked === "h"){
+      e.preventDefault();
+
+      // subtelny drag
+      const drag = dx * DRAG_RATIO;
+      setDrag(drag);
+    }
+  }, { passive:false });
+
+  area.addEventListener("touchend", (e)=>{
+    if (!tracking) return;
+    tracking = false;
+
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+
+    // jeśli użytkownik bardziej zjechał w pionie, nie zmieniamy miesiąca
+    if (Math.abs(dy) > THRESH_Y && Math.abs(dy) > Math.abs(dx)){
+      animateBack();
+      return;
+    }
+
+    if (Math.abs(dx) >= THRESH_X){
+      // swipe w lewo -> następny miesiąc (+1), swipe w prawo -> poprzedni (-1)
+      if (dx < 0) commitMonth(+1);
+      else commitMonth(-1);
+      return;
+    }
+
+    // za krótki swipe -> wróć
+    animateBack();
+  }, { passive:true });
+
+  // gdy touch zostanie przerwany (np. gest systemowy), wracamy
+  area.addEventListener("touchcancel", ()=>{
+    if (!tracking) return;
+    tracking = false;
+    animateBack();
+  }, { passive:true });
+})();
   })();
   </script>
 </body>
