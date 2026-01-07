@@ -244,11 +244,14 @@
     .dayNum.holiday{ color:var(--holiday); }
     .dayNum.saturday.holiday{ color:var(--holiday); font-weight:850; }
 
-    .dayCell.today{
-      border-color:rgba(26,115,232,.35);
-      box-shadow:0 0 0 3px rgba(26,115,232,.12);
-      background:rgba(255,255,255,.85);
-    }
+    .dayCell.today .dayNum{
+  background:rgba(26,115,232,.14);
+  color:#1a73e8;
+  border-radius:999px;       /* pastylka */
+  padding:2px 8px;
+  font-weight:700;
+  line-height:1.1;
+}
 
     .pillStack{
       display:flex;
