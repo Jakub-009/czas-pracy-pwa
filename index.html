@@ -568,22 +568,15 @@
  /* swipe-anim dla kalendarza */
 #calSwipeArea{
   touch-action: pan-y;
-  overflow:hidden;              /* żeby przesunięcie nie wychodziło poza sekcję */
+  overflow:hidden;
   position:relative;
 }
 
-#calGrid{
-  will-change: transform;
-}
-
-#dowRow{
-  will-change: transform;
-}
-    
 /* Warstwy (aktualna + ghost) */
 .calLayer{
   will-change: transform;
 }
+
 .calGhost{
   position:absolute;
   left:0; right:0;
@@ -637,22 +630,27 @@
     </div>
 
     <!-- ✅ KALENDARZ: ta sekcja ma być “szersza” na mobile -->
-<div class="section calSection" id="calSwipeArea">
-  <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
-  <div class="calGrid" id="calGrid"></div>
-  
-      <div class="row calBtns" style="margin-top:14px;">
-        <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
-        <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
-      </div>
-</div>
+<div class="section calSection">
+  <div id="calSwipeArea">
+    <!-- warstwa aktualna -->
+    <div class="calLayer" id="calLayerCurrent">
+      <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
+      <div class="calGrid" id="calGrid"></div>
+    </div>
 
-    <!-- ghost miesiąca (podpinany JS-em) -->
+    <!-- ghost miesiąca -->
     <div class="calGhost calLayer" id="calLayerGhost" style="display:none;">
       <div class="calGrid" id="dowRowGhost" style="margin-bottom:6px;"></div>
       <div class="calGrid" id="calGridGhost"></div>
     </div>
   </div>
+
+  <!-- przyciski POD kalendarzem (poza swipe-area) -->
+  <div class="row calBtns" style="margin-top:14px;">
+    <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
+    <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
+  </div>
+</div>
   
     <div class="section">
       <details id="extrasPanel">
@@ -847,7 +845,7 @@
     </div>
   </dialog>
 
- <script>
+<script>
 (() => {
   const showErr = (msg) => {
     const el = document.getElementById("status");
@@ -1133,6 +1131,24 @@
     return holidayCache.get(year);
   }
 
+  // ===== Helpers miesięcy dla swipe =====
+  function addMonths(ymStr, delta) {
+    const [Y, M] = ymStr.split("-").map(Number);
+    const dt = new Date(Y, (M - 1) + delta, 1);
+    return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
+  }
+  function getCurrentMonthYM() {
+    const mp = $("monthPick");
+    return (mp && mp.value) ? mp.value : ym(todayISO());
+  }
+  function setMonthYM(newYM) {
+    const mp = $("monthPick");
+    if (!mp) return;
+    mp.value = newYM;
+    shouldScrollToToday = false;
+    renderAll();
+  }
+
   // ===== KALENDARZ =====
   const DOW = ["Pn", "Wt", "Śr", "Czw", "Pt", "Sb", "Nd"];
   function mondayIndex(jsDay) { return (jsDay + 6) % 7; }
@@ -1146,12 +1162,15 @@
     dowRow.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
   }
 
+  function renderDowInto(el) {
+    if (!el) return;
+    el.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
+  }
+
   function buildPillsHTML(day) {
     const isVacation = !!day?.vacation;
     const shifts = (day?.shifts || []).slice().sort((a, b) => (a.start || "").localeCompare(b.start || ""));
-    if (isVacation) {
-      return `<div class="pillStack"><div class="pill vac">Urlop</div></div>`;
-    }
+    if (isVacation) return `<div class="pillStack"><div class="pill vac">Urlop</div></div>`;
 
     const maxVisible = 3;
     const visible = shifts.slice(0, maxVisible);
@@ -1164,7 +1183,6 @@
     });
 
     if (extra > 0) pills.push(`<div class="pill more">+${extra}</div>`);
-
     return `<div class="pillStack">${pills.join("")}</div>`;
   }
 
@@ -1174,6 +1192,13 @@
     if (!monthLabel || !calGrid) return;
 
     monthLabel.textContent = fmtMonthPL(monthYM);
+    renderCalendarInto(monthYM, calGrid, true);
+  }
+
+  // render do dowolnego gridEl (ghost też)
+  // bindClicks = true tylko dla głównej warstwy
+  function renderCalendarInto(monthYM, gridEl, bindClicks) {
+    if (!gridEl) return;
 
     const [Y, M] = monthYM.split("-").map(Number);
     const first = new Date(Y, M - 1, 1);
@@ -1212,86 +1237,11 @@
       cells.push(`
         <div class="${dayCellClass}" data-date="${dateISO}" ${tileTitle ? `title="${tileTitle}"` : ""}>
           ${hasNote ? `<span class="noteDot" aria-hidden="true"></span>` : ``}
-          <div class="dayTop">
-            <div class="${numClass}">${d}</div>
-          </div>
+          <div class="dayTop"><div class="${numClass}">${d}</div></div>
           ${pillsHTML}
         </div>
       `);
     }
-    // ===== Helpers do miesięcy (muszą być w tym samym IIFE) =====
-function addMonths(ymStr, delta){
-  const [Y, M] = ymStr.split("-").map(Number);
-  const dt = new Date(Y, (M-1) + delta, 1);
-  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}`;
-}
-function getCurrentMonthYM(){
-  const mp = $("monthPick");
-  return (mp && mp.value) ? mp.value : ym(todayISO());
-}
-function setMonthYM(newYM){
-  const mp = $("monthPick");
-  if (!mp) return;
-  mp.value = newYM;            // type="month" -> "YYYY-MM"
-  shouldScrollToToday = false;
-  renderAll();
-}
-
-// ===== Render „do elementów” (ghost) =====
-// Uwaga: renderDow() u Ciebie jest stałe, ale tu robimy też ghost.
-function renderDowInto(el){
-  if (!el) return;
-  el.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
-}
-
-function renderCalendarInto(monthYM, monthLabelEl, gridEl){
-  if (monthLabelEl) monthLabelEl.textContent = fmtMonthPL(monthYM);
-  if (!gridEl) return;
-
-  const [Y, M] = monthYM.split("-").map(Number);
-  const first = new Date(Y, M-1, 1);
-  const firstIdx = mondayIndex(first.getDay());
-  const dim = daysInMonth(Y, M);
-
-  const holidays = getHolidayMap(Y);
-  const cells = [];
-  const today = todayISO();
-
-  for (let i=0;i<firstIdx;i++) cells.push(`<div class="blankCell"></div>`);
-
-  for (let d=1; d<=dim; d++){
-    const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
-    const jsDow = new Date(Y, M-1, d).getDay();
-
-    const day = getDay(dateISO) || { date:dateISO, note:"", shifts:[], vacation:false };
-    const hasNote = !!(day.note && day.note.trim());
-
-    const holidayName = holidays.get(dateISO) || "";
-    const isHoliday = !!holidayName;
-
-    const numClass = [
-      "dayNum",
-      jsDow === 6 ? "saturday" : "",
-      jsDow === 0 ? "sunday" : "",
-      isHoliday ? "holiday" : ""
-    ].filter(Boolean).join(" ");
-
-    const tileTitle = day.vacation ? "Urlop" : (isHoliday ? holidayName : "");
-    const isToday = (dateISO === today);
-    const dayCellClass = ["dayCell", isToday ? "today" : ""].filter(Boolean).join(" ");
-
-    const pillsHTML = buildPillsHTML(day);
-
-    cells.push(`
-      <div class="${dayCellClass}" data-date="${dateISO}" ${tileTitle ? `title="${tileTitle}"` : ""}>
-        ${hasNote ? `<span class="noteDot" aria-hidden="true"></span>` : ``}
-        <div class="dayTop">
-          <div class="${numClass}">${d}</div>
-        </div>
-        ${pillsHTML}
-      </div>
-    `);
-  }
 
     const mod = cells.length % 7;
     if (mod !== 0) {
@@ -1299,16 +1249,18 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
       for (let i = 0; i < need; i++) cells.push(`<div class="blankCell"></div>`);
     }
 
-    calGrid.innerHTML = cells.join("");
+    gridEl.innerHTML = cells.join("");
 
-    document.querySelectorAll(".dayCell[data-date]").forEach(el => {
-      el.onclick = () => openDay(el.getAttribute("data-date"));
-    });
+    if (bindClicks) {
+      gridEl.querySelectorAll(".dayCell[data-date]").forEach(el => {
+        el.onclick = () => openDay(el.getAttribute("data-date"));
+      });
 
-    if (shouldScrollToToday) {
-      shouldScrollToToday = false;
-      const el = document.querySelector('.dayCell[data-date="' + today + '"]');
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (shouldScrollToToday) {
+        shouldScrollToToday = false;
+        const el = document.querySelector('.dayCell[data-date="' + today + '"]');
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     }
   }
 
@@ -1319,9 +1271,8 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
   function openDay(dateISO) {
     dlgDate = dateISO;
 
-    const weekday = fmtWeekdayLongPL(dateISO);
     if ($("dlgTitle")) $("dlgTitle").textContent = `${fmtDMYText(dateISO)}`;
-    if ($("dlgMeta")) $("dlgMeta").textContent = weekday;
+    if ($("dlgMeta")) $("dlgMeta").textContent = fmtWeekdayLongPL(dateISO);
 
     const day = getDay(dateISO) || { date: dateISO, note: "", shifts: [], vacation: false };
     if ($("dlgStart")) $("dlgStart").value = "";
@@ -1395,11 +1346,9 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
       `;
     }).join("");
 
-    if (shiftsBox) {
-      shiftsBox.innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
-    }
+    if (shiftsBox) shiftsBox.innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
 
-    document.querySelectorAll("[data-delshift]").forEach(btn => {
+    shiftsBox?.querySelectorAll("[data-delshift]").forEach(btn => {
       btn.onclick = () => {
         const idx = Number(btn.getAttribute("data-delshift"));
         if (!confirm("Usunąć ten zakres?")) return;
@@ -1434,262 +1383,7 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     renderTotals(monthYM);
   }
 
-    // ===== Helpers do miesięcy (muszą być w tym samym IIFE) =====
-function addMonths(ymStr, delta){
-  const [Y, M] = ymStr.split("-").map(Number);
-  const dt = new Date(Y, (M-1) + delta, 1);
-  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}`;
-}
-function getCurrentMonthYM(){
-  const mp = $("monthPick");
-  return (mp && mp.value) ? mp.value : ym(todayISO());
-}
-function setMonthYM(newYM){
-  const mp = $("monthPick");
-  if (!mp) return;
-  mp.value = newYM;            // type="month" -> "YYYY-MM"
-  shouldScrollToToday = false;
-  renderAll();
-}
-
-// ===== Render „do elementów” (ghost) =====
-// Uwaga: renderDow() u Ciebie jest stałe, ale tu robimy też ghost.
-function renderDowInto(el){
-  if (!el) return;
-  el.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
-}
-
-function renderCalendarInto(monthYM, monthLabelEl, gridEl){
-  if (monthLabelEl) monthLabelEl.textContent = fmtMonthPL(monthYM);
-  if (!gridEl) return;
-
-  const [Y, M] = monthYM.split("-").map(Number);
-  const first = new Date(Y, M-1, 1);
-  const firstIdx = mondayIndex(first.getDay());
-  const dim = daysInMonth(Y, M);
-
-  const holidays = getHolidayMap(Y);
-  const cells = [];
-  const today = todayISO();
-
-  for (let i=0;i<firstIdx;i++) cells.push(`<div class="blankCell"></div>`);
-
-  for (let d=1; d<=dim; d++){
-    const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
-    const jsDow = new Date(Y, M-1, d).getDay();
-
-    const day = getDay(dateISO) || { date:dateISO, note:"", shifts:[], vacation:false };
-    const hasNote = !!(day.note && day.note.trim());
-
-    const holidayName = holidays.get(dateISO) || "";
-    const isHoliday = !!holidayName;
-
-    const numClass = [
-      "dayNum",
-      jsDow === 6 ? "saturday" : "",
-      jsDow === 0 ? "sunday" : "",
-      isHoliday ? "holiday" : ""
-    ].filter(Boolean).join(" ");
-
-    const tileTitle = day.vacation ? "Urlop" : (isHoliday ? holidayName : "");
-    const isToday = (dateISO === today);
-    const dayCellClass = ["dayCell", isToday ? "today" : ""].filter(Boolean).join(" ");
-
-    const pillsHTML = buildPillsHTML(day);
-
-    cells.push(`
-      <div class="${dayCellClass}" data-date="${dateISO}" ${tileTitle ? `title="${tileTitle}"` : ""}>
-        ${hasNote ? `<span class="noteDot" aria-hidden="true"></span>` : ``}
-        <div class="dayTop">
-          <div class="${numClass}">${d}</div>
-        </div>
-        ${pillsHTML}
-      </div>
-    `);
-  }
-
-  const mod = cells.length % 7;
-  if (mod !== 0){
-    const need = 7 - mod;
-    for (let i=0;i<need;i++) cells.push(`<div class="blankCell"></div>`);
-  }
-
-  gridEl.innerHTML = cells.join("");
-
-  // klik w dzień działa też na ghost (ale ghost ma pointer-events:none, więc i tak klik idzie w current)
-  // jeśli kiedyś włączysz pointer-events dla ghost, dodaj tu bind jak w renderCalendar().
-}
-
-// ===== Swipe „jak Google”: live preview kolejnego miesiąca =====
-(function enableCalendarSwipe(){
-  const area = $("calSwipeArea");
-  const currentLayer = $("calLayerCurrent");
-  const ghostLayer = $("calLayerGhost");
-  const dowGhost = $("dowRowGhost");
-  const gridGhost = $("calGridGhost");
-
-  if (!area || !currentLayer || !ghostLayer || !dowGhost || !gridGhost) return;
-
-  let sx=0, sy=0;
-  let tracking=false;
-  let locked=null;            // "h" | "v"
-  let activeDelta=0;          // -1 / +1
-  let prepared=false;
-
-  const THRESH_X = 55;        // kiedy commit
-  const LOCK_START = 10;
-
-  const hasVibe = () => ("vibrate" in navigator);
-  const vibe = (ms) => { if (hasVibe()) navigator.vibrate(ms); };
-
-  function setX(el, x){
-    el.style.transform = `translateX(${x}px)`;
-  }
-
-  function resetLayers(withAnim=true){
-    if (withAnim){
-      currentLayer.style.transition = "transform 180ms ease";
-      ghostLayer.style.transition   = "transform 180ms ease";
-    }
-    setX(currentLayer, 0);
-    setX(ghostLayer, activeDelta > 0 ? window.innerWidth : -window.innerWidth);
-
-    if (withAnim){
-      setTimeout(()=>{
-        currentLayer.style.transition = "";
-        ghostLayer.style.transition   = "";
-        ghostLayer.style.display = "none";
-        prepared=false;
-        activeDelta=0;
-      }, 190);
-    } else {
-      ghostLayer.style.display = "none";
-      prepared=false;
-      activeDelta=0;
-    }
-  }
-
-  function prepareGhost(delta){
-    if (prepared && activeDelta === delta) return;
-    activeDelta = delta;
-    prepared = true;
-
-    const cur = getCurrentMonthYM();
-    const nextYM = addMonths(cur, delta);
-
-    // ghost dostaje nagłówki i siatkę
-    renderDowInto(dowGhost);
-    renderCalendarInto(nextYM, null, gridGhost);
-
-    ghostLayer.style.display = "block";
-
-    // ustawiamy ghost poza ekranem
-    const w = area.clientWidth || window.innerWidth;
-    setX(ghostLayer, delta > 0 ? w : -w);
-    setX(currentLayer, 0);
-  }
-
-  function commit(delta){
-    const w = area.clientWidth || window.innerWidth;
-
-    // haptic „klik”
-    vibe(10);
-
-    // dociągamy animacją do końca
-    currentLayer.style.transition = "transform 180ms ease";
-    ghostLayer.style.transition   = "transform 180ms ease";
-
-    setX(currentLayer, delta > 0 ? -w : w);
-    setX(ghostLayer, 0);
-
-    // opcjonalny „fade” na moment
-    currentLayer.classList.add("calFading");
-
-    setTimeout(()=>{
-      currentLayer.classList.remove("calFading");
-      const cur = getCurrentMonthYM();
-      setMonthYM(addMonths(cur, delta));  // renderAll -> podmieni miesiąc
-
-      // po renderze zerujemy transformy i chowamy ghost
-      currentLayer.style.transition = "";
-      ghostLayer.style.transition   = "";
-      setX(currentLayer, 0);
-      ghostLayer.style.display = "none";
-      prepared=false;
-      activeDelta=0;
-    }, 190);
-  }
-
-  area.addEventListener("touchstart", (e)=>{
-    if (e.touches.length !== 1) return;
-    const t = e.touches[0];
-    sx = t.clientX;
-    sy = t.clientY;
-    tracking = true;
-    locked = null;
-    prepared = false;
-    activeDelta = 0;
-  }, { passive:true });
-
-  area.addEventListener("touchmove", (e)=>{
-    if (!tracking || e.touches.length !== 1) return;
-
-    const t = e.touches[0];
-    const dx = t.clientX - sx;
-    const dy = t.clientY - sy;
-
-    if (!locked){
-      if (Math.abs(dx) > LOCK_START || Math.abs(dy) > LOCK_START){
-        locked = (Math.abs(dx) > Math.abs(dy)) ? "h" : "v";
-      }
-    }
-
-    if (locked !== "h") return;
-
-    // poziomo -> blokujemy scroll
-    e.preventDefault();
-
-    // przygotuj ghost zależnie od kierunku
-    if (dx < 0) prepareGhost(+1);   // w lewo -> następny miesiąc
-    else prepareGhost(-1);          // w prawo -> poprzedni
-
-    const w = area.clientWidth || window.innerWidth;
-
-    // przesuwamy oba „na żywo”
-    setX(currentLayer, dx);
-    setX(ghostLayer, (activeDelta > 0 ? w : -w) + dx);
-  }, { passive:false });
-
-  area.addEventListener("touchend", (e)=>{
-    if (!tracking) return;
-    tracking = false;
-
-    if (locked !== "h" || !prepared){
-      resetLayers(false);
-      return;
-    }
-
-    const t = e.changedTouches[0];
-    const dx = t.clientX - sx;
-
-    if (Math.abs(dx) >= THRESH_X){
-      // commit w stronę swipa
-      if (dx < 0) commit(+1);
-      else commit(-1);
-    } else {
-      // wróć na miejsce
-      resetLayers(true);
-    }
-  }, { passive:true });
-
-  area.addEventListener("touchcancel", ()=>{
-    if (!tracking) return;
-    tracking=false;
-    resetLayers(true);
-  }, { passive:true });
-})();
-
-  // ===== MODALE: URL / BULK (jak u Ciebie) =====
+  // ===== MODALE: URL / BULK =====
   const vacDlg = $("vacDialog");
   function openVac() {
     if (!vacDlg) return;
@@ -1722,7 +1416,7 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
   }
   if (bulkDlg) bulkDlg.addEventListener("cancel", (e) => { e.preventDefault(); closeBulk(); });
 
-  // ===== RAPORT PDF (jak u Ciebie) =====
+  // ===== RAPORT PDF =====
   function escapeHtml(s) {
     return String(s ?? "")
       .replaceAll("&", "&amp;")
@@ -1801,48 +1495,13 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
       gap:12px;
       margin-bottom:8px;
     }
-    h1{
-      margin:0;
-      font-size:16px;
-      letter-spacing:.2px;
-    }
-    .meta{
-      font-size:11px;
-      line-height:1.35;
-      color:#333;
-      text-align:right;
-      white-space:nowrap;
-    }
-    .sumLine{
-      margin:8px 0 10px;
-      font-size:12px;
-      color:#111;
-    }
-    .sumLine strong{
-      font-weight:900;
-      font-size:13px;
-    }
-    table{
-      width:100%;
-      border-collapse:collapse;
-      table-layout:fixed;
-      font-size:10px;
-    }
-    thead th{
-      text-align:left;
-      padding:6px 6px;
-      border-bottom:1px solid #cfd5e3;
-      background:#f3f5fb;
-      font-weight:800;
-    }
-    tbody td{
-      padding:4px 6px;
-      border-bottom:1px solid #eef1f6;
-      vertical-align:top;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
+    h1{ margin:0; font-size:16px; letter-spacing:.2px; }
+    .meta{ font-size:11px; line-height:1.35; color:#333; text-align:right; white-space:nowrap; }
+    .sumLine{ margin:8px 0 10px; font-size:12px; color:#111; }
+    .sumLine strong{ font-weight:900; font-size:13px; }
+    table{ width:100%; border-collapse:collapse; table-layout:fixed; font-size:10px; }
+    thead th{ text-align:left; padding:6px 6px; border-bottom:1px solid #cfd5e3; background:#f3f5fb; font-weight:800; }
+    tbody td{ padding:4px 6px; border-bottom:1px solid #eef1f6; vertical-align:top; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .c-date{ width:72px; }
     .c-dow{ width:34px; }
     .c-sum{ width:52px; text-align:right; }
@@ -1899,24 +1558,6 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     w.focus();
   }
 
-  // ===== helpers dla swipe miesiąca =====
-  function addMonths(ymStr, delta) {
-    const [Y, M] = ymStr.split("-").map(Number);
-    const dt = new Date(Y, (M - 1) + delta, 1);
-    return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
-  }
-  function getCurrentMonthYM() {
-    const mp = $("monthPick");
-    return (mp && mp.value) ? mp.value : ym(todayISO());
-  }
-  function setMonthYM(newYM) {
-    const mp = $("monthPick");
-    if (!mp) return;
-    mp.value = newYM;
-    shouldScrollToToday = false;
-    renderAll();
-  }
-
   // ===== UI =====
   const dlgBackBtn = $("dlgBack");
   if (dlgBackBtn) dlgBackBtn.onclick = closeDay;
@@ -1933,7 +1574,6 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
   const bulkBackBtn = $("bulkBack");
   if (bulkBackBtn) bulkBackBtn.onclick = closeBulk;
 
-  // usuwanie urlopu z dnia w modalu dnia
   const dlgRemoveVacationBtn = $("dlgRemoveVacation");
   if (dlgRemoveVacationBtn) {
     dlgRemoveVacationBtn.onclick = () => {
@@ -1949,7 +1589,6 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     };
   }
 
-  // Dodawanie zakresu w dniu
   const dlgAddShiftBtn = $("dlgAddShift");
   if (dlgAddShiftBtn) {
     dlgAddShiftBtn.onclick = () => {
@@ -1976,7 +1615,6 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     };
   }
 
-  // Autosave notatki
   const dlgNoteEl = $("dlgNote");
   let noteTimer = null;
   if (dlgNoteEl) {
@@ -1996,7 +1634,6 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     });
   }
 
-  // miesiąc picker
   const monthBar = $("monthBar");
   const monthPick = $("monthPick");
   if (monthBar && monthPick) {
@@ -2007,7 +1644,6 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     monthPick.addEventListener("change", renderAll);
   }
 
-  // Dzisiaj
   const todayBtn = $("todayBtn");
   if (todayBtn && monthPick) {
     todayBtn.onclick = () => {
@@ -2018,7 +1654,6 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     };
   }
 
-  // FAB: otwórz dzisiaj
   const fabAdd = $("fabAdd");
   if (fabAdd) {
     fabAdd.onclick = () => {
@@ -2032,7 +1667,6 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     };
   }
 
-  // urlop: zakres
   const setVacationRangeBtn = $("setVacationRange");
   if (setVacationRangeBtn) {
     setVacationRangeBtn.onclick = () => {
@@ -2042,6 +1676,7 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
       if (res.ok) closeVac();
     };
   }
+
   const clearVacationRangeBtn = $("clearVacationRange");
   if (clearVacationRangeBtn) {
     clearVacationRangeBtn.onclick = () => {
@@ -2051,7 +1686,6 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     };
   }
 
-  // wiele godzin: dodaj / usuń
   const bulkApplyBtn = $("bulkApply");
   if (bulkApplyBtn) {
     bulkApplyBtn.onclick = () => {
@@ -2063,6 +1697,7 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
       if (res.ok) closeBulk();
     };
   }
+
   const bulkRemoveBtn = $("bulkRemove");
   if (bulkRemoveBtn) {
     bulkRemoveBtn.onclick = () => {
@@ -2074,7 +1709,6 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     };
   }
 
-  // narzędzia
   const reportBtn = $("reportPdf");
   if (reportBtn) reportBtn.onclick = openReportPdf;
 
@@ -2133,6 +1767,172 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     rateEl.addEventListener("change", renderAll);
   }
 
+  // ===== Swipe „jak Google” z ghost (live preview) + haptic =====
+  (function enableCalendarSwipe() {
+    const area = $("calSwipeArea");
+    const currentLayer = $("calLayerCurrent");
+    const ghostLayer = $("calLayerGhost");
+    const dowGhost = $("dowRowGhost");
+    const gridGhost = $("calGridGhost");
+
+    if (!area || !currentLayer || !ghostLayer || !dowGhost || !gridGhost) return;
+
+    let sx = 0, sy = 0;
+    let tracking = false;
+    let locked = null;        // "h" | "v"
+    let activeDelta = 0;      // -1 / +1
+    let prepared = false;
+
+    const LOCK_START = 10;
+    const THRESH_X = 60;
+
+    const hasVibe = () => ("vibrate" in navigator);
+    const vibe = (ms) => { if (hasVibe()) navigator.vibrate(ms); };
+
+    function setX(el, x) {
+      el.style.transform = `translateX(${x}px)`;
+    }
+
+    function prepareGhost(delta) {
+      if (prepared && activeDelta === delta) return;
+
+      activeDelta = delta;
+      prepared = true;
+
+      const cur = getCurrentMonthYM();
+      const nextYM = addMonths(cur, delta);
+
+      renderDowInto(dowGhost);
+      renderCalendarInto(nextYM, gridGhost, false);
+
+      ghostLayer.style.display = "block";
+
+      const w = area.clientWidth || window.innerWidth;
+      setX(currentLayer, 0);
+      setX(ghostLayer, delta > 0 ? w : -w);
+    }
+
+    function resetLayers(animated) {
+      const w = area.clientWidth || window.innerWidth;
+
+      if (animated) {
+        currentLayer.style.transition = "transform 180ms ease";
+        ghostLayer.style.transition = "transform 180ms ease";
+      } else {
+        currentLayer.style.transition = "";
+        ghostLayer.style.transition = "";
+      }
+
+      setX(currentLayer, 0);
+      setX(ghostLayer, activeDelta > 0 ? w : -w);
+
+      if (animated) {
+        setTimeout(() => {
+          currentLayer.style.transition = "";
+          ghostLayer.style.transition = "";
+          ghostLayer.style.display = "none";
+          prepared = false;
+          activeDelta = 0;
+        }, 190);
+      } else {
+        ghostLayer.style.display = "none";
+        prepared = false;
+        activeDelta = 0;
+      }
+    }
+
+    function commit(delta) {
+      const w = area.clientWidth || window.innerWidth;
+
+      vibe(10);
+
+      currentLayer.style.transition = "transform 190ms ease";
+      ghostLayer.style.transition = "transform 190ms ease";
+
+      setX(currentLayer, delta > 0 ? -w : w);
+      setX(ghostLayer, 0);
+
+      currentLayer.classList.add("calFading");
+
+      setTimeout(() => {
+        currentLayer.classList.remove("calFading");
+
+        const cur = getCurrentMonthYM();
+        setMonthYM(addMonths(cur, delta)); // w środku renderAll()
+
+        currentLayer.style.transition = "";
+        ghostLayer.style.transition = "";
+        setX(currentLayer, 0);
+        ghostLayer.style.display = "none";
+        prepared = false;
+        activeDelta = 0;
+      }, 200);
+    }
+
+    area.addEventListener("touchstart", (e) => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      sx = t.clientX;
+      sy = t.clientY;
+      tracking = true;
+      locked = null;
+      prepared = false;
+      activeDelta = 0;
+    }, { passive: true });
+
+    area.addEventListener("touchmove", (e) => {
+      if (!tracking || e.touches.length !== 1) return;
+
+      const t = e.touches[0];
+      const dx = t.clientX - sx;
+      const dy = t.clientY - sy;
+
+      if (!locked) {
+        if (Math.abs(dx) > LOCK_START || Math.abs(dy) > LOCK_START) {
+          locked = (Math.abs(dx) > Math.abs(dy)) ? "h" : "v";
+        }
+      }
+
+      if (locked !== "h") return;
+
+      e.preventDefault();
+
+      if (dx < 0) prepareGhost(+1);
+      else prepareGhost(-1);
+
+      const w = area.clientWidth || window.innerWidth;
+
+      setX(currentLayer, dx);
+      setX(ghostLayer, (activeDelta > 0 ? w : -w) + dx);
+    }, { passive: false });
+
+    area.addEventListener("touchend", (e) => {
+      if (!tracking) return;
+      tracking = false;
+
+      if (locked !== "h" || !prepared) {
+        resetLayers(false);
+        return;
+      }
+
+      const t = e.changedTouches[0];
+      const dx = t.clientX - sx;
+
+      if (Math.abs(dx) >= THRESH_X) {
+        if (dx < 0) commit(+1);
+        else commit(-1);
+      } else {
+        resetLayers(true);
+      }
+    }, { passive: true });
+
+    area.addEventListener("touchcancel", () => {
+      if (!tracking) return;
+      tracking = false;
+      resetLayers(true);
+    }, { passive: true });
+  })();
+
   // ===== INIT =====
   try {
     normalize();
@@ -2140,7 +1940,8 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     hydrateSettingsUI();
 
     const t = todayISO();
-    if (monthPick) monthPick.value = ym(t);
+    const monthPickEl = $("monthPick");
+    if (monthPickEl) monthPickEl.value = ym(t);
 
     if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
     if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
@@ -2154,116 +1955,6 @@ function renderCalendarInto(monthYM, monthLabelEl, gridEl){
     const el = document.getElementById("status");
     if (el) el.textContent = "BŁĄD INIT: " + msg;
   }
-
-  // ===== Swipe na kalendarzu + subtelna animacja + haptic =====
-  (function enableCalendarSwipe(){
-    const area = $("calSwipeArea");
-    const grid = $("calGrid");
-    const dow = $("dowRow");
-    if (!area || !grid || !dow) return;
-
-    let sx = 0, sy = 0;
-    let tracking = false;
-    let locked = null;
-
-    const THRESH_X = 45;
-    const THRESH_Y = 30;
-
-    const DRAG_RATIO = 0.35;
-    const MAX_DRAG = 38;
-
-    const hasVibe = () => ("vibrate" in navigator);
-    const vibe = (ms) => { if (hasVibe()) navigator.vibrate(ms); };
-
-    function setDrag(px){
-      const v = Math.max(-MAX_DRAG, Math.min(MAX_DRAG, px));
-      grid.style.transform = `translateX(${v}px)`;
-      dow.style.transform  = `translateX(${v}px)`;
-    }
-
-    function animateBack(){
-      grid.style.transition = "transform 160ms ease";
-      dow.style.transition  = "transform 160ms ease";
-      setDrag(0);
-      setTimeout(()=>{
-        grid.style.transition = "";
-        dow.style.transition  = "";
-      }, 180);
-    }
-
-    function commitMonth(delta){
-      vibe(10);
-
-      const kick = delta > 0 ? -18 : 18;
-      grid.style.transition = "transform 120ms ease";
-      dow.style.transition  = "transform 120ms ease";
-      setDrag(kick);
-
-      setTimeout(()=>{
-        const cur = getCurrentMonthYM();
-        setMonthYM(addMonths(cur, delta));
-        grid.style.transition = "";
-        dow.style.transition  = "";
-        setDrag(0);
-      }, 130);
-    }
-
-    area.addEventListener("touchstart", (e)=>{
-      if (e.touches.length !== 1) return;
-      const t = e.touches[0];
-      sx = t.clientX;
-      sy = t.clientY;
-      tracking = true;
-      locked = null;
-    }, { passive:true });
-
-    area.addEventListener("touchmove", (e)=>{
-      if (!tracking || e.touches.length !== 1) return;
-
-      const t = e.touches[0];
-      const dx = t.clientX - sx;
-      const dy = t.clientY - sy;
-
-      if (!locked){
-        if (Math.abs(dx) > 12 || Math.abs(dy) > 12){
-          locked = (Math.abs(dx) > Math.abs(dy)) ? "h" : "v";
-        }
-      }
-
-      if (locked === "h"){
-        e.preventDefault();
-        setDrag(dx * DRAG_RATIO);
-      }
-    }, { passive:false });
-
-    area.addEventListener("touchend", (e)=>{
-      if (!tracking) return;
-      tracking = false;
-
-      const t = e.changedTouches[0];
-      const dx = t.clientX - sx;
-      const dy = t.clientY - sy;
-
-      if (Math.abs(dy) > THRESH_Y && Math.abs(dy) > Math.abs(dx)){
-        animateBack();
-        return;
-      }
-
-      if (Math.abs(dx) >= THRESH_X){
-        if (dx < 0) commitMonth(+1);
-        else commitMonth(-1);
-        return;
-      }
-
-      animateBack();
-    }, { passive:true });
-
-    area.addEventListener("touchcancel", ()=>{
-      if (!tracking) return;
-      tracking = false;
-      animateBack();
-    }, { passive:true });
-  })();
 })();
 </script>
 </body>
