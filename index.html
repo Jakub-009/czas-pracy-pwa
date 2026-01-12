@@ -669,7 +669,7 @@
           <div class="row" style="margin-top:12px;">
             <div style="flex:1; min-width:240px;">
               <label>Stawka godzinowa (PLN)</label>
-              <input id="rate" type="number" step="0.01" min="0" value="40" />
+              <input id="rate" type="number" step="0.01" min="0" placeholder="Wpisz stawkę (opcjonalnie)" />
             </div>
           </div>
         </div>
@@ -907,7 +907,7 @@
   };
 
   const STORAGE_KEY = "worktime_pwa_v1";
-  let db = load() || { settings: { rate: 40 }, entries: [] };
+  let db = load() || { settings:{ rate:0 }, entries:[] };
 
   function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
   function load() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; } }
