@@ -246,18 +246,22 @@
     .dayNum.saturday.holiday{ color:var(--holiday); font-weight:650; }
 
 .dayCell.today .dayNum{
-  background: rgba(40, 44, 120, 0.9);
-  color:#fff;
-  border-radius:999px;
-  height:15px;              /* było 10px -> MUSI być większe */
-  min-width:20px;
-  padding:0 8px;            /* tylko poziomy */
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  line-height:1;
+  font-size:11.5px;
+  font-weight:800;
+  color:#2f6f68; /* stonowany teal */
+  position:relative;
 }
 
+.dayCell.today .dayNum::after{
+  content:"";
+  display:block;
+  width:14px;
+  height:2px;
+  margin:3px auto 0;
+  background:#2f6f68;   /* ten sam kolor co numer */
+  border-radius:2px;
+  opacity:.9;
+}
     .pillStack{
       display:flex;
       flex-direction:column;
