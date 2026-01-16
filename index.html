@@ -246,19 +246,32 @@
     .dayNum.saturday.holiday{ color:var(--holiday); font-weight:650; }
 
 .dayCell.today .dayNum{
-  color:#2f6f68;
-  font-weight:900;
   position:relative;
+  font-weight:900;
+  color:#1E1E1E;
+  padding:0 6px; /* miejsce na kreski */
 }
 
-.dayCell.today .dayNum::after { 
-  content:""; 
-  display:block; 
-  width:13px; 
-  height:2px; 
-  margin:3px auto 0; 
-  background:#2f6f68; 
-  border-radius:2px; }
+.dayCell.today .dayNum::before,
+.dayCell.today .dayNum::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:3px;
+  height:12px;
+  background:#2F6F68;
+  border-radius:1px;
+  opacity:.85;
+}
+
+.dayCell.today .dayNum::before{
+  left:0;
+}
+
+.dayCell.today .dayNum::after{
+  right:0;
+}
     
     .pillStack{
       display:flex;
