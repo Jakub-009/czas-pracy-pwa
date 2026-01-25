@@ -935,6 +935,22 @@
     }
   }
 
+  const LAST_BACKUP_KEY = "worktime_last_backup_iso";
+const BACKUP_REMIND_EVERY_DAYS = 5; // np. co 5 dni przypominaj
+
+function getLastBackupISO(){
+  return localStorage.getItem(LAST_BACKUP_KEY) || "";
+}
+function setLastBackupNow(){
+  localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString());
+}
+function daysSince(iso){
+  if (!iso) return 9999;
+  const t = Date.parse(iso);
+  if (!Number.isFinite(t)) return 9999;
+  return Math.floor((Date.now() - t) / (1000*60*60*24));
+}
+
   function setStatus(t) { const el = $("status"); if (el) el.textContent = t || ""; }
 
   function minutesBetween(dateISO, start, end) {
@@ -1716,16 +1732,18 @@
 
   const backupBtn = $("backupJson");
   if (backupBtn) {
-    backupBtn.onclick = () => {
-      const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `czas-pracy-backup_${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    };
-  }
+    $("backupJson").onclick = ()=>{
+  const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  setLastBackupNow(); // ✅ zapamiętaj, że był backup
+  alert("Backup zapisany 👍\nPolecam wysłać plik na Google Drive lub maila do siebie.");
+};
 
   const restoreBtn = $("restoreBtn");
   const restoreInput = $("restoreJson");
@@ -1952,6 +1970,21 @@
     if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
 
     renderAll();
+    // przypomnienie o backupie po wejściu
+const last = getLastBackupISO();
+const ds = daysSince(last);
+
+if (ds >= BACKUP_REMIND_EVERY_DAYS){
+  setTimeout(()=>{
+    const msg = last
+      ? `Ostatni backup: ${ds} dni temu.\nZrób kopię zapasową teraz?`
+      : `Nie wykryto żadnego backupu.\nZrób kopię zapasową teraz?`;
+
+    if (confirm(msg)){
+      $("backupJson").click(); // uruchomi backup po kliknięciu w OK
+    }
+  }, 600);
+}
   } catch (err) {
     const msg = (err && err.message) ? err.message : String(err);
     const el = document.getElementById("status");
