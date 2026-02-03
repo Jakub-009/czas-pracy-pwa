@@ -644,7 +644,7 @@
 
       <div class="row calBtns" style="margin-top:14px;">
         <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
-        <button class="vacBtn" id="openVacDialog" type="button">Urlop / L4</button>
+        <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
       </div>
     </div>
 
@@ -705,8 +705,8 @@
   <dialog id="vacDialog">
     <div class="modalHead" style="position:relative;">
       <div class="modalHeadInner">
-        <h3 style="margin:0;">Urlop / L4</h3>
-        <div class="muted" style="margin-top:3px;">Ustaw status w zakresie dat. Status NIE usuwa godzin pracy (możesz mieć godziny i urlop jednocześnie).</div>
+        <h3 style="margin:0;">Dodaj urlop</h3>
+        <div class="muted" style="margin-top:3px;">Ustaw status w zakresie dat. Status nie usuwa godzin pracy (możesz mieć godziny i urlop jednocześnie).</div>
       </div>
 
       <button class="backBtn blue" id="vacBack" aria-label="Zamknij" type="button" title="Zamknij">
@@ -732,7 +732,7 @@
         <label>Rodzaj</label>
         <select id="vacType">
           <option value="paid">Urlop płatny</option>
-          <option value="unpaid">Urlop bezpłatny</option>
+          <option value="unpaid">Urlop b/z</option>
           <option value="sick">L4</option>
         </select>
       </div>
@@ -829,7 +829,7 @@
         <select id="dlgLeaveType">
           <option value="">Brak</option>
           <option value="paid">Urlop płatny</option>
-          <option value="unpaid">Urlop bezpłatny</option>
+          <option value="unpaid">Urlop b/z</option>
           <option value="sick">L4</option>
         </select>
         <div class="muted" style="margin-top:6px;">Status nie usuwa godzin pracy.</div>
@@ -1196,7 +1196,7 @@
 
   function leaveLabel(t) {
     if (t === "paid") return "Urlop płatny";
-    if (t === "unpaid") return "Urlop bezpłatny";
+    if (t === "unpaid") return "Urlop b/z";
     if (t === "sick") return "L4";
     return "";
   }
