@@ -866,6 +866,18 @@
   const pad2 = (n) => String(n).padStart(2, "0");
   const round2 = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
 
+  // ===== HAPTICS (global) =====
+  const HAPTICS_ON = true;
+  const hasVibe = () => HAPTICS_ON && ("vibrate" in navigator);
+  const vibe = (pattern) => { if (hasVibe()) navigator.vibrate(pattern); };
+  const haptic = {
+    tap:     () => vibe(8),                 // lekkie kliknięcia / open/close
+    commit:  () => vibe(10),                // zmiana miesiąca (swipe)
+    success: () => vibe([10, 30, 10]),       // zatwierdzenie / zapis
+    warning: () => vibe([12, 40, 12]),       // ostrożnie
+    danger:  () => vibe([20, 50, 20]),       // destrukcja
+  };
+
   const todayISO = () => {
     const d = new Date();
     return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
@@ -936,20 +948,20 @@
   }
 
   const LAST_BACKUP_KEY = "worktime_last_backup_iso";
-const BACKUP_REMIND_EVERY_DAYS = 5; // np. co 5 dni przypominaj
+  const BACKUP_REMIND_EVERY_DAYS = 5; // np. co 5 dni przypominaj
 
-function getLastBackupISO(){
-  return localStorage.getItem(LAST_BACKUP_KEY) || "";
-}
-function setLastBackupNow(){
-  localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString());
-}
-function daysSince(iso){
-  if (!iso) return 9999;
-  const t = Date.parse(iso);
-  if (!Number.isFinite(t)) return 9999;
-  return Math.floor((Date.now() - t) / (1000*60*60*24));
-}
+  function getLastBackupISO(){
+    return localStorage.getItem(LAST_BACKUP_KEY) || "";
+  }
+  function setLastBackupNow(){
+    localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString());
+  }
+  function daysSince(iso){
+    if (!iso) return 9999;
+    const t = Date.parse(iso);
+    if (!Number.isFinite(t)) return 9999;
+    return Math.floor((Date.now() - t) / (1000*60*60*24));
+  }
 
   function setStatus(t) { const el = $("status"); if (el) el.textContent = t || ""; }
 
@@ -1287,6 +1299,8 @@ function daysSince(iso){
   let dlgDate = null;
 
   function openDay(dateISO) {
+    haptic.tap();
+
     dlgDate = dateISO;
 
     if ($("dlgTitle")) $("dlgTitle").textContent = `${fmtDMYText(dateISO)}`;
@@ -1376,6 +1390,7 @@ function daysSince(iso){
         save();
         renderAll();
         renderDayDialog();
+        haptic.danger();
       };
     });
   }
@@ -1404,6 +1419,7 @@ function daysSince(iso){
   // ===== MODALE: URL / BULK =====
   const vacDlg = $("vacDialog");
   function openVac() {
+    haptic.tap();
     if (!vacDlg) return;
     const t = todayISO();
     if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
@@ -1412,6 +1428,7 @@ function daysSince(iso){
     else vacDlg.setAttribute("open", "");
   }
   function closeVac() {
+    haptic.tap();
     if (!vacDlg) return;
     if (typeof vacDlg.close === "function") vacDlg.close();
     else vacDlg.removeAttribute("open");
@@ -1420,6 +1437,7 @@ function daysSince(iso){
 
   const bulkDlg = $("bulkDialog");
   function openBulk() {
+    haptic.tap();
     if (!bulkDlg) return;
     const t = todayISO();
     if ($("bulkFrom") && !$("bulkFrom").value) $("bulkFrom").value = t;
@@ -1428,6 +1446,7 @@ function daysSince(iso){
     else bulkDlg.setAttribute("open", "");
   }
   function closeBulk() {
+    haptic.tap();
     if (!bulkDlg) return;
     if (typeof bulkDlg.close === "function") bulkDlg.close();
     else bulkDlg.removeAttribute("open");
@@ -1561,6 +1580,8 @@ function daysSince(iso){
   }
 
   function openReportPdf() {
+    haptic.tap();
+
     const monthPick = $("monthPick");
     const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
 
@@ -1578,7 +1599,7 @@ function daysSince(iso){
 
   // ===== UI =====
   const dlgBackBtn = $("dlgBack");
-  if (dlgBackBtn) dlgBackBtn.onclick = closeDay;
+  if (dlgBackBtn) dlgBackBtn.onclick = () => { haptic.tap(); closeDay(); };
 
   const openVacDialogBtn = $("openVacDialog");
   if (openVacDialogBtn) openVacDialogBtn.onclick = openVac;
@@ -1604,6 +1625,7 @@ function daysSince(iso){
       renderAll();
       renderDayDialog();
       setStatus("Usunięto urlop z dnia.");
+      haptic.warning();
     };
   }
 
@@ -1630,6 +1652,7 @@ function daysSince(iso){
       renderAll();
       renderDayDialog();
       setStatus("Dodano zakres.");
+      haptic.success();
     };
   }
 
@@ -1648,6 +1671,7 @@ function daysSince(iso){
         renderAll();
         renderDayDialog();
         setStatus("Zapisano notatkę.");
+        // celowo bez haptics, żeby nie wibrowało podczas pisania
       }, 250);
     });
   }
@@ -1656,6 +1680,7 @@ function daysSince(iso){
   const monthPick = $("monthPick");
   if (monthBar && monthPick) {
     monthBar.onclick = () => {
+      haptic.tap();
       if (typeof monthPick.showPicker === "function") monthPick.showPicker();
       else monthPick.focus();
     };
@@ -1665,6 +1690,7 @@ function daysSince(iso){
   const todayBtn = $("todayBtn");
   if (todayBtn && monthPick) {
     todayBtn.onclick = () => {
+      haptic.tap();
       const t = todayISO();
       monthPick.value = ym(t);
       shouldScrollToToday = true;
@@ -1675,6 +1701,7 @@ function daysSince(iso){
   const fabAdd = $("fabAdd");
   if (fabAdd) {
     fabAdd.onclick = () => {
+      haptic.tap();
       const t = todayISO();
       if (monthPick) {
         monthPick.value = ym(t);
@@ -1691,7 +1718,10 @@ function daysSince(iso){
       const from = $("vacFrom")?.value;
       const to = $("vacTo")?.value;
       const res = applyVacationRange(from, to, true);
-      if (res.ok) closeVac();
+      if (res.ok) {
+        haptic.success();
+        closeVac();
+      }
     };
   }
 
@@ -1700,7 +1730,8 @@ function daysSince(iso){
     clearVacationRangeBtn.onclick = () => {
       const from = $("vacFrom")?.value;
       const to = $("vacTo")?.value;
-      applyVacationRange(from, to, false);
+      const res = applyVacationRange(from, to, false);
+      if (res.ok) haptic.warning();
     };
   }
 
@@ -1712,7 +1743,10 @@ function daysSince(iso){
       const start = $("bulkStart")?.value;
       const end = $("bulkEnd")?.value;
       const res = applyBulkHours(from, to, start, end, "add");
-      if (res.ok) closeBulk();
+      if (res.ok) {
+        haptic.success();
+        closeBulk();
+      }
     };
   }
 
@@ -1723,33 +1757,37 @@ function daysSince(iso){
       const to = $("bulkTo")?.value;
       const start = $("bulkStart")?.value;
       const end = $("bulkEnd")?.value;
-      applyBulkHours(from, to, start, end, "remove");
+      const res = applyBulkHours(from, to, start, end, "remove");
+      if (res.ok) haptic.warning();
     };
   }
 
   const reportBtn = $("reportPdf");
   if (reportBtn) reportBtn.onclick = openReportPdf;
 
-const backupBtn = $("backupJson");
-if (backupBtn) {
-  backupBtn.onclick = () => {
-    const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const backupBtn = $("backupJson");
+  if (backupBtn) {
+    backupBtn.onclick = () => {
+      haptic.tap();
 
-    setLastBackupNow();
-    alert("Kopia zapisana 👍 Polecam wysłać plik na Google Drive lub maila do siebie.");
-  };
-} 
+      const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      setLastBackupNow();
+      haptic.success();
+      alert("Kopia zapisana 👍 Polecam wysłać plik na Google Drive lub maila do siebie.");
+    };
+  }
 
   const restoreBtn = $("restoreBtn");
   const restoreInput = $("restoreJson");
   if (restoreBtn && restoreInput) {
-    restoreBtn.onclick = () => restoreInput.click();
+    restoreBtn.onclick = () => { haptic.tap(); restoreInput.click(); };
     restoreInput.onchange = async (ev) => {
       const f = ev.target.files?.[0];
       if (!f) return;
@@ -1764,6 +1802,7 @@ if (backupBtn) {
         renderAll();
         if (dlgDate) renderDayDialog();
         setStatus("Przywrócono dane z pliku JSON.");
+        haptic.success();
       } catch {
         alert("Nie udało się wczytać pliku JSON.");
       }
@@ -1773,12 +1812,14 @@ if (backupBtn) {
   const clearMonthBtn = $("clearMonth");
   if (clearMonthBtn) {
     clearMonthBtn.onclick = () => {
+      haptic.tap();
       const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
       if (!confirm("Usunąć wszystkie wpisy z tego miesiąca?")) return;
       db.entries = db.entries.filter(e => ym(e.date) !== monthYM);
       save();
       renderAll();
       setStatus("Wyczyszczono miesiąc.");
+      haptic.danger();
     };
   }
 
@@ -1806,9 +1847,6 @@ if (backupBtn) {
 
     const LOCK_START = 10;
     const THRESH_X = 60;
-
-    const hasVibe = () => ("vibrate" in navigator);
-    const vibe = (ms) => { if (hasVibe()) navigator.vibrate(ms); };
 
     function setX(el, x) {
       el.style.transform = `translateX(${x}px)`;
@@ -1865,7 +1903,7 @@ if (backupBtn) {
     function commit(delta) {
       const w = area.clientWidth || window.innerWidth;
 
-      vibe(10);
+      haptic.commit();
 
       currentLayer.style.transition = "transform 190ms ease";
       ghostLayer.style.transition = "transform 190ms ease";
@@ -1971,21 +2009,22 @@ if (backupBtn) {
     if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
 
     renderAll();
+
     // przypomnienie o backupie po wejściu
-const last = getLastBackupISO();
-const ds = daysSince(last);
+    const last = getLastBackupISO();
+    const ds = daysSince(last);
 
-if (ds >= BACKUP_REMIND_EVERY_DAYS){
-  setTimeout(()=>{
-    const msg = last
-      ? `Ostatni backup: ${ds} dni temu.\nZrób kopię zapasową teraz?`
-      : `Nie wykryto żadnego backupu.\nZrób kopię zapasową teraz?`;
+    if (ds >= BACKUP_REMIND_EVERY_DAYS){
+      setTimeout(()=>{
+        const msg = last
+          ? `Ostatni backup: ${ds} dni temu.\nZrób kopię zapasową teraz?`
+          : `Nie wykryto żadnego backupu.\nZrób kopię zapasową teraz?`;
 
-    if (confirm(msg)){
-      $("backupJson").click(); // uruchomi backup po kliknięciu w OK
+        if (confirm(msg)){
+          $("backupJson").click(); // uruchomi backup po kliknięciu w OK
+        }
+      }, 600);
     }
-  }, 600);
-}
   } catch (err) {
     const msg = (err && err.message) ? err.message : String(err);
     const el = document.getElementById("status");
@@ -1993,5 +2032,6 @@ if (ds >= BACKUP_REMIND_EVERY_DAYS){
   }
 })();
 </script>
+
 </body>
 </html>
