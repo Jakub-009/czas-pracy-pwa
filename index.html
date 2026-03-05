@@ -589,6 +589,30 @@
       opacity:.92;
       transition:opacity 120ms ease;
     }
+
+    /* ===== Scroll tylko w dolnej sekcji (lista zakresów) ===== */
+#dayDialog .modalBody{
+  /* zamiast zwykłego bloku */
+  display:flex;
+  flex-direction:column;
+  height:calc(100dvh - 0px); /* modal ma full height, body ma wypełnić */
+  overflow:hidden;           /* ważne: NIE scrolluj całego modala */
+}
+
+#dlgShiftsBlock{
+  flex:1;            /* bierze resztę dostępnej wysokości */
+  min-height:0;      /* KLUCZ: pozwala overflow działać w flexie */
+  overflow:auto;     /* scroll tylko tutaj */
+  -webkit-overflow-scrolling: touch;
+  padding-bottom:12px; /* mały oddech na dole */
+}
+
+/* opcjonalnie: żeby sama lista nie “puchła” */
+#dlgShifts{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
   </style>
 </head>
 
