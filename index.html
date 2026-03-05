@@ -590,37 +590,59 @@
       transition:opacity 120ms ease;
     }
 
-    /* ===== Scroll tylko w dolnej sekcji (lista zakresów) ===== */
+/* ===== Scroll tylko w dolnej sekcji (lista zakresów) ===== */
+
 #dayDialog .modalBody{
-  /* zamiast zwykłego bloku */
   display:flex;
   flex-direction:column;
-  height:calc(100dvh - 0px); /* modal ma full height, body ma wypełnić */
-  overflow:hidden;           /* ważne: NIE scrolluj całego modala */
+  height:100dvh;
+  overflow:hidden;
 }
 
+/* kontener sekcji z godzinami */
 #dlgShiftsBlock{
-  flex:1;            /* bierze resztę dostępnej wysokości */
-  min-height:0;      /* KLUCZ: pozwala overflow działać w flexie */
-  overflow:auto;     /* scroll tylko tutaj */
+  flex:1;
+  min-height:0;
+  overflow:auto;
   -webkit-overflow-scrolling: touch;
-  padding-bottom:12px; /* mały oddech na dole */
+  padding-bottom:0;
 }
 
-/* opcjonalnie: żeby sama lista nie “puchła” */
+/* lista zakresów */
 #dlgShifts{
   display:flex;
   flex-direction:column;
   gap:12px;
 }
-    #dlgShiftsBlock{
-  padding-bottom: 0; /* żeby nie dublować */
-}
 
+/* spacer na dole żeby ostatni zakres był w pełni widoczny */
 #dlgShiftsBlock::after{
   content:"";
   display:block;
-  height: calc(24px + env(safe-area-inset-bottom, 0px));
+  height: calc(32px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ===== sticky nagłówek sekcji ===== */
+#dlgShiftsTitle{
+  position:sticky;
+  top:0;
+  z-index:5;
+
+  display:block;
+  padding:10px 2px 10px;
+  margin:0 0 10px;
+
+  background:var(--bg);
+  border-bottom:1px solid var(--outline-soft);
+}
+
+/* opcjonalny blur dla efektu premium */
+@supports ((backdrop-filter: blur(6px)) or (-webkit-backdrop-filter: blur(6px))){
+  #dlgShiftsTitle{
+    background:rgba(246,247,251,.92);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+  }
 }
   </style>
 </head>
