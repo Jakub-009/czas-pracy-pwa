@@ -524,7 +524,8 @@
       margin-top:12px;
     }
     .actionRow > *{ flex:1; }
-*{-webkit-tap-highlight-color:transparent}
+
+    *{-webkit-tap-highlight-color:transparent}
     :focus{outline:none}
     :focus-visible{
       outline:2px solid var(--primary);
@@ -571,19 +572,27 @@
       transition:opacity 120ms ease;
     }
 
-/* ===== Scroll tylko w dolnej sekcji (lista zakresów) ===== */
+/* ===== Scroll tylko w dolnej sekcji (lista zakresów) + sticky nagłówek ===== */
 
-#dayDialog .modalBody{
+/* Zrób z pełnoekranowego dialogu flex-kolumnę: nagłówek u góry, treść poniżej */
+dialog#dayDialog{
   display:flex;
   flex-direction:column;
-  height:100dvh;
-  overflow:hidden;
 }
 
-/* kontener sekcji z godzinami */
-#dlgShiftsBlock{
+/* modalBody zajmuje resztę wysokości (bez ręcznego 100dvh, żeby nic nie ucinało) */
+#dayDialog .modalBody{
   flex:1;
   min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden; /* NIE scrolluj całego modala */
+}
+
+/* dolna sekcja z listą zakresów — to ona się scrolluje */
+#dlgShiftsBlock{
+  flex:1;
+  min-height:0;                /* KLUCZ w flexie */
   overflow:auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom:0;
@@ -603,7 +612,7 @@
   height: calc(32px + env(safe-area-inset-bottom, 0px));
 }
 
-/* ===== sticky nagłówek sekcji ===== */
+/* sticky nagłówek sekcji */
 #dlgShiftsTitle{
   position:sticky;
   top:0;
@@ -625,6 +634,8 @@
     -webkit-backdrop-filter:blur(8px);
   }
 }
+
+
   </style>
 </head>
 
@@ -729,7 +740,6 @@
       </details>
     </div>
   </div>
-
   <!-- MODAL URLOPU -->
   <dialog id="vacDialog">
     <div class="modalHead" style="position:relative;">
@@ -1428,7 +1438,9 @@
     if ($("dlgStart")) $("dlgStart").value = "";
     if ($("dlgEnd")) $("dlgEnd").value = "";
     if ($("dlgNote")) $("dlgNote").value = day.note || "";
-renderDayDialog();
+    if ($("dlgLeaveType")) $("dlgLeaveType").value = day.leaveType || "";
+
+    renderDayDialog();
 
     if (dlg && typeof dlg.showModal === "function") dlg.showModal();
     else if (dlg) dlg.setAttribute("open", "");
@@ -1450,7 +1462,10 @@ renderDayDialog();
   function renderDayDialog() {
     if (!dlgDate) return;
     const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
-const mins = computeDayMinutes(day);
+
+    if ($("dlgLeaveType")) $("dlgLeaveType").value = day.leaveType || "";
+
+    const mins = computeDayMinutes(day);
     const pay = round2((mins / 60) * (db.settings.rate || 0));
 
     if ($("dlgSumHM")) $("dlgSumHM").textContent = fmtHM(mins);
@@ -1716,6 +1731,23 @@ const mins = computeDayMinutes(day);
 
   const bulkBackBtn = $("bulkBack");
   if (bulkBackBtn) bulkBackBtn.onclick = closeBulk;
+
+  const dlgLeaveTypeEl = $("dlgLeaveType");
+  if (dlgLeaveTypeEl) {
+    dlgLeaveTypeEl.addEventListener("change", () => {
+      if (!dlgDate) return;
+      const val = dlgLeaveTypeEl.value || "";
+      const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
+      day.leaveType = val;
+      upsertDay(dlgDate, day);
+      save();
+      renderAll();
+      renderDayDialog();
+      setStatus(val ? ("Ustawiono status: " + leaveLabel(val) + ".") : "Usunięto status dnia.");
+      if (val) haptic.success(); else haptic.warning();
+    });
+  }
+
   const dlgAddShiftBtn = $("dlgAddShift");
   if (dlgAddShiftBtn) {
     dlgAddShiftBtn.onclick = () => {
@@ -1780,9 +1812,6 @@ const mins = computeDayMinutes(day);
       monthPick.value = ym(t);
       shouldScrollToToday = true;
       renderAll();
-    };
-  }
-      openDay(t);
     };
   }
 
