@@ -613,6 +613,15 @@
   flex-direction:column;
   gap:12px;
 }
+    #dlgShiftsBlock{
+  padding-bottom: 0; /* żeby nie dublować */
+}
+
+#dlgShiftsBlock::after{
+  content:"";
+  display:block;
+  height: calc(24px + env(safe-area-inset-bottom, 0px));
+}
   </style>
 </head>
 
