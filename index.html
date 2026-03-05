@@ -852,7 +852,6 @@
           <div class="statMiniValue" id="dlgSumPay">0,00 zł</div>
         </div>
       </div>
-
       </div>
 
       <div class="modalStack" id="dlgWorkBlock">
@@ -1429,7 +1428,7 @@
     if ($("dlgStart")) $("dlgStart").value = "";
     if ($("dlgEnd")) $("dlgEnd").value = "";
     if ($("dlgNote")) $("dlgNote").value = day.note || "";
-    renderDayDialog();
+renderDayDialog();
 
     if (dlg && typeof dlg.showModal === "function") dlg.showModal();
     else if (dlg) dlg.setAttribute("open", "");
@@ -1451,7 +1450,7 @@
   function renderDayDialog() {
     if (!dlgDate) return;
     const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
-    const mins = computeDayMinutes(day);
+const mins = computeDayMinutes(day);
     const pay = round2((mins / 60) * (db.settings.rate || 0));
 
     if ($("dlgSumHM")) $("dlgSumHM").textContent = fmtHM(mins);
@@ -1783,6 +1782,10 @@
       renderAll();
     };
   }
+      openDay(t);
+    };
+  }
+
   const setVacationRangeBtn = $("setVacationRange");
   if (setVacationRangeBtn) {
     setVacationRangeBtn.onclick = () => {
