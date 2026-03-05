@@ -608,6 +608,18 @@ dialog#dayDialog .modalBody{
   overscroll-behavior:contain; /* nie “przebija” scrolla na tło */
   padding-bottom:24px; /* oddech na dole */
 }
+    /* ✅ DayDialog: header bez sticky (Android bug w dialog+sticky) */
+dialog#dayDialog .modalHead{
+  position:relative !important;
+  top:auto !important;
+  z-index:5;
+}
+
+/* back button zawsze klikalny */
+dialog#dayDialog .backBtn{
+  pointer-events:auto;
+  z-index:6;
+}
   </style>
 </head>
 
