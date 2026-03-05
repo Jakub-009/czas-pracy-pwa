@@ -589,37 +589,6 @@
       opacity:.92;
       transition:opacity 120ms ease;
     }
-    
-    /* ✅ Day dialog: przewijanie zawartości */
-dialog#dayDialog{
-  display:flex;
-  flex-direction:column;
-  overflow:hidden; /* zostaje, ale scroll będzie w .modalBody */
-}
-
-dialog#dayDialog .modalHead{
-  flex:0 0 auto;
-}
-
-dialog#dayDialog .modalBody{
-  flex:1 1 auto;
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain; /* nie “przebija” scrolla na tło */
-  padding-bottom:24px; /* oddech na dole */
-}
-    /* ✅ DayDialog: header bez sticky (Android bug w dialog+sticky) */
-dialog#dayDialog .modalHead{
-  position:relative !important;
-  top:auto !important;
-  z-index:5;
-}
-
-/* back button zawsze klikalny */
-dialog#dayDialog .backBtn{
-  pointer-events:auto;
-  z-index:6;
-}
   </style>
 </head>
 
