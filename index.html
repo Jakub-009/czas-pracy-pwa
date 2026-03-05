@@ -525,24 +525,6 @@
     }
     .actionRow > *{ flex:1; }
 
-    .fab{
-      position:fixed;
-      right:16px;
-      bottom:16px;
-      width:56px;
-      height:56px;
-      border-radius:18px;
-      border:none;
-      background:var(--primary);
-      color:#fff;
-      cursor:pointer;
-      display:grid;
-      place-items:center;
-      z-index:999;
-    }
-    .fab:active{ transform:scale(.98); }
-    .fab svg{ width:22px;height:22px; }
-
     *{-webkit-tap-highlight-color:transparent}
     :focus{outline:none}
     :focus-visible{
@@ -590,60 +572,60 @@
       transition:opacity 120ms ease;
     }
 
-/* ===== Scroll tylko w dolnej sekcji (lista zakresów) ===== */
+    /* ===== Scroll tylko w dolnej sekcji (lista zakresów) ===== */
 
-#dayDialog .modalBody{
-  display:flex;
-  flex-direction:column;
-  height:100dvh;
-  overflow:hidden;
-}
+    #dayDialog .modalBody{
+      display:flex;
+      flex-direction:column;
+      height:100dvh;
+      overflow:hidden;
+    }
 
-/* kontener sekcji z godzinami */
-#dlgShiftsBlock{
-  flex:1;
-  min-height:0;
-  overflow:auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom:0;
-}
+    /* kontener sekcji z godzinami */
+    #dlgShiftsBlock{
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom:0;
+    }
 
-/* lista zakresów */
-#dlgShifts{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
+    /* lista zakresów */
+    #dlgShifts{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
 
-/* spacer na dole żeby ostatni zakres był w pełni widoczny */
-#dlgShiftsBlock::after{
-  content:"";
-  display:block;
-  height: calc(32px + env(safe-area-inset-bottom, 0px));
-}
+    /* spacer na dole żeby ostatni zakres był w pełni widoczny */
+    #dlgShiftsBlock::after{
+      content:"";
+      display:block;
+      height: calc(32px + env(safe-area-inset-bottom, 0px));
+    }
 
-/* ===== sticky nagłówek sekcji ===== */
-#dlgShiftsTitle{
-  position:sticky;
-  top:0;
-  z-index:5;
+    /* ===== sticky nagłówek sekcji ===== */
+    #dlgShiftsTitle{
+      position:sticky;
+      top:0;
+      z-index:5;
 
-  display:block;
-  padding:10px 2px 10px;
-  margin:0 0 10px;
+      display:block;
+      padding:10px 2px 10px;
+      margin:0 0 10px;
 
-  background:var(--bg);
-  border-bottom:1px solid var(--outline-soft);
-}
+      background:var(--bg);
+      border-bottom:1px solid var(--outline-soft);
+    }
 
-/* opcjonalny blur dla efektu premium */
-@supports ((backdrop-filter: blur(6px)) or (-webkit-backdrop-filter: blur(6px))){
-  #dlgShiftsTitle{
-    background:rgba(246,247,251,.92);
-    backdrop-filter:blur(8px);
-    -webkit-backdrop-filter:blur(8px);
-  }
-}
+    /* opcjonalny blur dla efektu premium */
+    @supports ((backdrop-filter: blur(6px)) or (-webkit-backdrop-filter: blur(6px))){
+      #dlgShiftsTitle{
+        background:rgba(246,247,251,.92);
+        backdrop-filter:blur(8px);
+        -webkit-backdrop-filter:blur(8px);
+      }
+    }
   </style>
 </head>
 
@@ -748,13 +730,6 @@
       </details>
     </div>
   </div>
-
-  <!-- FAB -->
-  <button class="fab" id="fabAdd" aria-label="Dodaj godziny (dzisiaj)" title="Dodaj (dzisiaj)" type="button">
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path fill="currentColor" d="M11 5a1 1 0 0 1 2 0v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5z"/>
-    </svg>
-  </button>
 
   <!-- MODAL URLOPU -->
   <dialog id="vacDialog">
@@ -877,17 +852,6 @@
           <div class="muted">Dniówka</div>
           <div class="statMiniValue" id="dlgSumPay">0,00 zł</div>
         </div>
-      </div>
-
-      <div style="margin-bottom:14px;">
-        <label>Status dnia (opcjonalnie)</label>
-        <select id="dlgLeaveType">
-          <option value="">Brak</option>
-          <option value="paid">Urlop płatny</option>
-          <option value="unpaid">Urlop b/z</option>
-          <option value="sick">L4</option>
-        </select>
-        <div class="muted" style="margin-top:6px;">Status nie usuwa godzin pracy.</div>
       </div>
 
       <div class="modalStack" id="dlgWorkBlock">
@@ -1464,7 +1428,6 @@
     if ($("dlgStart")) $("dlgStart").value = "";
     if ($("dlgEnd")) $("dlgEnd").value = "";
     if ($("dlgNote")) $("dlgNote").value = day.note || "";
-    if ($("dlgLeaveType")) $("dlgLeaveType").value = day.leaveType || "";
 
     renderDayDialog();
 
@@ -1488,8 +1451,6 @@
   function renderDayDialog() {
     if (!dlgDate) return;
     const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
-
-    if ($("dlgLeaveType")) $("dlgLeaveType").value = day.leaveType || "";
 
     const mins = computeDayMinutes(day);
     const pay = round2((mins / 60) * (db.settings.rate || 0));
@@ -1758,22 +1719,6 @@
   const bulkBackBtn = $("bulkBack");
   if (bulkBackBtn) bulkBackBtn.onclick = closeBulk;
 
-  const dlgLeaveTypeEl = $("dlgLeaveType");
-  if (dlgLeaveTypeEl) {
-    dlgLeaveTypeEl.addEventListener("change", () => {
-      if (!dlgDate) return;
-      const val = dlgLeaveTypeEl.value || "";
-      const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
-      day.leaveType = val;
-      upsertDay(dlgDate, day);
-      save();
-      renderAll();
-      renderDayDialog();
-      setStatus(val ? ("Ustawiono status: " + leaveLabel(val) + ".") : "Usunięto status dnia.");
-      if (val) haptic.success(); else haptic.warning();
-    });
-  }
-
   const dlgAddShiftBtn = $("dlgAddShift");
   if (dlgAddShiftBtn) {
     dlgAddShiftBtn.onclick = () => {
@@ -1838,20 +1783,6 @@
       monthPick.value = ym(t);
       shouldScrollToToday = true;
       renderAll();
-    };
-  }
-
-  const fabAdd = $("fabAdd");
-  if (fabAdd) {
-    fabAdd.onclick = () => {
-      haptic.tap();
-      const t = todayISO();
-      if (monthPick) {
-        monthPick.value = ym(t);
-        shouldScrollToToday = false;
-        renderAll();
-      }
-      openDay(t);
     };
   }
 
