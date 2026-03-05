@@ -525,6 +525,24 @@
     }
     .actionRow > *{ flex:1; }
 
+    .fab{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      width:56px;
+      height:56px;
+      border-radius:18px;
+      border:none;
+      background:var(--primary);
+      color:#fff;
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      z-index:999;
+    }
+    .fab:active{ transform:scale(.98); }
+    .fab svg{ width:22px;height:22px; }
+
     *{-webkit-tap-highlight-color:transparent}
     :focus{outline:none}
     :focus-visible{
@@ -572,27 +590,19 @@
       transition:opacity 120ms ease;
     }
 
-/* ===== Scroll tylko w dolnej sekcji (lista zakresów) + sticky nagłówek ===== */
+/* ===== Scroll tylko w dolnej sekcji (lista zakresów) ===== */
 
-/* Zrób z pełnoekranowego dialogu flex-kolumnę: nagłówek u góry, treść poniżej */
-dialog#dayDialog{
-  display:flex;
-  flex-direction:column;
-}
-
-/* modalBody zajmuje resztę wysokości (bez ręcznego 100dvh, żeby nic nie ucinało) */
 #dayDialog .modalBody{
-  flex:1;
-  min-height:0;
   display:flex;
   flex-direction:column;
-  overflow:hidden; /* NIE scrolluj całego modala */
+  height:100dvh;
+  overflow:hidden;
 }
 
-/* dolna sekcja z listą zakresów — to ona się scrolluje */
+/* kontener sekcji z godzinami */
 #dlgShiftsBlock{
   flex:1;
-  min-height:0;                /* KLUCZ w flexie */
+  min-height:0;
   overflow:auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom:0;
@@ -612,7 +622,7 @@ dialog#dayDialog{
   height: calc(32px + env(safe-area-inset-bottom, 0px));
 }
 
-/* sticky nagłówek sekcji */
+/* ===== sticky nagłówek sekcji ===== */
 #dlgShiftsTitle{
   position:sticky;
   top:0;
@@ -634,8 +644,6 @@ dialog#dayDialog{
     -webkit-backdrop-filter:blur(8px);
   }
 }
-
-
   </style>
 </head>
 
@@ -740,6 +748,14 @@ dialog#dayDialog{
       </details>
     </div>
   </div>
+
+  <!-- FAB -->
+  <button class="fab" id="fabAdd" aria-label="Dodaj godziny (dzisiaj)" title="Dodaj (dzisiaj)" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path fill="currentColor" d="M11 5a1 1 0 0 1 2 0v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5z"/>
+    </svg>
+  </button>
+
   <!-- MODAL URLOPU -->
   <dialog id="vacDialog">
     <div class="modalHead" style="position:relative;">
@@ -862,6 +878,16 @@ dialog#dayDialog{
           <div class="statMiniValue" id="dlgSumPay">0,00 zł</div>
         </div>
       </div>
+
+      <div style="margin-bottom:14px;">
+        <label>Status dnia (opcjonalnie)</label>
+        <select id="dlgLeaveType">
+          <option value="">Brak</option>
+          <option value="paid">Urlop płatny</option>
+          <option value="unpaid">Urlop b/z</option>
+          <option value="sick">L4</option>
+        </select>
+        <div class="muted" style="margin-top:6px;">Status nie usuwa godzin pracy.</div>
       </div>
 
       <div class="modalStack" id="dlgWorkBlock">
@@ -1812,6 +1838,20 @@ dialog#dayDialog{
       monthPick.value = ym(t);
       shouldScrollToToday = true;
       renderAll();
+    };
+  }
+
+  const fabAdd = $("fabAdd");
+  if (fabAdd) {
+    fabAdd.onclick = () => {
+      haptic.tap();
+      const t = todayISO();
+      if (monthPick) {
+        monthPick.value = ym(t);
+        shouldScrollToToday = false;
+        renderAll();
+      }
+      openDay(t);
     };
   }
 
