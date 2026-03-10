@@ -1,4 +1,4 @@
-const CACHE_NAME = "worktime-pwa-gh-v4";
+const CACHE_NAME = "worktime-pwa-gh-v5";
 const BASE = "/czas-pracy-pwa/";
 
 const ASSETS = [
@@ -20,7 +20,11 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
+      Promise.all(
+        keys
+          .filter((k) => k !== CACHE_NAME)
+          .map((k) => caches.delete(k))
+      )
     )
   );
   self.clients.claim();
@@ -28,16 +32,40 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
+  const url = new URL(req.url);
 
-  // nawigacja (odświeżenie/otwarcie) -> offline fallback do index.html
+  // nawigacja (otwarcie / odświeżenie strony)
   if (req.mode === "navigate") {
     event.respondWith(
-      fetch(req).catch(() => caches.match(BASE + "index.html"))
+      fetch(req)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(BASE + "index.html", copy));
+          return response;
+        })
+        .catch(() => caches.match(BASE + "index.html"))
     );
     return;
   }
 
-  // reszta plików: cache-first
+  // tylko GET
+  if (req.method !== "GET") return;
+
+  // pliki aplikacji z tej samej domeny -> network first + fallback do cache
+  if (url.origin === location.origin && url.pathname.startsWith(BASE)) {
+    event.respondWith(
+      fetch(req)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          return response;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // reszta: cache first
   event.respondWith(
     caches.match(req).then((cached) => cached || fetch(req))
   );
