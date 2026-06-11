@@ -884,6 +884,222 @@
       .dayNum{font-size:18px}
       .pill{height:17px;font-size:10px}
     }
+  
+/* ===== Czas pracy 3.1 compact / S23 polish ===== */
+.hamburger{
+  border:none;
+  padding:0;
+  min-height:44px;
+  background:transparent;
+  box-shadow:none;
+}
+.toolGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.toolGrid button{
+  width:100%;
+  min-height:48px;
+}
+
+/* Pola bardziej jak nowe Google: mniej ciężkie, jaśniejsze, bez starego "betonowego" wypełnienia */
+input,textarea,select{
+  background:#f5f7fb !important;
+  border:1px solid transparent !important;
+  border-bottom:1px solid #a7afbc !important;
+  border-radius:12px 12px 0 0 !important;
+  box-shadow:none !important;
+}
+input:hover,textarea:hover,select:hover{
+  background:#eef3fa !important;
+}
+input:focus-visible,textarea:focus-visible,select:focus-visible{
+  background:#eef3fa !important;
+  border-bottom:2px solid var(--primary) !important;
+}
+
+/* Menu/modale boczne też w stylu bottom sheet */
+dialog#mainMenuDialog,
+dialog#settingsDialog,
+dialog#toolsDialog{
+  width:100vw;
+  max-width:100vw;
+  margin:auto 0 0 0;
+  border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;
+}
+@media(min-width:680px){
+  dialog#mainMenuDialog,
+  dialog#settingsDialog,
+  dialog#toolsDialog{
+    width:min(560px,calc(100vw - 32px));
+    max-width:560px;
+    margin:auto;
+    border-radius:var(--radius-sheet);
+  }
+}
+
+/* Telefony typu S23 / mniejsze wysokości — wersja bardziej zwarta */
+@media(max-width:430px), (max-height:820px){
+  body{padding-bottom:82px}
+  .wrap{padding-bottom:82px}
+  .appHeader{
+    min-height:58px;
+    padding:8px 12px 4px;
+  }
+  .hamburger{
+    width:38px;
+    height:38px;
+    min-height:38px;
+  }
+  .hamburger svg{width:24px;height:24px}
+  .appHeader h1{
+    font-size:22px;
+    max-width:52vw;
+  }
+  .topActions button.tonal{
+    height:34px !important;
+    min-height:34px !important;
+    padding:0 14px !important;
+    font-size:13px !important;
+  }
+
+  .monthSelector{
+    padding:0 8px 6px;
+  }
+  .monthTitle{
+    font-size:22px;
+  }
+  .iconCircle{
+    width:38px;
+    height:38px;
+  }
+  .iconCircle svg{width:22px;height:22px}
+
+  .calDow{
+    font-size:13px;
+    padding:6px 0;
+  }
+  #calGrid,#calGridGhost{
+    gap:3px;
+  }
+  .dayCell,.blankCell{
+    min-height:88px;
+    border-radius:8px;
+  }
+  .dayTop{
+    padding-bottom:4px;
+  }
+  .dayNum{
+    width:28px;
+    height:28px;
+    font-size:17px;
+  }
+  .pill{
+    height:17px;
+    font-size:10px;
+    border-radius:5px;
+  }
+
+  .summaryCard{
+    padding:12px 14px 0;
+    margin-top:4px;
+  }
+  .statBox{
+    min-height:48px;
+  }
+  .statValue{
+    font-size:23px;
+    margin-bottom:4px;
+  }
+  .statBox .muted{
+    font-size:12.5px;
+  }
+
+  .fab-container{
+    right:18px;
+    bottom:18px;
+  }
+  .fab{
+    width:58px;
+    height:58px;
+    min-height:58px;
+    padding:0;
+    border-radius:18px;
+  }
+  .fabText{display:none}
+  .fab svg{
+    width:30px;
+    height:30px;
+  }
+
+  .drag-handle{
+    margin:12px auto 10px;
+  }
+  .modalHead{
+    padding:0 20px 10px;
+  }
+  .modalBody{
+    padding:0 20px 20px;
+  }
+  .modalHead h3,.modalHeader h3{
+    font-size:24px;
+  }
+  .modalHead .muted,.modalHeader p{
+    font-size:14px;
+  }
+  .modalStats{
+    gap:18px;
+    margin:6px 0 20px;
+  }
+  .statMiniValue{
+    font-size:25px;
+  }
+  .modalStack{
+    padding:16px;
+    border-radius:24px;
+    margin-bottom:22px;
+  }
+  .shiftItem{
+    padding:14px 0;
+  }
+  .shiftItem .times{
+    font-size:19px;
+  }
+  .shiftItem .mins{
+    font-size:14px;
+    margin-top:5px;
+  }
+  input,textarea,select{
+    min-height:48px;
+    padding:13px 14px 10px;
+    font-size:15px;
+  }
+  textarea{
+    min-height:66px;
+  }
+  #setVacationRange,#bulkApply,#dlgAddShift{
+    min-height:48px;
+    font-size:15px;
+  }
+}
+
+/* bardzo niskie ekrany — modal dnia mniej zasłania */
+@media(max-height:760px){
+  dialog#dayDialog{
+    max-height:92dvh;
+  }
+  #dayDialog .modalBody{
+    max-height:calc(92dvh - 48px);
+  }
+  .modalStack{
+    padding:14px;
+  }
+  textarea{
+    min-height:58px;
+  }
+}
+
   </style>
 
 </head>
@@ -893,9 +1109,9 @@
 
     <header class="appHeader">
       <div class="appLeft">
-        <div class="hamburger" aria-hidden="true">
+        <button class="hamburger" id="mainMenuBtn" type="button" aria-label="Menu">
           <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2Zm0-5h18v-2H3v2Zm0-7v2h18V6H3Z"/></svg>
-        </div>
+        </button>
         <div class="appTitleWrap">
           <h1>Czas pracy</h1>
           <div class="sub">Kalendarz godzin, urlopów i wypłaty</div>
@@ -945,48 +1161,6 @@
       <div class="muted" id="status"></div>
     </div>
 
-    <div class="card compactCard">
-      <details id="extrasPanel">
-        <summary>
-          <span>Ustawienia pracodawcy</span>
-          <span class="chev" aria-hidden="true"></span>
-        </summary>
-        <div class="panel">
-          <div class="row" style="margin-bottom:16px;">
-            <div style="flex:1;min-width:220px;">
-              <label>Stawka godzinowa (PLN)</label>
-              <input id="rate" type="number" step="0.01" min="0" placeholder="Wpisz stawkę" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div style="flex:1;min-width:220px;">
-              <label>Limit urlopu płatnego (dni / rok)</label>
-              <input id="leaveQuota" type="number" step="1" min="0" placeholder="np. 26" />
-              <div class="muted" id="leaveCounter" style="margin-top:8px;">—</div>
-            </div>
-          </div>
-        </div>
-      </details>
-    </div>
-
-    <div class="card compactCard">
-      <details id="toolsPanel">
-        <summary>
-          <span>Narzędzia systemowe</span>
-          <span class="chev" aria-hidden="true"></span>
-        </summary>
-        <div class="panel grid-2">
-          <button class="tonal" id="reportPdf" type="button" style="width:100%;">Generuj PDF</button>
-          <button class="tonal" id="backupJson" type="button" style="width:100%;">Pobierz kopię</button>
-
-          <input id="restoreJson" type="file" accept="application/json" style="display:none" />
-          <button class="tonal" id="restoreBtn" type="button" style="width:100%;">Wczytaj dane</button>
-
-          <button class="error-tonal" id="clearMonth" type="button" style="width:100%;">Wyczyść miesiąc</button>
-        </div>
-      </details>
-    </div>
   </div>
 
   <div class="fab-container">
@@ -996,9 +1170,89 @@
     </button>
   </div>
 
+
+  <dialog id="mainMenuDialog">
+    <div class="drag-handle"></div>
+    <div class="modalHead">
+      <div class="modalHeadInner">
+        <h3>Menu</h3>
+        <div class="muted">Ustawienia i narzędzia przeniesione z głównego ekranu.</div>
+      </div>
+    </div>
+
+    <div style="padding:0 0 20px;">
+      <button class="menu-item" id="openEmployerSettings" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4Zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Z"/></svg>
+        <span>Ustawienia pracodawcy<span class="desc">Stawka godzinowa i limit urlopu</span></span>
+      </button>
+      <button class="menu-item" id="openSystemTools" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3l4.1 4.1-2.9 2.9L1.7 4.6C.6 7 .9 10 3 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.4-.4.4-1 0-1.4Z"/></svg>
+        <span>Narzędzia systemowe<span class="desc">PDF, kopia zapasowa i czyszczenie miesiąca</span></span>
+      </button>
+    </div>
+  </dialog>
+
+  <dialog id="settingsDialog">
+    <div class="drag-handle"></div>
+    <div class="modalHead">
+      <div class="modalHeadInner">
+        <h3>Ustawienia pracodawcy</h3>
+        <div class="muted">Dane używane do obliczania wypłaty i urlopu.</div>
+      </div>
+    </div>
+
+    <div class="modalBody">
+      <div style="margin-bottom:16px;">
+        <label>Stawka godzinowa (PLN)</label>
+        <input id="rate" type="number" step="0.01" min="0" placeholder="Wpisz stawkę" />
+      </div>
+
+      <div>
+        <label>Limit urlopu płatnego (dni / rok)</label>
+        <input id="leaveQuota" type="number" step="1" min="0" placeholder="np. 26" />
+        <div class="muted" id="leaveCounter" style="margin-top:8px;">—</div>
+      </div>
+
+      <div class="actionRow">
+        <button class="tonal" id="settingsClose" type="button">Zamknij</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="toolsDialog">
+    <div class="drag-handle"></div>
+    <div class="modalHead">
+      <div class="modalHeadInner">
+        <h3>Narzędzia systemowe</h3>
+        <div class="muted">Raporty, kopie zapasowe i operacje na danych.</div>
+      </div>
+    </div>
+
+    <div class="modalBody">
+      <div class="toolGrid">
+        <button class="tonal" id="reportPdf" type="button">Generuj PDF</button>
+        <button class="tonal" id="backupJson" type="button">Pobierz kopię</button>
+
+        <input id="restoreJson" type="file" accept="application/json" style="display:none" />
+        <button class="tonal" id="restoreBtn" type="button">Wczytaj dane</button>
+
+        <button class="error-tonal" id="clearMonth" type="button">Wyczyść miesiąc</button>
+      </div>
+
+      <div class="actionRow">
+        <button class="tonal" id="toolsClose" type="button">Zamknij</button>
+      </div>
+    </div>
+  </dialog>
+
+
   <dialog id="fabMenuDialog">
     <div class="drag-handle"></div>
     <div style="padding-bottom:20px;">
+      <button class="menu-item" id="openTodayDialog" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V9h14v10Zm-7-2.5c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3ZM19 7H5V5h14v2Z"/></svg>
+        <span>Dodaj godziny z dziś<span class="desc">Otwórz dzisiejszy dzień</span></span>
+      </button>
       <button class="menu-item" id="openBulkDialog" type="button">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V9h14v10Zm0-12H5V5h14v2ZM7 11h5v5H7v-5Z"/></svg>
         <span>Dodaj wiele godzin<span class="desc">Ten sam zakres dla kilku dni</span></span>
@@ -1699,6 +1953,9 @@
     document.body.classList.add("modal-open");
   }
 
+  window.openWorkDay = openDay;
+  window.workTodayISO = todayISO;
+
   function closeDay() {
     dlgDate = null;
     if (dlg && typeof dlg.close === "function") dlg.close();
@@ -2371,31 +2628,44 @@
     if (el) el.textContent = "BŁĄD INIT: " + msg;
   }
 })();
-</script><script>
+</script>
+<script>
 (() => {
   const $ = (id) => document.getElementById(id);
-  const mainFab = $("mainFab");
-  const fabMenu = $("fabMenuDialog");
-  const openBulk = $("openBulkDialog");
-  const openVac = $("openVacDialog");
 
+  function openDialog(dlg){
+    if (!dlg) return;
+    if (typeof dlg.showModal === "function") dlg.showModal();
+    else dlg.setAttribute("open", "");
+  }
   function closeDialog(dlg){
     if (!dlg) return;
     if (typeof dlg.close === "function" && dlg.open) dlg.close();
     else dlg.removeAttribute("open");
   }
 
+  const mainFab = $("mainFab");
+  const fabMenu = $("fabMenuDialog");
+  const openBulk = $("openBulkDialog");
+  const openVac = $("openVacDialog");
+  const openToday = $("openTodayDialog");
+
   if (mainFab && fabMenu) {
-    mainFab.addEventListener("click", () => {
-      if (typeof fabMenu.showModal === "function") fabMenu.showModal();
-      else fabMenu.setAttribute("open", "");
-    });
+    mainFab.addEventListener("click", () => openDialog(fabMenu));
     fabMenu.addEventListener("click", (e) => {
       if (e.target === fabMenu) closeDialog(fabMenu);
     });
-    fabMenu.addEventListener("cancel", () => {
-      document.body.classList.remove("modal-open");
-    });
+  }
+
+  if (openToday) {
+    openToday.addEventListener("click", () => {
+      closeDialog(fabMenu);
+      setTimeout(() => {
+        if (window.openWorkDay && window.workTodayISO) {
+          window.openWorkDay(window.workTodayISO());
+        }
+      }, 120);
+    }, { capture:true });
   }
 
   [openBulk, openVac].forEach((btn) => {
@@ -2403,45 +2673,79 @@
     btn.addEventListener("click", () => closeDialog(fabMenu), { capture:true });
   });
 
-  ["vacDialog","bulkDialog","dayDialog"].forEach((id) => {
+  const menuBtn = $("mainMenuBtn");
+  const mainMenu = $("mainMenuDialog");
+  const settingsDialog = $("settingsDialog");
+  const toolsDialog = $("toolsDialog");
+
+  if (menuBtn && mainMenu) menuBtn.addEventListener("click", () => openDialog(mainMenu));
+
+  $("openEmployerSettings")?.addEventListener("click", () => {
+    closeDialog(mainMenu);
+    setTimeout(() => openDialog(settingsDialog), 120);
+  });
+
+  $("openSystemTools")?.addEventListener("click", () => {
+    closeDialog(mainMenu);
+    setTimeout(() => openDialog(toolsDialog), 120);
+  });
+
+  $("settingsClose")?.addEventListener("click", () => closeDialog(settingsDialog));
+  $("toolsClose")?.addEventListener("click", () => closeDialog(toolsDialog));
+
+  ["fabMenuDialog","mainMenuDialog","settingsDialog","toolsDialog","vacDialog","bulkDialog","dayDialog"].forEach((id) => {
     const dlg = $(id);
     if (!dlg) return;
     dlg.addEventListener("click", (e) => {
-      if (e.target === dlg) {
-        if (id === "dayDialog") $("dlgBack")?.click();
-        if (id === "vacDialog") $("vacBack")?.click();
-        if (id === "bulkDialog") $("bulkBack")?.click();
-      }
+      if (e.target !== dlg) return;
+      if (id === "dayDialog") $("dlgBack")?.click();
+      else if (id === "vacDialog") $("vacBack")?.click();
+      else if (id === "bulkDialog") $("bulkBack")?.click();
+      else closeDialog(dlg);
     });
   });
 })();
 </script>
+
+
 
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
-  const mainFab = $("mainFab");
-  const fabMenu = $("fabMenuDialog");
-  const openBulk = $("openBulkDialog");
-  const openVac = $("openVacDialog");
 
+  function openDialog(dlg){
+    if (!dlg) return;
+    if (typeof dlg.showModal === "function") dlg.showModal();
+    else dlg.setAttribute("open", "");
+  }
   function closeDialog(dlg){
     if (!dlg) return;
     if (typeof dlg.close === "function" && dlg.open) dlg.close();
     else dlg.removeAttribute("open");
   }
 
+  const mainFab = $("mainFab");
+  const fabMenu = $("fabMenuDialog");
+  const openBulk = $("openBulkDialog");
+  const openVac = $("openVacDialog");
+  const openToday = $("openTodayDialog");
+
   if (mainFab && fabMenu) {
-    mainFab.addEventListener("click", () => {
-      if (typeof fabMenu.showModal === "function") fabMenu.showModal();
-      else fabMenu.setAttribute("open", "");
-    });
+    mainFab.addEventListener("click", () => openDialog(fabMenu));
     fabMenu.addEventListener("click", (e) => {
       if (e.target === fabMenu) closeDialog(fabMenu);
     });
-    fabMenu.addEventListener("cancel", () => {
-      document.body.classList.remove("modal-open");
-    });
+  }
+
+  if (openToday) {
+    openToday.addEventListener("click", () => {
+      closeDialog(fabMenu);
+      setTimeout(() => {
+        if (window.openWorkDay && window.workTodayISO) {
+          window.openWorkDay(window.workTodayISO());
+        }
+      }, 120);
+    }, { capture:true });
   }
 
   [openBulk, openVac].forEach((btn) => {
@@ -2449,19 +2753,40 @@
     btn.addEventListener("click", () => closeDialog(fabMenu), { capture:true });
   });
 
-  ["vacDialog","bulkDialog","dayDialog"].forEach((id) => {
+  const menuBtn = $("mainMenuBtn");
+  const mainMenu = $("mainMenuDialog");
+  const settingsDialog = $("settingsDialog");
+  const toolsDialog = $("toolsDialog");
+
+  if (menuBtn && mainMenu) menuBtn.addEventListener("click", () => openDialog(mainMenu));
+
+  $("openEmployerSettings")?.addEventListener("click", () => {
+    closeDialog(mainMenu);
+    setTimeout(() => openDialog(settingsDialog), 120);
+  });
+
+  $("openSystemTools")?.addEventListener("click", () => {
+    closeDialog(mainMenu);
+    setTimeout(() => openDialog(toolsDialog), 120);
+  });
+
+  $("settingsClose")?.addEventListener("click", () => closeDialog(settingsDialog));
+  $("toolsClose")?.addEventListener("click", () => closeDialog(toolsDialog));
+
+  ["fabMenuDialog","mainMenuDialog","settingsDialog","toolsDialog","vacDialog","bulkDialog","dayDialog"].forEach((id) => {
     const dlg = $(id);
     if (!dlg) return;
     dlg.addEventListener("click", (e) => {
-      if (e.target === dlg) {
-        if (id === "dayDialog") $("dlgBack")?.click();
-        if (id === "vacDialog") $("vacBack")?.click();
-        if (id === "bulkDialog") $("bulkBack")?.click();
-      }
+      if (e.target !== dlg) return;
+      if (id === "dayDialog") $("dlgBack")?.click();
+      else if (id === "vacDialog") $("vacBack")?.click();
+      else if (id === "bulkDialog") $("bulkBack")?.click();
+      else closeDialog(dlg);
     });
   });
 })();
 </script>
+
 
 </body>
 </html>
