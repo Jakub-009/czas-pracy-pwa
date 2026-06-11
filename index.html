@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 3.2</title>
+  <title>Czas pracy 3.0</title>
   <meta name="theme-color" content="#f8fafd" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -1404,6 +1404,135 @@ dialog#dayDialog{
 
   textarea{
     min-height:52px !important;
+  }
+}
+
+  
+/* ===== Czas pracy 3.3: dłuższe dni + drobniejsze numery i pastylki jak Google ===== */
+:root{
+  --day-height:clamp(82px, 12.6dvh, 112px);
+  --day-num-size:clamp(13px, 3.65vw, 17px);
+  --day-num-box:clamp(22px, 6.4vw, 28px);
+  --pill-size:clamp(8px, 2.25vw, 10px);
+  --pill-height:clamp(14px, 3.65vw, 18px);
+}
+
+.dayCell,.blankCell{
+  min-height:var(--day-height) !important;
+}
+
+.dayNum{
+  width:var(--day-num-box) !important;
+  height:var(--day-num-box) !important;
+  font-size:var(--day-num-size) !important;
+  font-weight:700 !important;
+}
+
+.dayCell.today .dayNum{
+  background:#4285f4 !important;
+  color:#fff !important;
+}
+
+.dayTop{
+  padding-bottom:5px !important;
+}
+
+.pillStack{
+  gap:2px !important;
+  padding:0 2px !important;
+}
+
+.pill{
+  height:var(--pill-height) !important;
+  font-size:var(--pill-size) !important;
+  font-weight:600 !important;
+  line-height:1 !important;
+  border-radius:5px !important;
+  padding:0 4px !important;
+  justify-content:flex-start !important;
+  text-align:left !important;
+  letter-spacing:-.025em !important;
+  box-shadow:none !important;
+}
+
+.pill.work{
+  background:#d7f2dd !important;
+  color:#137333 !important;
+}
+
+.pill.vac{
+  background:#d3e3fd !important;
+  color:#1a73e8 !important;
+}
+
+.pill.sick{
+  background:#fce8e6 !important;
+  color:#d93025 !important;
+}
+
+.pill.unpaid{
+  background:#eef0f4 !important;
+  color:#3c4043 !important;
+}
+
+.pill.more{
+  background:transparent !important;
+  color:#5f6368 !important;
+  justify-content:center !important;
+}
+
+/* S23 / mniejsze ekrany: dni trochę dłuższe, ale cyfry i wpisy mniejsze */
+@media(max-width:430px){
+  :root{
+    --day-height:clamp(86px, 11.55dvh, 102px);
+    --day-num-size:clamp(13px, 3.8vw, 16px);
+    --day-num-box:clamp(22px, 6.2vw, 27px);
+    --pill-size:clamp(7.6px, 2.18vw, 9.2px);
+    --pill-height:clamp(13px, 3.55vw, 16px);
+  }
+
+  #calGrid,#calGridGhost{
+    gap:4px !important;
+  }
+
+  .dayCell,.blankCell{
+    border-radius:8px !important;
+    padding-top:5px !important;
+  }
+
+  .dayTop{
+    padding-bottom:5px !important;
+  }
+
+  .pill{
+    padding:0 3px !important;
+    border-radius:5px !important;
+  }
+}
+
+/* Bardzo niskie ekrany: nadal kompaktowo, ale bez przesadnego ściskania */
+@media(max-height:820px) and (max-width:430px){
+  :root{
+    --day-height:clamp(82px, 11.05dvh, 96px);
+    --day-num-size:clamp(12.5px, 3.6vw, 15px);
+    --day-num-box:clamp(21px, 5.9vw, 26px);
+    --pill-size:clamp(7.2px, 2.05vw, 8.8px);
+    --pill-height:clamp(12px, 3.35vw, 15px);
+  }
+
+  .calDow{
+    font-size:12px !important;
+    padding:4px 0 5px !important;
+  }
+}
+
+@media(max-height:740px) and (max-width:430px){
+  :root{
+    --day-height:76px;
+    --day-num-size:12px;
+    --day-num-box:21px;
+    --pill-size:7px;
+    --pill-height:12px;
   }
 }
 
