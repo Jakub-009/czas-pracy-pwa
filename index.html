@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 3.5</title>
+  <title>Czas pracy 3.5.1</title>
   <meta name="theme-color" content="#f8fafd" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2111,6 +2111,155 @@ dialog[open]{
   }
 }
 
+  
+/* ===== Czas pracy 3.6: poprawki 3.5 — ghost swipe, urlopy jako wydarzenia, handle jak Google ===== */
+
+/* Stabilizacja ghost layer podczas przesuwania miesiąca */
+#calSwipeArea.is-swiping #calGrid,
+#calSwipeArea.is-swiping #calGridGhost{
+  gap:4px !important;
+}
+#calSwipeArea.is-swiping .dayCell,
+#calSwipeArea.is-swiping .blankCell,
+#calLayerCurrent .dayCell,
+#calLayerGhost .dayCell,
+#calLayerCurrent .blankCell,
+#calLayerGhost .blankCell{
+  min-height:var(--day-height) !important;
+  height:var(--day-height) !important;
+  max-height:var(--day-height) !important;
+}
+#calSwipeArea.is-swiping .dayNum,
+#calLayerCurrent .dayNum,
+#calLayerGhost .dayNum{
+  width:var(--day-num-box) !important;
+  min-width:var(--day-num-box) !important;
+  height:var(--day-num-box) !important;
+  max-height:var(--day-num-box) !important;
+  font-size:var(--day-num-size) !important;
+}
+#calSwipeArea.is-swiping .dayCell.today .dayNum,
+#calLayerCurrent .dayCell.today .dayNum,
+#calLayerGhost .dayCell.today .dayNum{
+  width:auto !important;
+  min-width:var(--today-badge-w) !important;
+  height:var(--today-badge-h) !important;
+  max-height:var(--today-badge-h) !important;
+}
+#calSwipeArea.is-swiping .pill,
+#calLayerCurrent .pill,
+#calLayerGhost .pill{
+  height:var(--pill-height) !important;
+  min-height:var(--pill-height) !important;
+  max-height:var(--pill-height) !important;
+  font-size:var(--pill-size) !important;
+  line-height:1 !important;
+}
+
+/* Wyrazistsze kolory wydarzeń */
+.pill.work{
+  background:#34a853 !important;
+  color:#fff !important;
+}
+.pill.vac{
+  background:#8ab4f8 !important;
+  color:#202124 !important;
+}
+.pill.unpaid{
+  background:#fbbc04 !important;
+  color:#202124 !important;
+}
+.pill.sick{
+  background:#ea4335 !important;
+  color:#fff !important;
+}
+
+/* Urlopy w modalu dnia jako wydarzenia całego dnia */
+.shiftItem.googleEvent.workEvent{
+  background:#eaf6ee !important;
+}
+.shiftItem.googleEvent.workEvent .eventStripe{
+  background:#34a853 !important;
+}
+.shiftItem.googleEvent.leaveEvent{
+  min-height:50px !important;
+}
+.shiftItem.googleEvent.leaveEvent.vac{
+  background:#e8f0fe !important;
+}
+.shiftItem.googleEvent.leaveEvent.vac .eventStripe{
+  background:#8ab4f8 !important;
+}
+.shiftItem.googleEvent.leaveEvent.unpaid{
+  background:#fff4ce !important;
+}
+.shiftItem.googleEvent.leaveEvent.unpaid .eventStripe{
+  background:#fbbc04 !important;
+}
+.shiftItem.googleEvent.leaveEvent.sick{
+  background:#fce8e6 !important;
+}
+.shiftItem.googleEvent.leaveEvent.sick .eventStripe{
+  background:#ea4335 !important;
+}
+.shiftItem.googleEvent.leaveEvent .times{
+  color:#202124 !important;
+}
+.shiftItem.googleEvent.leaveEvent.sick .times{
+  color:#202124 !important;
+}
+
+/* Górny uchwyt modala: subtelna strzałka w dół zamiast paska */
+.drag-handle{
+  width:44px !important;
+  height:26px !important;
+  margin:8px auto 6px !important;
+  background:transparent !important;
+  border-radius:999px !important;
+  display:grid !important;
+  place-items:center !important;
+  cursor:grab !important;
+  touch-action:none !important;
+}
+.drag-handle:active{
+  cursor:grabbing !important;
+}
+.drag-handle::before{
+  content:"" !important;
+  width:12px !important;
+  height:12px !important;
+  border-right:2px solid #9aa0a6 !important;
+  border-bottom:2px solid #9aa0a6 !important;
+  transform:rotate(45deg) translateY(-2px) !important;
+  border-radius:1px !important;
+}
+.drag-handle::after{
+  content:none !important;
+}
+
+/* Trochę ciaśniej po zmianie handle */
+#dayDialog .drag-handle{
+  margin-top:6px !important;
+  margin-bottom:4px !important;
+}
+#dayDialog .modalHead{
+  padding-top:0 !important;
+}
+
+/* Na małych telefonach też bez skakania przy ghost */
+@media(max-width:430px){
+  #calSwipeArea.is-swiping #calGrid,
+  #calSwipeArea.is-swiping #calGridGhost{
+    gap:4px !important;
+  }
+  #calSwipeArea.is-swiping .pill,
+  #calLayerCurrent .pill,
+  #calLayerGhost .pill{
+    border-radius:3px !important;
+    padding:0 3px !important;
+  }
+}
+
   </style>
 
 </head>
@@ -2766,8 +2915,8 @@ dialog[open]{
 
   function leaveLabel(t) {
     if (t === "paid") return "Urlop płatny";
-    if (t === "unpaid") return "Urlop b/z";
-    if (t === "sick") return "L4";
+    if (t === "unpaid") return "Urlop bezpłatny";
+    if (t === "sick") return "Zwolnienie L4";
     return "";
   }
   function leavePillClass(t) {
@@ -2974,6 +3123,8 @@ dialog[open]{
 
     const day = getDay(dateISO) || { date: dateISO, note: "", shifts: [], vacation: false, leaveType:"" };
     const hasShifts = (day.shifts || []).length > 0;
+    const hasLeaveEvent = !!(day.leaveType || day.vacation);
+    const hasAnyEvent = hasShifts || hasLeaveEvent;
 
     if ($("dlgTitle")) $("dlgTitle").textContent = fmtDateLongPL(dateISO);
     if ($("dlgMeta")) $("dlgMeta").textContent = capFirst(fmtWeekdayLongPL(dateISO));
@@ -2983,9 +3134,9 @@ dialog[open]{
     if ($("dlgNote")) $("dlgNote").value = day.note || "";
 
     if (dlg) {
-      dlg.classList.toggle("is-form-open", !hasShifts);
-      dlg.classList.toggle("is-preview-only", hasShifts);
-      dlg.classList.toggle("is-empty-day", !hasShifts);
+      dlg.classList.toggle("is-form-open", !hasAnyEvent);
+      dlg.classList.toggle("is-preview-only", hasAnyEvent);
+      dlg.classList.toggle("is-empty-day", !hasAnyEvent);
     }
 
     renderDayDialog();
@@ -3043,13 +3194,24 @@ dialog[open]{
 
     day.shifts.sort((a, b) => (a.start || "").localeCompare(b.start || ""));
 
-    const items = (day.shifts || []).map((s, idx) => {
+    const leaveType = day.leaveType || (day.vacation ? "paid" : "");
+    const leaveEvent = leaveType ? `
+      <div class="shiftItem googleEvent leaveEvent ${leavePillClass(leaveType)}">
+        <div class="eventStripe" aria-hidden="true"></div>
+        <div class="eventContent">
+          <div class="times">${leaveLabel(leaveType)}</div>
+          <div class="mins">Wydarzenie całego dnia</div>
+        </div>
+      </div>
+    ` : "";
+
+    const shiftEvents = (day.shifts || []).map((s, idx) => {
       const a = s.start || "—";
       const b = s.end || "—";
       const m = (s.start && s.end) ? Math.max(0, minutesBetween(day.date, s.start, s.end)) : 0;
 
       return `
-        <div class="shiftItem googleEvent">
+        <div class="shiftItem googleEvent workEvent">
           <div class="eventStripe" aria-hidden="true"></div>
           <div class="eventContent">
             <div class="times">${a} – ${b}</div>
@@ -3060,7 +3222,9 @@ dialog[open]{
       `;
     }).join("");
 
-    if (shiftsTitle) shiftsTitle.textContent = "Godziny pracy";
+    const items = leaveEvent + shiftEvents;
+
+    if (shiftsTitle) shiftsTitle.textContent = items ? "Wydarzenia dnia" : "Godziny pracy";
     if (shiftsBox) shiftsBox.innerHTML = items || `<div class="emptyDayHint">Brak godzin w tym dniu. Dodaj pierwszy zakres poniżej.</div>`;
 
     shiftsBox?.querySelectorAll("[data-delshift]").forEach(btn => {
@@ -3074,7 +3238,7 @@ dialog[open]{
         renderAll();
         renderDayDialog();
 
-        if (dlg && d.shifts.length === 0) {
+        if (dlg && d.shifts.length === 0 && !(d.leaveType || d.vacation)) {
           dlg.classList.add("is-form-open", "is-empty-day");
           dlg.classList.remove("is-preview-only");
         }
@@ -3783,6 +3947,66 @@ dialog[open]{
       else closeDialog(dlg);
     });
   });
+
+  function enableSwipeDownToClose(dlg){
+    if (!dlg) return;
+    const handle = dlg.querySelector(".drag-handle");
+    if (!handle) return;
+
+    let startY = 0;
+    let currentY = 0;
+    let dragging = false;
+
+    const reset = () => {
+      dragging = false;
+      dlg.style.transform = "";
+      dlg.style.transition = "";
+    };
+
+    handle.addEventListener("pointerdown", (e) => {
+      if (!dlg.open) return;
+      dragging = true;
+      startY = e.clientY;
+      currentY = startY;
+      dlg.style.transition = "none";
+      handle.setPointerCapture?.(e.pointerId);
+    });
+
+    handle.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      currentY = e.clientY;
+      const dy = Math.max(0, currentY - startY);
+      dlg.style.transform = `translateY(${dy}px)`;
+    });
+
+    handle.addEventListener("pointerup", (e) => {
+      if (!dragging) return;
+      const dy = Math.max(0, currentY - startY);
+      handle.releasePointerCapture?.(e.pointerId);
+      if (dy > 90) {
+        dlg.style.transition = "transform .18s cubic-bezier(.2,0,0,1), opacity .18s cubic-bezier(.2,0,0,1)";
+        dlg.style.transform = "translateY(110%)";
+        dlg.style.opacity = "0";
+        setTimeout(() => {
+          dlg.style.opacity = "";
+          closeDialog(dlg);
+          if (dlg.id === "dayDialog") document.body.classList.remove("modal-open");
+          reset();
+        }, 170);
+      } else {
+        dlg.style.transition = "transform .18s cubic-bezier(.2,0,0,1)";
+        dlg.style.transform = "translateY(0)";
+        setTimeout(reset, 180);
+      }
+    });
+
+    handle.addEventListener("pointercancel", reset);
+  }
+
+  ["dayDialog","vacDialog","bulkDialog","fabMenuDialog","mainMenuDialog","settingsDialog","toolsDialog"].forEach((id) => {
+    enableSwipeDownToClose($(id));
+  });
+
 })();
 </script>
 
