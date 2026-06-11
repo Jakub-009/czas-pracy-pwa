@@ -4,547 +4,750 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Czas pracy</title>
-  <meta name="theme-color" content="#f7f9fc" />
+  <meta name="theme-color" content="#f6f7fb" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
   <style>
-    *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+    *{box-sizing:border-box}
 
     :root{
-      font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
 
-      /* Material Design 3 Design Tokens */
-      --md-sys-color-background: #f7f9fc;
-      --md-sys-color-surface: #f7f9fc;
-      --md-sys-color-surface-container-lowest: #ffffff;
-      --md-sys-color-surface-container-low: #f3f4f8;
-      --md-sys-color-surface-container: #edeef4;
-      --md-sys-color-surface-container-high: #e7e8ee;
-      --md-sys-color-surface-container-highest: #e1e2e8;
-      
-      --md-sys-color-on-surface: #1a1b1f;
-      --md-sys-color-on-surface-variant: #44474e;
-      --md-sys-color-outline: #74777f;
-      --md-sys-color-outline-variant: #c4c6d0;
+      --bg:#f6f7fb;
+      --surface:#ffffff;
+      --surface-soft:rgba(255,255,255,.7);
+      --outline-soft:rgba(17,17,17,.08);
 
-      --md-sys-color-primary: #0a56d0;
-      --md-sys-color-on-primary: #ffffff;
-      --md-sys-color-primary-container: #d3e3fd;
-      --md-sys-color-on-primary-container: #041e49;
+      --primary:#50827C;
+      --primary-soft:rgba(80,130,124,.12);
 
-      --md-sys-color-error: #ba1a1a;
-      --md-sys-color-error-container: #ffdad6;
-      --md-sys-color-on-error-container: #410002;
+      --danger:#d92d20;
+      --danger-soft:rgba(217,45,32,.12);
 
-      /* Kalendarz specyficzne */
-      --bar-work: #146c2e;
-      --bar-work-soft: #c4eed0;
-      --bar-vac: #0a56d0;
-      --bar-vac-soft: #d3e3fd;
+      --sat:rgba(60,64,67,.65);
+      --sun:#d93025;
+      --holiday:#d93025;
 
-      --radius-pill: 9999px;
-      --radius-sheet: 28px;
-      --radius-card: 24px;
-      
-      --shadow-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
-      --shadow-2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
-      --shadow-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
-      --shadow-5: 0px 8px 12px 6px rgba(0, 0, 0, 0.15), 0px 4px 4px 0px rgba(0, 0, 0, 0.3);
+      --bar-work:#1e8e3e;
+      --bar-note:#f9ab00;
+      --bar-vac:#1a73e8;
+
+      /* tła modali */
+      --vac-bg:rgba(26,115,232,.12);
+      --bulk-bg:rgba(80,130,124,.14);
+
+      --radius-lg:20px;
+      --radius-md:16px;
+      --radius-sm:12px;
+
+      /* kontrola marginesów “jak Google” */
+      --wrapPad:18px;
+      --calEdgePad:2px; /* minimalny oddech kalendarza przy krawędzi */
     }
 
     html,body{ width:100%; overflow-x:hidden; }
-    body{ 
-      margin:0; 
-      background: var(--md-sys-color-background); 
-      color: var(--md-sys-color-on-surface); 
-      padding-bottom: 96px; /* Miejsce na FAB */
-    }
+    body{ margin:0; background:var(--bg); color:#111; }
 
     .wrap{
-      max-width: 840px;
-      margin: 0 auto;
-      padding: 16px 16px;
+      max-width:980px;
+      margin:18px auto;
+      padding:0 var(--wrapPad) 90px;
     }
 
-    /* Google Top App Bar */
-    .appHeader{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 64px;
-      padding: 0 4px 16px;
+    .section{
+      border-bottom:1px solid var(--outline-soft);
+      padding-bottom:14px;
+      margin-bottom:14px;
     }
-    .appHeader h1{ 
-      font-size: 22px; 
-      font-weight: 400; 
-      margin:0; 
-      color: var(--md-sys-color-on-surface); 
-    }
+    .section:last-of-type{ border-bottom:none; padding-bottom:0; margin-bottom:0; }
 
-    /* Karty Surface */
-    .card {
-      background: var(--md-sys-color-surface-container-lowest);
-      border-radius: var(--radius-card);
-      padding: 16px;
-      margin-bottom: 16px;
-      border: 1px solid var(--md-sys-color-outline-variant);
-    }
-    
-    .calCard {
-      padding: 16px 8px;
-    }
+    .appHeader{ text-align:center; margin:14px 0 8px; }
+    .appHeader h1{ font-size:22px; font-weight:800; margin:0; }
+    .appHeader .emoji{ margin-left:6px; opacity:.75; }
 
     label{
       display:block;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--md-sys-color-on-surface-variant);
-      margin-bottom: 4px;
+      font-size:12px;
+      color:rgba(17,17,17,.65);
+      margin-bottom:6px;
     }
-    .muted{ font-size: 13px; color: var(--md-sys-color-on-surface-variant); }
+    .muted{ font-size:12.5px; color:rgba(17,17,17,.6); }
 
-    /* Inputs: MD3 Filled Style */
-    input, textarea, select {
-      width: 100%;
-      padding: 16px 16px 12px;
-      background: var(--md-sys-color-surface-container-highest);
-      border: none;
-      border-bottom: 1px solid var(--md-sys-color-outline);
-      border-radius: 4px 4px 0 0;
-      font-size: 16px;
-      color: var(--md-sys-color-on-surface);
-      font-family: inherit;
-      transition: background 0.2s, border-color 0.2s;
-    }
-    textarea { min-height: 80px; resize: vertical; }
-    input:hover, textarea:hover, select:hover { background: #d7d8de; }
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-bottom: 2px solid var(--md-sys-color-primary);
-      padding-bottom: 11px;
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
     }
 
-    /* Przyciski standardowe */
-    button {
-      height: 40px;
-      padding: 0 24px;
-      border-radius: var(--radius-pill);
-      border: none;
-      font-size: 14px;
-      font-weight: 500;
-      font-family: inherit;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    button.filled {
-      background: var(--md-sys-color-primary);
-      color: var(--md-sys-color-on-primary);
-    }
-    button.filled:hover { box-shadow: var(--shadow-1); }
-    
-    button.tonal {
-      background: var(--md-sys-color-primary-container);
-      color: var(--md-sys-color-on-primary-container);
-    }
-    button.tonal:hover { background: #bcdcff; }
-    
-    button.error-tonal {
-      background: var(--md-sys-color-error-container);
-      color: var(--md-sys-color-on-error-container);
-    }
-    
-    button.text {
-      background: transparent;
-      color: var(--md-sys-color-primary);
-      padding: 0 12px;
+    .twoCols{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
     }
 
-    /* Wiersze i siatki */
-    .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    input,textarea,select{
+      width:100%;
+      padding:12px 14px;
+      border-radius:var(--radius-lg);
+      border:1px solid var(--outline-soft);
+      background:var(--surface-soft);
+      font-size:14px;
+      transition:border-color .15s ease, box-shadow .15s ease;
+    }
+    textarea{ min-height:44px; resize:vertical; }
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px var(--primary-soft);
+    }
 
-    /* Rozwijane panele */
+    button{
+      padding:12px 16px;
+      border-radius:var(--radius-lg);
+      border:none;
+      font-size:13px;
+      font-weight:500;
+      background:var(--primary);
+      color:#fff;
+      cursor:pointer;
+      transition:filter .15s ease, transform .08s ease;
+    }
+    button.secondary{ background:var(--primary-soft); color:#0f2f2b; }
+    button.danger{ background:var(--danger-soft); color:#7a1410; }
+    button:active{ transform:scale(.98); }
+    button:disabled{ opacity:.5; cursor:not-allowed; }
+
     .chev{
-      width:24px; height:24px;
-      display:inline-flex; align-items:center; justify-content:center;
-      transition:transform .2s ease;
+      width:18px; height:18px;
+      display:inline-flex;
+      align-items:center; justify-content:center;
+      opacity:.6;
+      transition:transform .18s ease;
     }
     .chev::before{
-      content:""; width:10px; height:10px;
-      border-right: 2px solid var(--md-sys-color-on-surface-variant);
-      border-bottom: 2px solid var(--md-sys-color-on-surface-variant);
+      content:"";
+      width:8px; height:8px;
+      border-right:2px solid #111;
+      border-bottom:2px solid #111;
       transform:rotate(45deg);
     }
-    details[open] .chev{ transform:rotate(180deg) translateY(-2px); }
+    details[open] .chev{ transform:rotate(180deg); }
     details summary{
-      cursor:pointer; font-weight:500; font-size: 16px;
-      display:flex; justify-content:space-between; align-items:center;
-      list-style:none; padding: 12px 0;
+      cursor:pointer;
+      font-weight:600;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      list-style:none;
+      padding:10px 0;
     }
     details summary::-webkit-details-marker{display:none}
-    .panel{ margin-top:8px; animation:panelIn .2s ease; }
-    @keyframes panelIn{ from{opacity:0; transform:translateY(-8px)} to{opacity:1; transform:translateY(0)} }
+    .panel{ margin-top:10px; animation:panelIn .18s ease; }
+    @keyframes panelIn{ from{opacity:.4; transform:translateY(-4px)} to{opacity:1; transform:translateY(0)} }
 
-    /* Nagłówek miesiąca */
-    .monthSelector {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      padding: 0 8px;
+    .topMonthBar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:10px 0 2px;
     }
-    .monthTitle {
-      font-size: 24px;
-      font-weight: 400;
-      color: var(--md-sys-color-on-surface);
-      margin: 0;
-    }
-    .iconCircle {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      display: grid; place-items: center;
-      position: relative; cursor: pointer;
-      background: transparent;
-    }
-    .iconCircle:hover { background: var(--md-sys-color-surface-container-high); }
-    .iconCircle svg { fill: var(--md-sys-color-on-surface-variant); width: 24px; height: 24px; }
-    #monthPick { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .monthTitle{ font-size:18px; font-weight:800; line-height:1.1; }
+    .monthActions{ display:flex; gap:8px; align-items:center; position:relative; }
 
-    /* Statystyki */
-    .statBox {
-      background: var(--md-sys-color-surface-container-low);
-      border-radius: 16px;
-      padding: 16px;
-      display: flex; flex-direction: column;
+    .chip{
+      border:1px solid var(--outline-soft);
+      background:var(--surface-soft);
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:600;
+      font-size:13px;
+      color:#111;
+      cursor:pointer;
     }
-    .statValue {
-      font-size: 24px; font-weight: 400;
-      color: var(--md-sys-color-on-surface);
-      margin-top: 4px;
+    .chip:active{ transform:scale(.98); }
+
+    .iconCircle{
+      width:42px; height:42px;
+      border-radius:999px;
+      border:1px solid var(--outline-soft);
+      background:var(--surface-soft);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      position:relative;
+    }
+    .iconCircle svg{ width:20px; height:20px; opacity:.85; }
+    #monthPick{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      cursor:pointer;
+      appearance:none;
+      -webkit-appearance:none;
     }
 
     /* ===== KALENDARZ ===== */
-    .calGrid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
-    .calDow {
-      text-align:center; font-size:13px; font-weight: 500;
-      color: var(--md-sys-color-on-surface-variant);
-      padding: 8px 0;
+    .calGrid{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:3px;
+    }
+    .calDow{
+      text-align:center;
+      font-size:12px;
+      color:rgba(17,17,17,.55);
+      padding:2px 0;
     }
 
-    .dayCell {
-      border-radius: 12px;
-      background: transparent;
-      padding: 2px 0;
-      cursor: pointer;
-      position: relative;
-      display: flex; flex-direction: column;
-      align-items: stretch;
-      min-height: 80px;
+    .dayCell{
+      border-radius:10px;
+      background:var(--surface-soft);
+      padding:0;
+      gap:5px;
+      cursor:pointer;
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      align-items:stretch;
+      overflow:hidden;
+      aspect-ratio: 1 / 1.55;
+      min-height:0;
     }
-    .dayCell:hover { background: var(--md-sys-color-surface-container); }
-    .blankCell { background: transparent; pointer-events: none; }
-
-    .dayTop {
-      display: flex; justify-content: center; padding-bottom: 4px;
-    }
-    .dayNum {
-      width: 28px; height: 28px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%; font-size: 13px; font-weight: 400;
-      color: var(--md-sys-color-on-surface);
-    }
-    
-    .dayCell.today .dayNum { background: var(--md-sys-color-primary); color: white; font-weight: 500; }
-    
-    .dayNum.saturday { color: var(--md-sys-color-primary); }
-    .dayNum.sunday, .dayNum.holiday { color: var(--md-sys-color-error); }
-
-    .pillStack { display:flex; flex-direction:column; gap:2px; padding: 0 2px; }
-    .pill {
-      height: 16px; border-radius: 4px;
-      font-size: 9px; font-weight: 500;
-      display: flex; align-items: center; justify-content: center;
-      white-space: nowrap; overflow: hidden;
-    }
-    .pill.work { background: var(--bar-work-soft); color: var(--bar-work); }
-    .pill.vac { background: var(--bar-vac-soft); color: var(--bar-vac); }
-    .pill.unpaid { background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface-variant); }
-    .pill.sick { background: var(--md-sys-color-error-container); color: var(--md-sys-color-error); }
-    .pill.more { background: transparent; color: var(--md-sys-color-on-surface-variant); }
-
-    .noteDot {
-      position: absolute; width: 6px; height: 6px;
-      top: 6px; right: 8px; border-radius: 50%;
-      background: var(--bar-note); pointer-events: none;
+    .blankCell{
+      border:none;
+      background:transparent;
+      box-shadow:none;
+      pointer-events:none;
     }
 
-    /* ===== FLOATING ACTION BUTTON (FAB) ===== */
-    .fab-container {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 16px;
+    .dayTop{
+      width:100%;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding-top:4px;
     }
-    
-    .fab {
-      width: 56px; height: 56px;
-      border-radius: 16px;
-      background: var(--md-sys-color-primary-container);
-      color: var(--md-sys-color-on-primary-container);
-      display: grid; place-items: center;
-      box-shadow: var(--shadow-3);
-      border: none;
-      cursor: pointer;
-      transition: box-shadow 0.2s, background 0.2s, border-radius 0.2s;
+    .dayNum{
+      font-size:11.5px;
+      font-weight:650;
+      line-height:1;
+      letter-spacing:.2px;
+      color:#111;
     }
-    .fab:hover {
-      box-shadow: var(--shadow-5);
-      background: #bcdcff;
-    }
-    .fab:active { border-radius: 20px; }
-    .fab svg { width: 24px; height: 24px; fill: currentColor; }
+    .dayNum.saturday{ color:var(--sat); font-weight:650; }
+    .dayNum.sunday{ color:var(--sun); }
+    .dayNum.holiday{ color:var(--holiday); }
+    .dayNum.saturday.holiday{ color:var(--holiday); font-weight:650; }
 
-    /* ===== BOTTOM SHEETS (MODALE MD3) ===== */
-    dialog {
-      margin: auto 0 0 0; /* Wyśrodkowanie na dole */
-      width: 100vw;
-      max-width: 100vw;
-      border: none;
-      padding: 0;
-      border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
-      background: var(--md-sys-color-surface-container-lowest);
-      box-shadow: var(--shadow-5);
-      overflow: hidden;
+    .dayCell.today .dayNum{ font-weight:900; }
+    .dayCell.today{ border:1px solid #00000066; }
+
+    .pillStack{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-height:0;
+      flex:1;
     }
-    
-    @media (min-width: 640px) {
-      dialog {
-        margin: auto;
-        max-width: 500px;
-        border-radius: var(--radius-sheet);
-        max-height: 90vh;
+
+    .pill{
+      height:10px;
+      width:100%;
+      font-size:7.5px;
+      font-weight:650;
+      line-height:1;
+      border-radius:2px;
+      display:flex;
+      align-items:center;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      border:none;
+      justify-content:center;
+    }
+    .pill.work{
+      background:rgba(30,142,62,.12);
+      border-color:rgba(30,142,62,.18);
+      color:#0f2f2b;
+    }
+    .pill.vac{
+      background:rgba(26,115,232,.14);
+      border-color:rgba(26,115,232,.20);
+      color:#0b2d64;
+      font-weight:900;
+    }
+    .pill.unpaid{
+      background:rgba(17,17,17,.07);
+      border-color:rgba(17,17,17,.12);
+      color:rgba(17,17,17,.75);
+      font-weight:900;
+    }
+    .pill.sick{
+      background:rgba(217,45,32,.10);
+      border-color:rgba(217,45,32,.18);
+      color:#7a1410;
+      font-weight:900;
+    }
+    .pill.more{
+      background:rgba(17,17,17,.06);
+      border-color:rgba(17,17,17,.10);
+      color:rgba(17,17,17,.72);
+      font-weight:650;
+      justify-content:center;
+      padding:0 10px;
+    }
+
+    .noteDot{
+      position:absolute;
+      width:7px;
+      height:7px;
+      top:5px;
+      right:5px;
+      border-radius:999px;
+      background:var(--bar-note);
+      pointer-events:none;
+    }
+
+    .statBox{
+      background:var(--primary-soft);
+      border-radius:16px;
+      padding:12px 14px;
+    }
+    .statValue{ font-size:22px; font-weight:900; margin-top:4px; }
+
+    /* ===== MODAL DNIA (pełny ekran) ===== */
+    dialog#dayDialog{
+      border:none;
+      padding:0;
+      width:100vw;
+      height:100dvh;
+      max-width:100vw;
+      max-height:100dvh;
+      margin:0;
+      border-radius:0;
+      box-shadow:0 18px 60px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    dialog#dayDialog::backdrop{ background:rgba(17,17,17,.45); }
+
+    /* ===== MODALE (pełna szerokość z minimalnym marginesem) ===== */
+    dialog#vacDialog,
+    dialog#bulkDialog{
+      border:none;
+      padding:0;
+      width:calc(100vw - 16px);
+      max-width:980px;
+      margin:auto;
+      border-radius:22px;
+      box-shadow:0 18px 60px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    dialog#vacDialog::backdrop,
+    dialog#bulkDialog::backdrop{ background:rgba(17,17,17,.45); }
+
+    .modalHead{
+      background:var(--bg);
+      padding:12px;
+      border-bottom:1px solid var(--outline-soft);
+      position:sticky;
+      top:0;
+      z-index:2;
+    }
+    .modalBody{
+      padding:12px;
+      background:var(--bg);
+    }
+
+    #vacDialog .modalBody{ background:var(--vac-bg); }
+    #bulkDialog .modalBody{ background:var(--bulk-bg); }
+
+    .backBtn{
+      width:44px;
+      height:44px;
+      padding:0;
+      border-radius:18px;
+      border:1px solid var(--outline-soft);
+      background:var(--primary);
+      color:#fff;
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      position:absolute;
+      top:10px;
+      right:12px;
+      left:auto;
+    }
+    .backBtn.blue{
+      background:var(--bar-vac);
+      border:1px solid rgba(26,115,232,.18);
+    }
+    .backBtn svg{ width:20px; height:20px; opacity:.92; }
+
+    .modalHeadInner{ padding-right:58px; }
+
+    .modalStats{
+      display:flex;
+      justify-content:space-between;
+      align-items:stretch;
+      gap:12px;
+      margin-bottom:14px;
+      flex-wrap:nowrap;
+    }
+    .statMini{
+      flex:1;
+      min-width:0;
+      background:var(--primary-soft);
+      border-radius:16px;
+      padding:12px 14px;
+    }
+    .statMiniValue{
+      font-size:20px;
+      font-weight:900;
+      margin-top:4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    @media(max-width:380px){ .statMiniValue{ font-size:18px; } }
+
+    .modalStack{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .timeGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    @media(max-width:520px){
+      .timeGrid{ grid-template-columns:1fr 1fr; gap:10px; }
+    }
+    .addBtnCenter{
+      width:min(320px, 100%);
+      margin:4px auto 0;
+      display:block;
+    }
+
+    .shiftList{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-top:10px;
+    }
+    .shiftItem{
+      border:none;
+      background:var(--primary-soft);
+      border-radius:16px;
+      padding:12px 12px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .shiftItem .times{ font-weight:650; font-size:16px; }
+    .shiftItem .mins{
+      font-size:12.5px;
+      color:rgba(17,17,17,.6);
+      margin-top:4px;
+    }
+
+    .delIcon{
+      width:36px;
+      height:36px;
+      border-radius:18px;
+      border:1px solid rgba(217,45,32,.22);
+      background:rgba(217,45,32,.10);
+      cursor:pointer;
+      position:relative;
+      flex:0 0 auto;
+    }
+    .delIcon::before,.delIcon::after{
+      content:"";
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:14px;
+      height:2px;
+      background:#7a1410;
+      border-radius:2px;
+      transform-origin:center;
+    }
+    .delIcon::before{ transform:translate(-50%,-50%) rotate(45deg); }
+    .delIcon::after{ transform:translate(-50%,-50%) rotate(-45deg); }
+
+    body.modal-open{
+      overflow:hidden;
+      height:100vh;
+      touch-action:none;
+    }
+
+    /* Przyciski pod kalendarzem (obok siebie) */
+    .row.calBtns{ flex-wrap:nowrap; }
+    .bulkBtn, .vacBtn{
+      width:auto;
+      flex:1;
+      margin-bottom:20px;
+    }
+    .bulkBtn{
+      background:rgba(80,130,124,.14);
+      color:#0f2f2b;
+      font-weight:500;
+    }
+    .vacBtn{
+      background:rgba(26,115,232,.12);
+      color:#0b2d64;
+      font-weight:500;
+    }
+
+    .rangeRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:nowrap;
+      align-items:flex-end;
+    }
+    .rangeRow > *{ flex:1; min-width:0; }
+    @media(max-width:380px){
+      .rangeRow{ flex-wrap:wrap; }
+      .rangeRow > *{ min-width:160px; }
+    }
+
+    .actionRow{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+    }
+    .actionRow > *{ flex:1; }
+
+    *{-webkit-tap-highlight-color:transparent}
+    :focus{outline:none}
+    :focus-visible{
+      outline:2px solid var(--primary);
+      outline-offset:2px;
+      border-radius:12px;
+    }
+
+    /* ===== FULL-WIDTH jak Google (mobile) + kalendarz jeszcze szerzej ===== */
+    @media (max-width: 640px){
+      :root{
+        --wrapPad:6px;
+        --calEdgePad:2px;
+      }
+
+      .wrap{
+        padding:0 var(--wrapPad) 90px;
+        margin:12px auto;
+      }
+
+      .section.calSection{
+        margin-left:calc(-1 * var(--wrapPad) + var(--calEdgePad));
+        margin-right:calc(-1 * var(--wrapPad) + var(--calEdgePad));
+        padding-left:var(--calEdgePad);
+        padding-right:var(--calEdgePad);
       }
     }
-    
-    dialog::backdrop {
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(2px);
-      animation: fadeIn 0.2s ease-out forwards;
+
+    /* swipe-anim dla kalendarza */
+    #calSwipeArea{
+      touch-action: pan-y;
+      overflow:hidden;
+      position:relative;
+    }
+    .calLayer{ will-change: transform; }
+    .calGhost{
+      position:absolute;
+      left:0; right:0;
+      top:0;
+      pointer-events:none;
+      opacity:1;
+    }
+    .calFading{
+      opacity:.92;
+      transition:opacity 120ms ease;
     }
 
-    /* Animacja wyjazdu od dołu na mobile */
-    @media (max-width: 639px) {
-      dialog[open] {
-        animation: slideUp 0.3s cubic-bezier(0.2, 0, 0, 1) forwards;
+    /* ===== Scroll tylko w dolnej sekcji (lista zakresów) ===== */
+
+    #dayDialog .modalBody{
+      display:flex;
+      flex-direction:column;
+      height:100dvh;
+      overflow:hidden;
+    }
+
+    /* kontener sekcji z godzinami */
+    #dlgShiftsBlock{
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom:0;
+    }
+
+    /* lista zakresów */
+    #dlgShifts{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    /* spacer na dole żeby ostatni zakres był w pełni widoczny */
+    #dlgShiftsBlock::after{
+      content:"";
+      display:block;
+      height: calc(45px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* ===== sticky nagłówek sekcji ===== */
+    #dlgShiftsTitle{
+      position:sticky;
+      top:0;
+      z-index:5;
+
+      display:block;
+      padding:10px 2px 10px;
+      margin:0 0 10px;
+
+      background:var(--bg);
+      border-bottom:1px solid var(--outline-soft);
+    }
+
+    /* opcjonalny blur dla efektu premium */
+    @supports ((backdrop-filter: blur(6px)) or (-webkit-backdrop-filter: blur(6px))){
+      #dlgShiftsTitle{
+        background:rgba(246,247,251,.92);
+        backdrop-filter:blur(8px);
+        -webkit-backdrop-filter:blur(8px);
       }
     }
-    
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .drag-handle {
-      width: 32px;
-      height: 4px;
-      background: var(--md-sys-color-outline-variant);
-      border-radius: 2px;
-      margin: 16px auto;
-    }
-
-    .modalBody { padding: 0 24px 24px; }
-    .modalHeader { margin-bottom: 24px; }
-    .modalHeader h3 { margin: 0; font-size: 24px; font-weight: 400; color: var(--md-sys-color-on-surface); }
-    .modalHeader p { margin: 8px 0 0; font-size: 14px; color: var(--md-sys-color-on-surface-variant); line-height: 1.4; }
-
-    /* Menu kontekstowe (wybór z FAB) */
-    .menu-item {
-      width: 100%;
-      height: 56px;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: transparent;
-      border: none;
-      font-size: 16px;
-      color: var(--md-sys-color-on-surface);
-      cursor: pointer;
-      text-align: left;
-      border-radius: 0;
-    }
-    .menu-item:hover { background: var(--md-sys-color-surface-container-high); }
-    .menu-item svg { fill: var(--md-sys-color-on-surface-variant); width: 24px; height: 24px; }
-
-    /* Lista godzin na widoku dnia */
-    .shiftItem {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--md-sys-color-surface-container-highest);
-    }
-    .shiftItem:last-child { border-bottom: none; }
-    .shiftItem .times { font-size: 16px; color: var(--md-sys-color-on-surface); }
-    .shiftItem .mins { font-size: 14px; color: var(--md-sys-color-on-surface-variant); margin-top: 4px; }
-    
-    .delIcon {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: transparent; border: none; cursor: pointer;
-      display: grid; place-items: center;
-    }
-    .delIcon:hover { background: var(--md-sys-color-error-container); }
-    .delIcon svg { fill: var(--md-sys-color-error); width: 20px; height: 20px; }
-
-    /* Akcje dolne w modalach */
-    .actionRow {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 32px;
-    }
-
-    /* Swipe area */
-    #calSwipeArea { touch-action: pan-y; overflow: hidden; position: relative; }
-    .calLayer { will-change: transform; }
-    .calGhost { position: absolute; left: 0; right: 0; top: 0; pointer-events: none; opacity: 1; }
-    .calFading { opacity: .92; transition: opacity 120ms ease; }
-    
-    /* Zablokowanie body */
-    body.modal-open { overflow: hidden; }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    
     <header class="appHeader">
-      <h1>Czas pracy</h1>
-      <button class="tonal" id="todayBtn" style="height: 32px; padding: 0 16px; font-size: 13px;">Dzisiaj</button>
+      <h1>Czas pracy <span class="emoji">⏱️</span></h1>
     </header>
 
-    <div class="card calCard">
-      <div class="monthSelector">
-        <h2 class="monthTitle" id="monthLabelText">—</h2>
-        <div class="iconCircle" id="monthBar" aria-label="Wybierz miesiąc">
-          <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
-          <input id="monthPick" type="month" aria-label="Wybierz miesiąc" />
+    <div class="section">
+      <div class="topMonthBar">
+        <div class="monthTitle" id="monthLabelText">—</div>
+
+        <div class="monthActions">
+          <button class="chip" id="todayBtn" type="button">Dzisiaj</button>
+
+          <div class="iconCircle" id="monthBar" title="Wybierz miesiąc" aria-label="Wybierz miesiąc">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="currentColor" d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm12 8H5v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10ZM6 6a1 1 0 0 0-1 1v1h14V7a1 1 0 0 0-1-1H6Z"/>
+            </svg>
+            <input id="monthPick" type="month" aria-label="Wybierz miesiąc" />
+          </div>
         </div>
       </div>
 
+      <div class="twoCols" style="margin-top:12px;">
+        <div class="statBox">
+          <div class="muted">Suma godzin w miesiącu</div>
+          <div class="statValue" id="sumHours">0:00</div>
+        </div>
+        <div class="statBox">
+          <div class="muted">Wypłata</div>
+          <div class="statValue" id="sumPay">0,00 zł</div>
+        </div>
+      </div>
+
+      <div class="muted" id="status" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- KALENDARZ -->
+    <div class="section calSection">
       <div id="calSwipeArea">
         <div class="calLayer" id="calLayerCurrent">
-          <div class="calGrid" id="dowRow"></div>
+          <div class="calGrid" id="dowRow" style="margin-bottom:6px;"></div>
           <div class="calGrid" id="calGrid"></div>
         </div>
 
         <div class="calGhost calLayer" id="calLayerGhost" style="display:none;">
-          <div class="calGrid" id="dowRowGhost"></div>
+          <div class="calGrid" id="dowRowGhost" style="margin-bottom:6px;"></div>
           <div class="calGrid" id="calGridGhost"></div>
         </div>
       </div>
-    </div>
 
-    <div class="card">
-      <div class="grid-2">
-        <div class="statBox">
-          <span class="muted">Suma godzin</span>
-          <span class="statValue" id="sumHours">0:00</span>
-        </div>
-        <div class="statBox">
-          <span class="muted">Wypłata</span>
-          <span class="statValue" id="sumPay">0,00 zł</span>
-        </div>
+      <div class="row calBtns" style="margin-top:14px;">
+        <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
+        <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
       </div>
-      <div class="muted" id="status" style="margin-top:16px; text-align: center;"></div>
     </div>
 
-    <div class="card">
-      <details>
+    <div class="section">
+      <details id="extrasPanel">
         <summary>
           <span>Ustawienia pracodawcy</span>
-          <span class="chev"></span>
+          <span class="chev" aria-hidden="true"></span>
         </summary>
         <div class="panel">
-          <div class="row" style="margin-bottom: 16px;">
-            <div style="flex:1;">
+          <div class="row" style="margin-top:12px;">
+            <div style="flex:1; min-width:240px;">
               <label>Stawka godzinowa (PLN)</label>
-              <input id="rate" type="number" step="0.01" min="0" />
+              <input id="rate" type="number" step="0.01" min="0" placeholder="Wpisz stawkę (opcjonalnie)" />
             </div>
           </div>
-          <div class="row">
-            <div style="flex:1;">
+
+          <div class="row" style="margin-top:12px;">
+            <div style="flex:1; min-width:240px;">
               <label>Limit urlopu płatnego (dni / rok)</label>
-              <input id="leaveQuota" type="number" step="1" min="0" />
-              <div class="muted" id="leaveCounter" style="margin-top:8px;">—</div>
+              <input id="leaveQuota" type="number" step="1" min="0" placeholder="np. 26" />
+              <div class="muted" id="leaveCounter" style="margin-top:6px;">—</div>
             </div>
           </div>
         </div>
       </details>
     </div>
 
-    <div class="card">
-      <details>
+    <div class="section">
+      <details id="toolsPanel">
         <summary>
-          <span>Narzędzia systemowe</span>
-          <span class="chev"></span>
+          <span>Narzędzia</span>
+          <span class="chev" aria-hidden="true"></span>
         </summary>
-        <div class="panel grid-2">
-          <button class="tonal" id="reportPdf" style="width: 100%;">Generuj PDF</button>
-          <button class="tonal" id="backupJson" style="width: 100%;">Pobierz kopię</button>
-          <input id="restoreJson" type="file" accept="application/json" style="display:none" />
-          <button class="tonal" id="restoreBtn" style="width: 100%;">Wczytaj dane</button>
-          <button class="error-tonal" id="clearMonth" style="width: 100%;">Wyczyść miesiąc</button>
+        <div class="panel">
+          <div class="row" style="margin-top:12px;">
+            <button class="secondary" id="reportPdf" type="button" style="flex:1; min-width:180px;">Raport PDF</button>
+
+            <button class="danger" id="clearMonth" type="button" style="flex:1; min-width:180px;">Usuń cały miesiąc</button>
+            <button class="secondary" id="backupJson" type="button" style="flex:1; min-width:180px;">Kopia zapasowa</button>
+
+            <input id="restoreJson" type="file" accept="application/json" style="display:none" />
+            <button class="secondary" id="restoreBtn" type="button" style="flex:1; min-width:180px;">Przywróć kopię zapasową</button>
+          </div>
         </div>
       </details>
     </div>
   </div>
 
-  <div class="fab-container">
-    <button class="fab" id="mainFab" aria-label="Dodaj">
-      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-    </button>
-  </div>
-
-  <dialog id="fabMenuDialog">
-    <div class="drag-handle"></div>
-    <div style="padding-bottom: 24px;">
-      <button class="menu-item" id="btnOpenBulkFromMenu">
-        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-        Wpisz wiele godzin
-      </button>
-      <button class="menu-item" id="btnOpenVacFromMenu">
-        <svg viewBox="0 0 24 24"><path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79s7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 2.5-1.06 4.84-2.91 6.64-3.71 3.65-9.76 3.65-13.46 0-3.71-3.65-3.71-9.58 0-13.23 3.71-3.65 9.76-3.65 13.46 0l2.91-2.82V10.12zM12.5 8v5.25l4.43 2.62-.75 1.23-5.18-3.07V8h1.5z"/></svg>
-        Ustaw status (Urlop/L4)
-      </button>
-    </div>
-  </dialog>
-
+  <!-- MODAL URLOPU -->
   <dialog id="vacDialog">
-    <div class="drag-handle"></div>
-    <div class="modalBody">
-      <div class="modalHeader">
-        <h3>Dodaj urlop</h3>
-        <p>Ustaw status w zakresie dat. Nie kasuje to wpisanych wcześniej godzin.</p>
+    <div class="modalHead" style="position:relative;">
+      <div class="modalHeadInner">
+        <h3 style="margin:0;">Dodaj urlop</h3>
+        <div class="muted" style="margin-top:3px;">Ustaw status w zakresie dat. Status nie usuwa godzin pracy (możesz mieć godziny i urlop jednocześnie).</div>
       </div>
 
-      <div class="grid-2" style="margin-bottom: 16px;">
+      <button class="backBtn blue" id="vacBack" aria-label="Zamknij" type="button" title="Zamknij">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modalBody">
+      <div class="rangeRow">
         <div>
           <label>Od</label>
           <input id="vacFrom" type="date" />
@@ -554,32 +757,42 @@
           <input id="vacTo" type="date" />
         </div>
       </div>
-      <div>
-        <label>Rodzaj absencji</label>
+
+      <div style="margin-top:12px;">
+        <label>Rodzaj</label>
         <select id="vacType">
           <option value="paid">Urlop płatny</option>
-          <option value="unpaid">Urlop bezpłatny</option>
-          <option value="sick">Zwolnienie lekarskie (L4)</option>
+          <option value="unpaid">Urlop b/z</option>
+          <option value="sick">L4</option>
         </select>
       </div>
 
       <div class="actionRow">
-        <button type="button" class="text" id="vacBack">Anuluj</button>
-        <button type="button" class="text" id="clearVacationRange" style="color: var(--md-sys-color-error);">Usuń status</button>
-        <button type="button" class="filled" id="setVacationRange">Zapisz</button>
+        <button id="setVacationRange" type="button" style="background:var(--bar-vac); font-weight:900;">Ustaw</button>
+        <button class="danger" id="clearVacationRange" type="button" style="font-weight:900;">Usuń status</button>
       </div>
+
+      <div style="height:6px;"></div>
     </div>
   </dialog>
 
+  <!-- MODAL WIELE GODZIN -->
   <dialog id="bulkDialog">
-    <div class="drag-handle"></div>
-    <div class="modalBody">
-      <div class="modalHeader">
-        <h3>Wiele godzin</h3>
-        <p>Ustaw stałe godziny pracy dla wybranego zakresu dni.</p>
+    <div class="modalHead" style="position:relative;">
+      <div class="modalHeadInner">
+        <h3 style="margin:0;">Dodaj wiele godzin</h3>
+        <div class="muted" style="margin-top:3px;">Ustaw zakres dat i jedną parę wejścia/wyjścia dla wszystkich dni.</div>
       </div>
 
-      <div class="grid-2" style="margin-bottom: 16px;">
+      <button class="backBtn" id="bulkBack" aria-label="Zamknij" type="button" title="Zamknij">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modalBody">
+      <div class="rangeRow">
         <div>
           <label>Od</label>
           <input id="bulkFrom" type="date" />
@@ -589,72 +802,85 @@
           <input id="bulkTo" type="date" />
         </div>
       </div>
-      <div class="grid-2">
+
+      <div class="timeGrid" style="margin-top:12px;">
         <div>
-          <label>Wejście</label>
+          <label>Godzina wejścia</label>
           <input id="bulkStart" type="time" />
         </div>
         <div>
-          <label>Wyjście</label>
+          <label>Godzina wyjścia</label>
           <input id="bulkEnd" type="time" />
         </div>
       </div>
 
       <div class="actionRow">
-        <button type="button" class="text" id="bulkBack">Anuluj</button>
-        <button type="button" class="text" id="bulkRemove" style="color: var(--md-sys-color-error);">Usuń godziny</button>
-        <button type="button" class="filled" id="bulkApply">Dodaj</button>
+        <button id="bulkApply" type="button" style="background:var(--primary); font-weight:900;">Dodaj</button>
+        <button id="bulkRemove" type="button" class="danger" style="font-weight:900;">Usuń godziny</button>
       </div>
+
+      <div class="muted" style="margin-top:10px; line-height:1.35;">
+        Uwaga: „Dodaj” dopisuje zakres do każdego dnia (nie nadpisuje istniejących). „Usuń godziny” usuwa w tych dniach dokładnie ten sam zakres (jeśli istnieje).
+      </div>
+
+      <div style="height:6px;"></div>
     </div>
   </dialog>
 
+  <!-- MODAL DNIA -->
   <dialog id="dayDialog">
-    <div class="drag-handle"></div>
-    <div class="modalBody" style="max-height: 80vh; overflow-y: auto;">
-      <div class="modalHeader">
-        <h3 id="dlgTitle">Dzień</h3>
-        <p id="dlgMeta"></p>
+    <div class="modalHead" style="position:relative;">
+      <div class="modalHeadInner">
+        <h3 id="dlgTitle" style="margin:0;">Dzień</h3>
+        <div class="muted" id="dlgMeta" style="margin-top:3px;"></div>
       </div>
 
-      <div class="grid-2" style="margin-bottom: 24px;">
-        <div class="statBox">
-          <span class="muted">Suma godzin</span>
-          <span class="statValue" id="dlgSumHM">0:00</span>
+      <button class="backBtn" id="dlgBack" aria-label="Wróć" type="button" title="Wróć">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modalBody">
+      <div class="modalStats">
+        <div class="statMini">
+          <div class="muted">Suma godzin</div>
+          <div class="statMiniValue" id="dlgSumHM">0:00</div>
         </div>
-        <div class="statBox">
-          <span class="muted">Dniówka</span>
-          <span class="statValue" id="dlgSumPay">0,00 zł</span>
+        <div class="statMini">
+          <div class="muted">Dniówka</div>
+          <div class="statMiniValue" id="dlgSumPay">0,00 zł</div>
         </div>
       </div>
 
-      <div class="card" style="padding: 16px; margin-bottom: 24px; border: none; background: var(--md-sys-color-surface-container-low);">
-        <div class="grid-2" style="margin-bottom: 16px;">
+      <div class="modalStack" id="dlgWorkBlock">
+        <div class="timeGrid">
           <div>
-            <label>Wejście</label>
-            <input id="dlgStart" type="time" style="background: var(--md-sys-color-surface-container-highest);" />
+            <label>Godzina wejścia</label>
+            <input id="dlgStart" type="time" />
           </div>
           <div>
-            <label>Wyjście</label>
-            <input id="dlgEnd" type="time" style="background: var(--md-sys-color-surface-container-highest);" />
+            <label>Godzina wyjścia</label>
+            <input id="dlgEnd" type="time" />
           </div>
         </div>
+
         <div>
-          <label>Notatka do dnia</label>
-          <textarea id="dlgNote" placeholder="Zapisuje się automatycznie..." style="background: var(--md-sys-color-surface-container-highest); min-height: 56px;"></textarea>
+          <label>Notatka</label>
+          <textarea id="dlgNote"></textarea>
+          <div class="muted" style="margin-top:6px;">Notatka zapisuje się automatycznie.</div>
         </div>
-        <div style="display:flex; justify-content: flex-end; margin-top: 16px;">
-          <button type="button" class="filled" id="dlgAddShift">Dodaj godziny</button>
-        </div>
+
+        <button id="dlgAddShift" type="button" class="addBtnCenter">Dodaj</button>
       </div>
 
-      <div id="dlgShiftsBlock">
-        <h4 style="margin: 0 0 8px; font-weight: 500; color: var(--md-sys-color-on-surface-variant);">Wprowadzone zakresy</h4>
-        <div id="dlgShifts"></div>
+      <div style="margin-top:16px;" id="dlgShiftsBlock">
+        <strong id="dlgShiftsTitle">Godziny pracy w ciągu dnia</strong>
+        <div class="shiftList" id="dlgShifts"></div>
       </div>
 
-      <div class="actionRow">
-        <button type="button" class="tonal" id="dlgBack">Zamknij</button>
-      </div>
+      <div style="height:14px;"></div>
     </div>
   </dialog>
 
@@ -662,22 +888,31 @@
 (() => {
   const showErr = (msg) => {
     const el = document.getElementById("status");
-    if (el) el.textContent = msg;
+    if (el) el.textContent = "BŁĄD: " + msg;
   };
-  window.addEventListener("error", (e) => showErr(e.message || "Błąd aplikacji"));
+  window.addEventListener("error", (e) => showErr(e.message || "Nieznany błąd JS"));
+  window.addEventListener("unhandledrejection", (e) => {
+    showErr((e.reason && e.reason.message) ? e.reason.message : String(e.reason || "Promise error"));
+  });
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/czas-pracy-pwa/sw.js", { scope: "/czas-pracy-pwa/" });
+  }
 
   const $ = (id) => document.getElementById(id);
   const pad2 = (n) => String(n).padStart(2, "0");
   const round2 = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
 
-  // ===== HAPTICS =====
-  const hasVibe = () => ("vibrate" in navigator);
+  // ===== HAPTICS (global) =====
+  const HAPTICS_ON = true;
+  const hasVibe = () => HAPTICS_ON && ("vibrate" in navigator);
   const vibe = (pattern) => { if (hasVibe()) navigator.vibrate(pattern); };
   const haptic = {
-    tap:     () => vibe(5),
+    tap:     () => vibe(8),
     commit:  () => vibe(10),
     success: () => vibe([10, 30, 10]),
     warning: () => vibe([12, 40, 12]),
+    danger:  () => vibe([20, 50, 20]),
   };
 
   const todayISO = () => {
@@ -685,12 +920,12 @@
     return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
   };
   const ym = (dateISO) => dateISO.slice(0, 7);
-  const MON = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
-  
+
+  const MON = ["sty", "lut", "mar", "kwi", "maj", "cze", "lip", "sie", "wrz", "paź", "lis", "gru"];
   const fmtDMYText = (dateISO) => {
     if (!dateISO) return "";
     const [y, m, d] = dateISO.split("-").map(Number);
-    return `${d} ${MON[m - 1]} ${y}`;
+    return `${pad2(d)}-${MON[m - 1]}-${y}`;
   };
 
   const fmtMonthPL = (monthYM) => {
@@ -702,30 +937,88 @@
 
   function fmtWeekdayLongPL(dateISO) {
     const [Y, M, D] = dateISO.split("-").map(Number);
-    return new Intl.DateTimeFormat("pl-PL", { weekday: "long" }).format(new Date(Y, M - 1, D));
+    const dt = new Date(Y, M - 1, D);
+    return new Intl.DateTimeFormat("pl-PL", { weekday: "long" }).format(dt);
   }
 
   const DOW_SHORT = ["Nd", "Pn", "Wt", "Śr", "Czw", "Pt", "Sb"];
-  
+  const fmtWeekdayPL = (dateISO) => {
+    const [Y, M, D] = dateISO.split("-").map(Number);
+    const dt = new Date(Y, M - 1, D);
+    return DOW_SHORT[dt.getDay()];
+  };
+
   const STORAGE_KEY = "worktime_pwa_v1";
   let db = load() || { settings:{ rate:0, leaveQuota:26 }, entries:[] };
 
   function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
   function load() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; } }
 
+  // leaveType: "" | "paid" | "unpaid" | "sick"
+  function migrateIfNeeded() {
+    let changed = false;
+    db.settings = db.settings || {};
+    if (typeof db.settings.leaveQuota !== "number") { db.settings.leaveQuota = 26; changed = true; }
+
+    db.entries = (Array.isArray(db.entries) ? db.entries : []).map(e => {
+      if (!e) return e;
+
+      // stary format: start/end
+      if (!Array.isArray(e.shifts)) {
+        const shifts = [];
+        if (e.start && e.end) shifts.push({ start: e.start, end: e.end });
+        e = { date: e.date, note: e.note || "", shifts, vacation: false };
+        changed = true;
+      }
+
+      // stary urlop: vacation boolean -> leaveType=paid
+      if (typeof e.leaveType !== "string") {
+        if (e.vacation === true) { e.leaveType = "paid"; changed = true; }
+        else { e.leaveType = ""; changed = true; }
+      }
+
+      // porządek pól
+      e.note = e.note || "";
+      e.shifts = Array.isArray(e.shifts) ? e.shifts : [];
+      e.vacation = !!e.vacation; // zostawiamy dla kompatybilności, ale nie używamy w logice
+      return e;
+    });
+
+    if (changed) save();
+  }
+
   function normalize() {
     db.settings = db.settings || {};
     db.settings.rate = Number(db.settings.rate ?? 40);
     db.settings.leaveQuota = Number(db.settings.leaveQuota ?? 26);
+
     db.entries = Array.isArray(db.entries) ? db.entries : [];
     for (const e of db.entries) {
       e.shifts = Array.isArray(e.shifts) ? e.shifts : [];
       e.note = e.note || "";
-      e.leaveType = ["paid", "unpaid", "sick"].includes(e.leaveType) ? e.leaveType : "";
+      e.vacation = !!e.vacation;
+      e.leaveType = (typeof e.leaveType === "string") ? e.leaveType : "";
+      if (!["", "paid", "unpaid", "sick"].includes(e.leaveType)) e.leaveType = "";
     }
   }
 
-  function setStatus(t) { const el = $("status"); if (el) { el.textContent = t; setTimeout(()=>el.textContent="", 3000); } }
+  const LAST_BACKUP_KEY = "worktime_last_backup_iso";
+  const BACKUP_REMIND_EVERY_DAYS = 5;
+
+  function getLastBackupISO(){
+    return localStorage.getItem(LAST_BACKUP_KEY) || "";
+  }
+  function setLastBackupNow(){
+    localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString());
+  }
+  function daysSince(iso){
+    if (!iso) return 9999;
+    const t = Date.parse(iso);
+    if (!Number.isFinite(t)) return 9999;
+    return Math.floor((Date.now() - t) / (1000*60*60*24));
+  }
+
+  function setStatus(t) { const el = $("status"); if (el) el.textContent = t || ""; }
 
   function minutesBetween(dateISO, start, end) {
     const [y, m, d] = dateISO.split("-").map(Number);
@@ -738,17 +1031,25 @@
   }
 
   function fmtHM(mins) {
-    return `${Math.floor(mins / 60)}:${pad2(mins % 60)}`;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return `${h}:${pad2(m)}`;
   }
   function pln(x) { return x.toLocaleString("pl-PL", { style: "currency", currency: "PLN" }); }
 
   function readSettingsFromUI() {
-    if ($("rate")) db.settings.rate = Number($("rate").value || 0);
-    if ($("leaveQuota")) db.settings.leaveQuota = Number($("leaveQuota").value || 0);
+    const rateEl = $("rate");
+    if (rateEl) db.settings.rate = Number(rateEl.value || 0);
+
+    const qEl = $("leaveQuota");
+    if (qEl) db.settings.leaveQuota = Number(qEl.value || 0);
   }
   function hydrateSettingsUI() {
-    if ($("rate")) $("rate").value = db.settings.rate;
-    if ($("leaveQuota")) $("leaveQuota").value = db.settings.leaveQuota;
+    const rateEl = $("rate");
+    if (rateEl) rateEl.value = db.settings.rate;
+
+    const qEl = $("leaveQuota");
+    if (qEl) qEl.value = db.settings.leaveQuota;
   }
 
   function getDay(date) { return db.entries.find(e => e.date === date) || null; }
@@ -757,130 +1058,302 @@
     const i = db.entries.findIndex(e => e.date === date);
     if (i >= 0) db.entries[i] = { ...db.entries[i], ...patch };
     else db.entries.push({ date, note: "", shifts: [], vacation: false, leaveType:"", ...patch });
+    db.entries.sort((a, b) => a.date.localeCompare(b.date));
   }
 
   function computeDayMinutes(day) {
+    // status (urlop/L4) NIE blokuje godzin
     let total = 0;
     for (const s of day.shifts) {
-      if (s?.start && s?.end) total += Math.max(0, minutesBetween(day.date, s.start, s.end));
+      if (!s?.start || !s?.end) continue;
+      total += Math.max(0, minutesBetween(day.date, s.start, s.end));
     }
     return total;
   }
 
   function computeMonthMinutes(monthYM) {
-    return db.entries.filter(e => ym(e.date) === monthYM).reduce((acc, d) => acc + computeDayMinutes(d), 0);
+    const days = db.entries.filter(e => ym(e.date) === monthYM);
+    return days.reduce((acc, d) => acc + computeDayMinutes(d), 0);
+  }
+
+  function yearFromMonthYM(monthYM) {
+    const [Y] = monthYM.split("-").map(Number);
+    return Y || new Date().getFullYear();
+  }
+
+  function countLeaveDays(year, type) {
+    return db.entries.filter(e => {
+      if (!e?.date) return false;
+      return e.date.startsWith(String(year) + "-") && e.leaveType === type;
+    }).length;
   }
 
   function updateLeaveCounterUI(year) {
     const out = $("leaveCounter");
     if (!out) return;
     const quota = Number(db.settings.leaveQuota || 0);
-    const used = db.entries.filter(e => e?.date?.startsWith(String(year) + "-") && e.leaveType === "paid").length;
-    out.textContent = `Urlop płatny: wykorzystane ${used} / ${quota} (pozostało ${Math.max(0, quota - used)}).`;
+    const used = countLeaveDays(year, "paid");
+    const left = Math.max(0, quota - used);
+    out.textContent = `Urlop płatny ${year}: wykorzystane ${used} / ${quota} (pozostało ${left}).`;
   }
 
+  // ===== Daty pomocnicze =====
   function parseISODate(s) {
     if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
     const [Y, M, D] = s.split("-").map(Number);
-    return new Date(Y, M - 1, D);
+    const dt = new Date(Y, M - 1, D);
+    if (dt.getFullYear() !== Y || dt.getMonth() !== (M - 1) || dt.getDate() !== D) return null;
+    return dt;
   }
   function isoFromDate(dt) {
     return `${dt.getFullYear()}-${pad2(dt.getMonth() + 1)}-${pad2(dt.getDate())}`;
   }
   function addDays(dt, n) {
-    const x = new Date(dt); x.setDate(x.getDate() + n); return x;
+    const x = new Date(dt);
+    x.setDate(x.getDate() + n);
+    return x;
   }
 
+  // ===== Status (urlop/L4): zakres =====
   function applyLeaveRange(fromISO, toISO, leaveType) {
-    const a = parseISODate(fromISO), b = parseISODate(toISO);
-    if (!a || !b || b < a) return { ok: false };
+    const a = parseISODate(fromISO);
+    const b = parseISODate(toISO);
+    if (!a || !b) { alert("Uzupełnij poprawnie daty 'Od' i 'Do'."); return { ok: false }; }
+    if (b < a) { alert("Data 'Do' nie może być wcześniejsza niż 'Od'."); return { ok: false }; }
+    if (!["paid","unpaid","sick"].includes(leaveType)) { alert("Wybierz poprawny rodzaj."); return { ok:false }; }
+
     let cur = a;
+    let count = 0;
     while (cur <= b) {
       const dISO = isoFromDate(cur);
-      const day = getDay(dISO) || { date: dISO, note: "", shifts: [], leaveType:"" };
+      const day = getDay(dISO) || { date: dISO, note: "", shifts: [], vacation: false, leaveType:"" };
       day.leaveType = leaveType;
       upsertDay(dISO, day);
+      count++;
       cur = addDays(cur, 1);
     }
-    save(); renderAll(); if(dlgDate) renderDayDialog();
-    return { ok: true };
+    save();
+    renderAll();
+    if (dlgDate) renderDayDialog();
+    setStatus(`Ustawiono status: ${leaveLabel(leaveType)} (${count} dni).`);
+    return { ok: true, count };
   }
 
   function clearLeaveRange(fromISO, toISO) {
-    const a = parseISODate(fromISO), b = parseISODate(toISO);
-    if (!a || !b || b < a) return { ok: false };
+    const a = parseISODate(fromISO);
+    const b = parseISODate(toISO);
+    if (!a || !b) { alert("Uzupełnij poprawnie daty 'Od' i 'Do'."); return { ok: false }; }
+    if (b < a) { alert("Data 'Do' nie może być wcześniejsza niż 'Od'."); return { ok: false }; }
+
     let cur = a;
+    let count = 0;
     while (cur <= b) {
       const dISO = isoFromDate(cur);
       const day = getDay(dISO);
-      if (day && day.leaveType) { day.leaveType = ""; upsertDay(dISO, day); }
-      cur = addDays(cur, 1);
-    }
-    save(); renderAll(); if(dlgDate) renderDayDialog();
-    return { ok: true };
-  }
-
-  function applyBulkHours(fromISO, toISO, start, end, mode) {
-    const a = parseISODate(fromISO), b = parseISODate(toISO);
-    if (!a || !b || b < a || !start || !end) return { ok: false };
-    let cur = a;
-    while (cur <= b) {
-      const dISO = isoFromDate(cur);
-      const day = getDay(dISO) || { date: dISO, note: "", shifts: [], leaveType:"" };
-      if (mode === "add") {
-        day.shifts.push({ start, end });
-        day.shifts.sort((x, y) => x.start.localeCompare(y.start));
+      if (day && day.leaveType) {
+        day.leaveType = "";
         upsertDay(dISO, day);
-      } else {
-        day.shifts = day.shifts.filter(s => !(s.start === start && s.end === end));
-        upsertDay(dISO, day);
+        count++;
       }
       cur = addDays(cur, 1);
     }
-    save(); renderAll(); if(dlgDate) renderDayDialog();
-    return { ok: true };
+    save();
+    renderAll();
+    if (dlgDate) renderDayDialog();
+    setStatus(`Usunięto status w ${count} dniach.`);
+    return { ok: true, count };
   }
 
-  function leaveLabel(t) { return t === "paid" ? "Urlop" : t === "unpaid" ? "Urlop b/z" : t === "sick" ? "L4" : ""; }
+  // ===== Wiele godzin: zakres =====
+  function applyBulkHours(fromISO, toISO, start, end, mode) {
+    const a = parseISODate(fromISO);
+    const b = parseISODate(toISO);
+    if (!a || !b) { alert("Uzupełnij poprawnie daty 'Od' i 'Do'."); return { ok: false }; }
+    if (b < a) { alert("Data 'Do' nie może być wcześniejsza niż 'Od'."); return { ok: false }; }
+    if (!start || !end) { alert("Uzupełnij godzinę wejścia i wyjścia."); return { ok: false }; }
 
-  function getHolidayMap(year) {
+    let cur = a;
+    let changedDays = 0;
+
+    while (cur <= b) {
+      const dISO = isoFromDate(cur);
+      const day = getDay(dISO) || { date: dISO, note: "", shifts: [], vacation: false, leaveType:"" };
+
+      day.shifts = Array.isArray(day.shifts) ? day.shifts : [];
+
+      if (mode === "add") {
+        day.shifts.push({ start, end });
+        day.shifts.sort((x, y) => (x.start || "").localeCompare(y.start || ""));
+        upsertDay(dISO, day);
+        changedDays++;
+      }
+
+      if (mode === "remove") {
+        const before = day.shifts.length;
+        day.shifts = day.shifts.filter(s => !(s && s.start === start && s.end === end));
+        if (day.shifts.length !== before) {
+          upsertDay(dISO, day);
+          changedDays++;
+        }
+      }
+
+      cur = addDays(cur, 1);
+    }
+
+    save();
+    renderAll();
+    if (dlgDate) renderDayDialog();
+
+    setStatus(
+      mode === "add"
+        ? `Dodano godziny (zakres) w ${changedDays} dniach.`
+        : `Usunięto godziny (zakres) w ${changedDays} dniach.`
+    );
+
+    return { ok: true, changedDays };
+  }
+
+  function leaveLabel(t) {
+    if (t === "paid") return "Urlop płatny";
+    if (t === "unpaid") return "Urlop b/z";
+    if (t === "sick") return "L4";
+    return "";
+  }
+  function leavePillClass(t) {
+    if (t === "paid") return "vac";
+    if (t === "unpaid") return "unpaid";
+    if (t === "sick") return "sick";
+    return "";
+  }
+
+  // ===== ŚWIĘTA PL =====
+  function easterSunday(year) {
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(year, month - 1, day);
+  }
+
+  function polishHolidays(year) {
     const map = new Map();
-    map.set(`${year}-01-01`, "Nowy Rok"); map.set(`${year}-01-06`, "Trzech Króli");
-    map.set(`${year}-05-01`, "Święto Pracy"); map.set(`${year}-05-03`, "Konstytucji 3 Maja");
-    map.set(`${year}-08-15`, "Wniebowzięcie NMP"); map.set(`${year}-11-01`, "Wszystkich Świętych");
-    map.set(`${year}-11-11`, "Święto Niepodległości"); map.set(`${year}-12-25`, "Boże Narodzenie");
-    map.set(`${year}-12-26`, "Boże Narodzenie");
+    map.set(`${year}-01-01`, "Nowy Rok");
+    map.set(`${year}-01-06`, "Święto Trzech Króli");
+    map.set(`${year}-05-01`, "Święto Pracy");
+    map.set(`${year}-05-03`, "Święto Konstytucji 3 Maja");
+    map.set(`${year}-08-15`, "Wniebowzięcie NMP");
+    map.set(`${year}-11-01`, "Wszystkich Świętych");
+    map.set(`${year}-11-11`, "Narodowe Święto Niepodległości");
+    map.set(`${year}-12-24`, "Wigilia");
+    map.set(`${year}-12-25`, "Boże Narodzenie (1. dzień)");
+    map.set(`${year}-12-26`, "Boże Narodzenie (2. dzień)");
+
+    const easter = easterSunday(year);
+    map.set(isoFromDate(easter), "Wielkanoc");
+    map.set(isoFromDate(addDays(easter, 1)), "Poniedziałek Wielkanocny");
+    map.set(isoFromDate(addDays(easter, 49)), "Zielone Świątki");
+    map.set(isoFromDate(addDays(easter, 60)), "Boże Ciało");
+
     return map;
   }
 
+  const holidayCache = new Map();
+  function getHolidayMap(year) {
+    if (!holidayCache.has(year)) holidayCache.set(year, polishHolidays(year));
+    return holidayCache.get(year);
+  }
+
+  // ===== Helpers miesięcy dla swipe =====
   function addMonths(ymStr, delta) {
     const [Y, M] = ymStr.split("-").map(Number);
     const dt = new Date(Y, (M - 1) + delta, 1);
-    return `${dt.getFullYear()}-${pad2(dt.getMonth() + 1)}`;
+    return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
   }
-  function getCurrentMonthYM() { return $("monthPick")?.value || ym(todayISO()); }
+  function getCurrentMonthYM() {
+    const mp = $("monthPick");
+    return (mp && mp.value) ? mp.value : ym(todayISO());
+  }
+  function setMonthYM(newYM) {
+    const mp = $("monthPick");
+    if (!mp) return;
+    mp.value = newYM;
+    shouldScrollToToday = false;
+    renderAll();
+  }
 
+  // ===== KALENDARZ =====
   const DOW = ["Pn", "Wt", "Śr", "Czw", "Pt", "Sb", "Nd"];
-  
-  function renderDowInto(el) { el.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join(""); }
+  function mondayIndex(jsDay) { return (jsDay + 6) % 7; }
+  function daysInMonth(year, month1) { return new Date(year, month1, 0).getDate(); }
+
+  let shouldScrollToToday = false;
+
+  function renderDow() {
+    const dowRow = $("dowRow");
+    if (!dowRow) return;
+    dowRow.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
+  }
+
+  function renderDowInto(el) {
+    if (!el) return;
+    el.innerHTML = DOW.map(d => `<div class="calDow">${d}</div>`).join("");
+  }
 
   function buildPillsHTML(day) {
-    const shifts = (day?.shifts || []).slice().sort((a, b) => (a.start||"").localeCompare(b.start||""));
-    const leaveLbl = leaveLabel(day?.leaveType);
+    const shifts = (day?.shifts || []).slice().sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+    const leaveType = day?.leaveType || "";
+    const leaveLbl = leaveLabel(leaveType);
+    const leaveCls = leavePillClass(leaveType);
+
     const pills = [];
-    if (leaveLbl) pills.push(`<div class="pill ${day.leaveType === 'sick' ? 'sick' : day.leaveType === 'paid' ? 'vac' : 'unpaid'}">${leaveLbl}</div>`);
-    const maxVisible = leaveLbl ? 1 : 2; 
-    pills.push(...shifts.slice(0, maxVisible).map(s => `<div class="pill work">${s.start}–${s.end}</div>`));
-    if (shifts.length > maxVisible) pills.push(`<div class="pill more">+${shifts.length - maxVisible}</div>`);
+
+    // status zawsze pierwszy (jeśli jest)
+    if (leaveLbl) {
+      pills.push(`<div class="pill ${leaveCls}">${leaveLbl}</div>`);
+    }
+
+    const maxVisible = leaveLbl ? 2 : 3; // żeby zmieścić status + godziny
+    const visible = shifts.slice(0, maxVisible);
+    const extra = Math.max(0, shifts.length - maxVisible);
+
+    pills.push(...visible.map(s => {
+      const a = (s && s.start) ? s.start : "—";
+      const b = (s && s.end) ? s.end : "—";
+      return `<div class="pill work">${a}–${b}</div>`;
+    }));
+
+    if (extra > 0) pills.push(`<div class="pill more">+${extra}</div>`);
+
     return `<div class="pillStack">${pills.join("")}</div>`;
+  }
+
+  function renderCalendar(monthYM) {
+    const monthLabel = $("monthLabelText");
+    const calGrid = $("calGrid");
+    if (!monthLabel || !calGrid) return;
+
+    monthLabel.textContent = fmtMonthPL(monthYM);
+    renderCalendarInto(monthYM, calGrid, true);
   }
 
   function renderCalendarInto(monthYM, gridEl, bindClicks) {
     if (!gridEl) return;
+
     const [Y, M] = monthYM.split("-").map(Number);
     const first = new Date(Y, M - 1, 1);
-    const firstIdx = (first.getDay() + 6) % 7;
-    const dim = new Date(Y, M, 0).getDate();
+    const firstIdx = mondayIndex(first.getDay());
+    const dim = daysInMonth(Y, M);
+
     const holidays = getHolidayMap(Y);
     const cells = [];
     const today = todayISO();
@@ -890,225 +1363,750 @@
     for (let d = 1; d <= dim; d++) {
       const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
       const jsDow = new Date(Y, M - 1, d).getDay();
-      const day = getDay(dateISO) || { date: dateISO, note: "", shifts: [], leaveType:"" };
-      const isHol = !!holidays.get(dateISO);
 
-      const numClass = ["dayNum", jsDow === 6 ? "saturday" : "", jsDow === 0 ? "sunday" : "", isHol ? "holiday" : ""].join(" ");
-      const dayCellClass = ["dayCell", dateISO === today ? "today" : ""].join(" ");
+      const day = getDay(dateISO) || { date: dateISO, note: "", shifts: [], vacation: false, leaveType:"" };
+      const hasNote = !!(day.note && day.note.trim());
+
+      const holidayName = holidays.get(dateISO) || "";
+      const isHoliday = !!holidayName;
+
+      const numClass = [
+        "dayNum",
+        jsDow === 6 ? "saturday" : "",
+        jsDow === 0 ? "sunday" : "",
+        isHoliday ? "holiday" : ""
+      ].filter(Boolean).join(" ");
+
+      const tileTitle = day.leaveType ? leaveLabel(day.leaveType) : (isHoliday ? holidayName : "");
+      const isToday = (dateISO === today);
+      const dayCellClass = ["dayCell", isToday ? "today" : ""].filter(Boolean).join(" ");
+
+      const pillsHTML = buildPillsHTML(day);
 
       cells.push(`
-        <div class="${dayCellClass}" data-date="${dateISO}">
-          ${day.note.trim() ? `<span class="noteDot"></span>` : ``}
+        <div class="${dayCellClass}" data-date="${dateISO}" ${tileTitle ? `title="${tileTitle}"` : ""}>
+          ${hasNote ? `<span class="noteDot" aria-hidden="true"></span>` : ``}
           <div class="dayTop"><div class="${numClass}">${d}</div></div>
-          ${buildPillsHTML(day)}
+          ${pillsHTML}
         </div>
       `);
     }
 
-    while (cells.length % 7 !== 0) cells.push(`<div class="blankCell"></div>`);
+    const mod = cells.length % 7;
+    if (mod !== 0) {
+      const need = 7 - mod;
+      for (let i = 0; i < need; i++) cells.push(`<div class="blankCell"></div>`);
+    }
+
     gridEl.innerHTML = cells.join("");
 
     if (bindClicks) {
       gridEl.querySelectorAll(".dayCell[data-date]").forEach(el => {
         el.onclick = () => openDay(el.getAttribute("data-date"));
       });
+
+      if (shouldScrollToToday) {
+        shouldScrollToToday = false;
+        const el = document.querySelector('.dayCell[data-date="' + today + '"]');
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     }
   }
 
+  // ===== MODAL DNIA =====
+  const dlg = $("dayDialog");
   let dlgDate = null;
-  const dialogHelper = {
-    open: (el) => {
-      if(!el) return;
-      if(typeof el.showModal === "function") el.showModal(); else el.setAttribute("open", "");
-      document.body.classList.add("modal-open");
-    },
-    close: (el) => {
-      if(!el) return;
-      if(typeof el.close === "function") el.close(); else el.removeAttribute("open");
-      if(!document.querySelector('dialog[open]')) document.body.classList.remove("modal-open");
-    }
-  };
 
   function openDay(dateISO) {
-    haptic.tap(); dlgDate = dateISO;
-    $("dlgTitle").textContent = fmtDMYText(dateISO);
-    $("dlgMeta").textContent = fmtWeekdayLongPL(dateISO);
-    
-    const day = getDay(dateISO) || { date: dateISO, note: "", shifts: [] };
-    $("dlgStart").value = ""; $("dlgEnd").value = ""; $("dlgNote").value = day.note || "";
+    haptic.tap();
+    dlgDate = dateISO;
+
+    if ($("dlgTitle")) $("dlgTitle").textContent = `${fmtDMYText(dateISO)}`;
+    if ($("dlgMeta")) $("dlgMeta").textContent = fmtWeekdayLongPL(dateISO);
+
+    const day = getDay(dateISO) || { date: dateISO, note: "", shifts: [], vacation: false, leaveType:"" };
+    if ($("dlgStart")) $("dlgStart").value = "";
+    if ($("dlgEnd")) $("dlgEnd").value = "";
+    if ($("dlgNote")) $("dlgNote").value = day.note || "";
+
     renderDayDialog();
-    dialogHelper.open($("dayDialog"));
+
+    if (dlg && typeof dlg.showModal === "function") dlg.showModal();
+    else if (dlg) dlg.setAttribute("open", "");
+    document.body.classList.add("modal-open");
+  }
+
+  function closeDay() {
+    dlgDate = null;
+    if (dlg && typeof dlg.close === "function") dlg.close();
+    else if (dlg) dlg.removeAttribute("open");
+    document.body.classList.remove("modal-open");
+  }
+
+  if (dlg) {
+    dlg.addEventListener("close", () => document.body.classList.remove("modal-open"));
+    dlg.addEventListener("cancel", (e) => { e.preventDefault(); closeDay(); });
   }
 
   function renderDayDialog() {
     if (!dlgDate) return;
-    const day = getDay(dlgDate) || { shifts: [] };
+    const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
+
     const mins = computeDayMinutes(day);
-    $("dlgSumHM").textContent = fmtHM(mins);
-    $("dlgSumPay").textContent = pln(round2((mins / 60) * (db.settings.rate || 0)));
+    const pay = round2((mins / 60) * (db.settings.rate || 0));
 
+    if ($("dlgSumHM")) $("dlgSumHM").textContent = fmtHM(mins);
+    if ($("dlgSumPay")) $("dlgSumPay").textContent = pln(pay);
+
+    const shiftsTitle = $("dlgShiftsTitle");
     const shiftsBox = $("dlgShifts");
-    day.shifts.sort((a, b) => a.start.localeCompare(b.start));
 
-    shiftsBox.innerHTML = day.shifts.length ? day.shifts.map((s, idx) => `
-      <div class="shiftItem">
-        <div>
-          <div class="times">${s.start} – ${s.end}</div>
-          <div class="mins">Suma: ${fmtHM(Math.max(0, minutesBetween(dlgDate, s.start, s.end)))}</div>
+    day.shifts.sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+
+    const items = (day.shifts || []).map((s, idx) => {
+      const a = s.start || "—";
+      const b = s.end || "—";
+      const m = (s.start && s.end) ? Math.max(0, minutesBetween(day.date, s.start, s.end)) : 0;
+
+      return `
+        <div class="shiftItem">
+          <div>
+            <div class="times">${a} – ${b}</div>
+            <div class="mins">${m ? ("Ilość godzin: " + fmtHM(m)) : "-"}</div>
+          </div>
+          <button class="delIcon" data-delshift="${idx}" aria-label="Usuń zakres" type="button"></button>
         </div>
-        <button class="delIcon" data-idx="${idx}"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
-      </div>
-    `).join("") : `<div class="muted">Brak wpisanych godzin.</div>`;
+      `;
+    }).join("");
 
-    shiftsBox.querySelectorAll(".delIcon").forEach(btn => {
+    if (shiftsTitle) shiftsTitle.textContent = "Godziny pracy w ciągu dnia";
+    if (shiftsBox) shiftsBox.innerHTML = items || `<div class="muted">Brak zakresów. Dodaj pierwszy powyżej.</div>`;
+
+    shiftsBox?.querySelectorAll("[data-delshift]").forEach(btn => {
       btn.onclick = () => {
-        haptic.warning();
-        getDay(dlgDate).shifts.splice(Number(btn.getAttribute("data-idx")), 1);
-        save(); renderAll(); renderDayDialog();
+        const idx = Number(btn.getAttribute("data-delshift"));
+        if (!confirm("Usunąć ten zakres?")) return;
+        const d = getDay(dlgDate);
+        if (!d) return;
+        d.shifts.splice(idx, 1);
+        save();
+        renderAll();
+        renderDayDialog();
+        haptic.danger();
       };
     });
   }
 
-  function renderAll() {
-    normalize(); readSettingsFromUI(); save();
-    const monthYM = getCurrentMonthYM();
-    renderDowInto($("dowRow"));
-    $("monthLabelText").textContent = fmtMonthPL(monthYM);
-    renderCalendarInto(monthYM, $("calGrid"), true);
-    
+  // ===== TOTALS =====
+  function renderTotals(monthYM) {
     const sumMin = computeMonthMinutes(monthYM);
-    $("sumHours").textContent = fmtHM(sumMin);
-    $("sumPay").textContent = pln(round2((sumMin / 60) * (db.settings.rate || 0)));
-    updateLeaveCounterUI(monthYM.split("-")[0]);
+    if ($("sumHours")) $("sumHours").textContent = fmtHM(sumMin);
+    const money = round2((sumMin / 60) * (db.settings.rate || 0));
+    if ($("sumPay")) $("sumPay").textContent = pln(money);
+
+    updateLeaveCounterUI(yearFromMonthYM(monthYM));
   }
 
-  // Bindings
-  $("dlgBack").onclick = () => dialogHelper.close($("dayDialog"));
-  $("dayDialog").addEventListener("cancel", (e) => { e.preventDefault(); dialogHelper.close($("dayDialog")); });
+  function renderAll() {
+    normalize();
+    readSettingsFromUI();
+    save();
 
-  $("mainFab").onclick = () => dialogHelper.open($("fabMenuDialog"));
-  $("fabMenuDialog").addEventListener("click", (e) => {
-    if(e.target === $("fabMenuDialog")) dialogHelper.close($("fabMenuDialog")); // Klik w tło zamyka
-  });
+    const monthPick = $("monthPick");
+    const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
 
-  $("btnOpenBulkFromMenu").onclick = () => {
-    dialogHelper.close($("fabMenuDialog"));
-    const t = todayISO(); $("bulkFrom").value = t; $("bulkTo").value = t;
-    setTimeout(() => dialogHelper.open($("bulkDialog")), 150);
-  };
-  
-  $("btnOpenVacFromMenu").onclick = () => {
-    dialogHelper.close($("fabMenuDialog"));
-    const t = todayISO(); $("vacFrom").value = t; $("vacTo").value = t;
-    setTimeout(() => dialogHelper.open($("vacDialog")), 150);
-  };
+    renderDow();
+    renderCalendar(monthYM);
+    renderTotals(monthYM);
+  }
 
-  $("vacBack").onclick = () => dialogHelper.close($("vacDialog"));
-  $("bulkBack").onclick = () => dialogHelper.close($("bulkDialog"));
+  // ===== MODALE: STATUS / BULK =====
+  const vacDlg = $("vacDialog");
+  function openVac() {
+    haptic.tap();
+    if (!vacDlg) return;
+    const t = todayISO();
+    if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
+    if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
+    if (typeof vacDlg.showModal === "function") vacDlg.showModal();
+    else vacDlg.setAttribute("open", "");
+  }
+  function closeVac() {
+    haptic.tap();
+    if (!vacDlg) return;
+    if (typeof vacDlg.close === "function") vacDlg.close();
+    else vacDlg.removeAttribute("open");
+  }
+  if (vacDlg) vacDlg.addEventListener("cancel", (e) => { e.preventDefault(); closeVac(); });
 
-  $("dlgAddShift").onclick = () => {
-    if (!dlgDate || !$("dlgStart").value || !$("dlgEnd").value) return;
-    const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], leaveType:"" };
-    day.shifts.push({ start: $("dlgStart").value, end: $("dlgEnd").value });
-    upsertDay(dlgDate, day);
-    $("dlgStart").value = ""; $("dlgEnd").value = "";
-    save(); renderAll(); renderDayDialog(); haptic.success();
-  };
+  const bulkDlg = $("bulkDialog");
+  function openBulk() {
+    haptic.tap();
+    if (!bulkDlg) return;
+    const t = todayISO();
+    if ($("bulkFrom") && !$("bulkFrom").value) $("bulkFrom").value = t;
+    if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
+    if (typeof bulkDlg.showModal === "function") bulkDlg.showModal();
+    else bulkDlg.setAttribute("open", "");
+  }
+  function closeBulk() {
+    haptic.tap();
+    if (!bulkDlg) return;
+    if (typeof bulkDlg.close === "function") bulkDlg.close();
+    else bulkDlg.removeAttribute("open");
+  }
+  if (bulkDlg) bulkDlg.addEventListener("cancel", (e) => { e.preventDefault(); closeBulk(); });
 
-  let noteTimer;
-  $("dlgNote").addEventListener("input", () => {
-    if (!dlgDate) return;
-    clearTimeout(noteTimer);
-    noteTimer = setTimeout(() => {
-      const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], leaveType:"" };
-      day.note = $("dlgNote").value.trim();
-      upsertDay(dlgDate, day); save(); renderAll();
-    }, 400);
-  });
+  // ===== RAPORT PDF =====
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
-  $("monthBar").onclick = () => $("monthPick").showPicker ? $("monthPick").showPicker() : $("monthPick").focus();
-  $("monthPick").addEventListener("change", renderAll);
-  $("todayBtn").onclick = () => { $("monthPick").value = ym(todayISO()); renderAll(); };
+  function buildReportHTML(monthYM) {
+    const [Y, M] = monthYM.split("-").map(Number);
+    const dim = new Date(Y, M, 0).getDate();
 
-  $("setVacationRange").onclick = () => {
-    if(applyLeaveRange($("vacFrom").value, $("vacTo").value, $("vacType").value).ok) {
-      haptic.success(); dialogHelper.close($("vacDialog")); setStatus("Zapisano status.");
+    const monthLabelReminder = fmtMonthPL(monthYM);
+    const sumMin = computeMonthMinutes(monthYM);
+
+    const rows = [];
+
+    for (let d = 1; d <= dim; d++) {
+      const dateISO = `${Y}-${pad2(M)}-${pad2(d)}`;
+      const dow = fmtWeekdayPL(dateISO);
+      const day = getDay(dateISO) || { date: dateISO, note: "", shifts: [], vacation: false, leaveType:"" };
+
+      const mins = computeDayMinutes(day);
+
+      // pokaż jeśli są godziny albo jest status
+      if (mins === 0 && !day.leaveType) continue;
+
+      const shifts = (day.shifts || []).slice().sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+      const shiftText = shifts
+        .map(s => (s?.start && s?.end) ? `${s.start}-${s.end}` : "")
+        .filter(Boolean)
+        .join(", ");
+
+      const status = day.leaveType ? leaveLabel(day.leaveType) : "";
+      let ranges = "";
+      if (status && shiftText) ranges = `${status} | ${shiftText}`;
+      else if (status) ranges = status;
+      else ranges = shiftText;
+
+      const note = (day.note || "").trim();
+      const noteShort = note.length > 44 ? (note.slice(0, 44) + "…") : note;
+
+      rows.push(`
+        <tr>
+          <td class="c-date">${pad2(d)}.${pad2(M)}.${Y}</td>
+          <td class="c-dow">${dow}</td>
+          <td class="c-ranges">${escapeHtml(ranges)}</td>
+          <td class="c-sum">${fmtHM(mins)}</td>
+          <td class="c-note">${escapeHtml(noteShort)}</td>
+        </tr>
+      `);
     }
-  };
-  $("clearVacationRange").onclick = () => {
-    if(clearLeaveRange($("vacFrom").value, $("vacTo").value).ok) {
-      haptic.warning(); dialogHelper.close($("vacDialog")); setStatus("Usunięto status.");
-    }
-  };
 
-  $("bulkApply").onclick = () => {
-    if(applyBulkHours($("bulkFrom").value, $("bulkTo").value, $("bulkStart").value, $("bulkEnd").value, "add").ok) {
-      haptic.success(); dialogHelper.close($("bulkDialog")); setStatus("Godziny dodane.");
-    }
-  };
-  $("bulkRemove").onclick = () => {
-    if(applyBulkHours($("bulkFrom").value, $("bulkTo").value, $("bulkStart").value, $("bulkEnd").value, "remove").ok) {
-      haptic.warning(); dialogHelper.close($("bulkDialog")); setStatus("Godziny usunięte.");
-    }
-  };
+    const gen = new Date();
+    const genText = `${gen.getFullYear()}-${pad2(gen.getMonth() + 1)}-${pad2(gen.getDate())} ${pad2(gen.getHours())}:${pad2(gen.getMinutes())}`;
 
-  $("rate").addEventListener("change", renderAll);
-  $("leaveQuota").addEventListener("change", renderAll);
+    return `<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Raport godzin pracy</title>
+  <style>
+    @page { size: A4; margin: 10mm; }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:#111;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:8px;
+    }
+    h1{ margin:0; font-size:16px; letter-spacing:.2px; }
+    .meta{ font-size:11px; line-height:1.35; color:#333; text-align:right; white-space:nowrap; }
+    .sumLine{ margin:8px 0 10px; font-size:12px; color:#111; }
+    .sumLine strong{ font-weight:900; font-size:13px; }
+    table{ width:100%; border-collapse:collapse; table-layout:fixed; font-size:10px; }
+    thead th{ text-align:left; padding:6px 6px; border-bottom:1px solid #cfd5e3; background:#f3f5fb; font-weight:800; }
+    tbody td{ padding:4px 6px; border-bottom:1px solid #eef1f6; vertical-align:top; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .c-date{ width:72px; }
+    .c-dow{ width:34px; }
+    .c-sum{ width:52px; text-align:right; }
+    .c-note{ width:170px; }
+    .c-ranges{ width:auto; }
+  </style>
+</head>
+<body onload="setTimeout(function(){window.print();}, 250)">
+  <div class="head">
+    <div>
+      <h1>RAPORT GODZIN PRACY</h1>
+      <div style="font-size:11px; color:#333; margin-top:2px;">Miesiąc: <strong>${escapeHtml(monthLabelReminder)}</strong></div>
+    </div>
+    <div class="meta">
+      Wygenerowano: ${escapeHtml(genText)}
+    </div>
+  </div>
 
-  // Swipe gesture (uproszczony wizualnie, logika z poprzedniej wersji)
-  (function enableSwipe() {
-    const area = $("calSwipeArea"), cur = $("calLayerCurrent"), gh = $("calLayerGhost");
-    let sx = 0, tracking = false, locked = false, delta = 0;
-    
+  <div class="sumLine">
+    Łączna liczba godzin: <strong>${escapeHtml(fmtHM(sumMin))}</strong>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="c-date">Data</th>
+        <th class="c-dow">Dzień</th>
+        <th class="c-ranges">Godziny / status</th>
+        <th class="c-sum">Suma</th>
+        <th class="c-note">Notatka (skrót)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.length ? rows.join("") : `<tr><td colspan="5" style="padding:8px 6px; color:#666;">Brak wpisów do wyświetlenia.</td></tr>`}
+    </tbody>
+  </table>
+</body>
+</html>`;
+  }
+
+  function openReportPdf() {
+    haptic.tap();
+
+    const monthPick = $("monthPick");
+    const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
+
+    const html = buildReportHTML(monthYM);
+    const w = window.open("", "_blank");
+    if (!w) {
+      alert("Twoja przeglądarka zablokowała nowe okno. Zezwól na pop-upy dla tej strony i spróbuj ponownie.");
+      return;
+    }
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+  }
+
+  // ===== UI =====
+  const dlgBackBtn = $("dlgBack");
+  if (dlgBackBtn) dlgBackBtn.onclick = () => { haptic.tap(); closeDay(); };
+
+  const openVacDialogBtn = $("openVacDialog");
+  if (openVacDialogBtn) openVacDialogBtn.onclick = openVac;
+
+  const openBulkDialogBtn = $("openBulkDialog");
+  if (openBulkDialogBtn) openBulkDialogBtn.onclick = openBulk;
+
+  const vacBackBtn = $("vacBack");
+  if (vacBackBtn) vacBackBtn.onclick = closeVac;
+
+  const bulkBackBtn = $("bulkBack");
+  if (bulkBackBtn) bulkBackBtn.onclick = closeBulk;
+
+  const dlgAddShiftBtn = $("dlgAddShift");
+  if (dlgAddShiftBtn) {
+    dlgAddShiftBtn.onclick = () => {
+      if (!dlgDate) return;
+
+      const start = $("dlgStart")?.value;
+      const end = $("dlgEnd")?.value;
+      if (!start || !end) return alert("Uzupełnij godzinę wejścia i wyjścia.");
+
+      const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
+      day.shifts.push({ start, end });
+      day.shifts.sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+
+      upsertDay(dlgDate, day);
+
+      if ($("dlgStart")) $("dlgStart").value = "";
+      if ($("dlgEnd")) $("dlgEnd").value = "";
+      save();
+      renderAll();
+      renderDayDialog();
+      setStatus("Dodano zakres.");
+      haptic.success();
+    };
+  }
+
+  const dlgNoteEl = $("dlgNote");
+  let noteTimer = null;
+  if (dlgNoteEl) {
+    dlgNoteEl.addEventListener("input", () => {
+      if (!dlgDate) return;
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(() => {
+        const note = (dlgNoteEl.value || "").trim();
+        const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
+        day.note = note;
+        upsertDay(dlgDate, day);
+        save();
+        renderAll();
+        renderDayDialog();
+        setStatus("Zapisano notatkę.");
+        // bez haptics, żeby nie wibrowało podczas pisania
+      }, 250);
+    });
+  }
+
+  const monthBar = $("monthBar");
+  const monthPick = $("monthPick");
+  if (monthBar && monthPick) {
+    monthBar.onclick = () => {
+      haptic.tap();
+      if (typeof monthPick.showPicker === "function") monthPick.showPicker();
+      else monthPick.focus();
+    };
+    monthPick.addEventListener("change", renderAll);
+  }
+
+  const todayBtn = $("todayBtn");
+  if (todayBtn && monthPick) {
+    todayBtn.onclick = () => {
+      haptic.tap();
+      const t = todayISO();
+      monthPick.value = ym(t);
+      shouldScrollToToday = true;
+      renderAll();
+    };
+  }
+
+  const setVacationRangeBtn = $("setVacationRange");
+  if (setVacationRangeBtn) {
+    setVacationRangeBtn.onclick = () => {
+      const from = $("vacFrom")?.value;
+      const to = $("vacTo")?.value;
+      const type = $("vacType")?.value || "paid";
+      const res = applyLeaveRange(from, to, type);
+      if (res.ok) {
+        haptic.success();
+        closeVac();
+      }
+    };
+  }
+
+  const clearVacationRangeBtn = $("clearVacationRange");
+  if (clearVacationRangeBtn) {
+    clearVacationRangeBtn.onclick = () => {
+      const from = $("vacFrom")?.value;
+      const to = $("vacTo")?.value;
+      const res = clearLeaveRange(from, to);
+      if (res.ok) haptic.warning();
+    };
+  }
+
+  const bulkApplyBtn = $("bulkApply");
+  if (bulkApplyBtn) {
+    bulkApplyBtn.onclick = () => {
+      const from = $("bulkFrom")?.value;
+      const to = $("bulkTo")?.value;
+      const start = $("bulkStart")?.value;
+      const end = $("bulkEnd")?.value;
+      const res = applyBulkHours(from, to, start, end, "add");
+      if (res.ok) {
+        haptic.success();
+        closeBulk();
+      }
+    };
+  }
+
+  const bulkRemoveBtn = $("bulkRemove");
+  if (bulkRemoveBtn) {
+    bulkRemoveBtn.onclick = () => {
+      const from = $("bulkFrom")?.value;
+      const to = $("bulkTo")?.value;
+      const start = $("bulkStart")?.value;
+      const end = $("bulkEnd")?.value;
+      const res = applyBulkHours(from, to, start, end, "remove");
+      if (res.ok) haptic.warning();
+    };
+  }
+
+  const reportBtn = $("reportPdf");
+  if (reportBtn) reportBtn.onclick = openReportPdf;
+
+  const backupBtn = $("backupJson");
+  if (backupBtn) {
+    backupBtn.onclick = () => {
+      haptic.tap();
+
+      const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      setLastBackupNow();
+      haptic.success();
+      alert("Kopia zapisana 👍 Polecam wysłać plik na Google Drive lub maila do siebie.");
+    };
+  }
+
+  const restoreBtn = $("restoreBtn");
+  const restoreInput = $("restoreJson");
+  if (restoreBtn && restoreInput) {
+    restoreBtn.onclick = () => { haptic.tap(); restoreInput.click(); };
+    restoreInput.onchange = async (ev) => {
+      const f = ev.target.files?.[0];
+      if (!f) return;
+      try {
+        const txt = await f.text();
+        const obj = JSON.parse(txt);
+        db = obj;
+        normalize();
+        migrateIfNeeded();
+        save();
+        hydrateSettingsUI();
+        renderAll();
+        if (dlgDate) renderDayDialog();
+        setStatus("Przywrócono dane z pliku JSON.");
+        haptic.success();
+      } catch {
+        alert("Nie udało się wczytać pliku JSON.");
+      }
+    };
+  }
+
+  const clearMonthBtn = $("clearMonth");
+  if (clearMonthBtn) {
+    clearMonthBtn.onclick = () => {
+      haptic.tap();
+      const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
+      if (!confirm("Usunąć wszystkie wpisy z tego miesiąca?")) return;
+      db.entries = db.entries.filter(e => ym(e.date) !== monthYM);
+      save();
+      renderAll();
+      setStatus("Wyczyszczono miesiąc.");
+      haptic.danger();
+    };
+  }
+
+  const rateEl = $("rate");
+  if (rateEl) {
+    rateEl.addEventListener("input", renderAll);
+    rateEl.addEventListener("change", renderAll);
+  }
+  const leaveQuotaEl = $("leaveQuota");
+  if (leaveQuotaEl) {
+    leaveQuotaEl.addEventListener("input", renderAll);
+    leaveQuotaEl.addEventListener("change", renderAll);
+  }
+
+  // ===== Swipe „jak Google” z ghost (live preview) + haptic =====
+  (function enableCalendarSwipe() {
+    const area = $("calSwipeArea");
+    const currentLayer = $("calLayerCurrent");
+    const ghostLayer = $("calLayerGhost");
+    const dowGhost = $("dowRowGhost");
+    const gridGhost = $("calGridGhost");
+
+    if (!area || !currentLayer || !ghostLayer || !dowGhost || !gridGhost) return;
+
+    let sx = 0, sy = 0;
+    let tracking = false;
+    let locked = null;        // "h" | "v"
+    let activeDelta = 0;      // -1 / +1
+    let prepared = false;
+
+    const LOCK_START = 10;
+    const THRESH_X = 60;
+
+    function setX(el, x) { el.style.transform = `translateX(${x}px)`; }
+
+    function prepareGhost(delta) {
+      if (prepared && activeDelta === delta) return;
+
+      activeDelta = delta;
+      prepared = true;
+
+      const cur = getCurrentMonthYM();
+      const nextYM = addMonths(cur, delta);
+
+      renderDowInto(dowGhost);
+      renderCalendarInto(nextYM, gridGhost, false);
+
+      ghostLayer.style.display = "block";
+
+      const w = area.clientWidth || window.innerWidth;
+      setX(currentLayer, 0);
+      setX(ghostLayer, delta > 0 ? w : -w);
+    }
+
+    function resetLayers(animated) {
+      const w = area.clientWidth || window.innerWidth;
+
+      if (animated) {
+        currentLayer.style.transition = "transform 180ms ease";
+        ghostLayer.style.transition = "transform 180ms ease";
+      } else {
+        currentLayer.style.transition = "";
+        ghostLayer.style.transition = "";
+      }
+
+      setX(currentLayer, 0);
+      setX(ghostLayer, activeDelta > 0 ? w : -w);
+
+      if (animated) {
+        setTimeout(() => {
+          currentLayer.style.transition = "";
+          ghostLayer.style.transition = "";
+          ghostLayer.style.display = "none";
+          prepared = false;
+          activeDelta = 0;
+        }, 190);
+      } else {
+        ghostLayer.style.display = "none";
+        prepared = false;
+        activeDelta = 0;
+      }
+    }
+
+    function commit(delta) {
+      const w = area.clientWidth || window.innerWidth;
+
+      haptic.commit();
+
+      currentLayer.style.transition = "transform 190ms ease";
+      ghostLayer.style.transition = "transform 190ms ease";
+
+      setX(currentLayer, delta > 0 ? -w : w);
+      setX(ghostLayer, 0);
+
+      currentLayer.classList.add("calFading");
+
+      setTimeout(() => {
+        currentLayer.classList.remove("calFading");
+
+        const cur = getCurrentMonthYM();
+        setMonthYM(addMonths(cur, delta)); // w środku renderAll()
+
+        currentLayer.style.transition = "";
+        ghostLayer.style.transition = "";
+        setX(currentLayer, 0);
+        ghostLayer.style.display = "none";
+        prepared = false;
+        activeDelta = 0;
+      }, 200);
+    }
+
     area.addEventListener("touchstart", (e) => {
-      if(e.touches.length!==1) return;
-      sx = e.touches[0].clientX; tracking = true; locked = false;
-    }, {passive:true});
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      sx = t.clientX;
+      sy = t.clientY;
+      tracking = true;
+      locked = null;
+      prepared = false;
+      activeDelta = 0;
+    }, { passive: true });
 
     area.addEventListener("touchmove", (e) => {
-      if(!tracking) return;
-      const dx = e.touches[0].clientX - sx;
-      if(!locked) { if(Math.abs(dx)>10) locked = true; else return; }
-      e.preventDefault();
-      
-      const d = dx < 0 ? 1 : -1;
-      if(delta !== d) {
-        delta = d; gh.style.display = "block";
-        renderDowInto($("dowRowGhost")); renderCalendarInto(addMonths(getCurrentMonthYM(), delta), $("calGridGhost"), false);
+      if (!tracking || e.touches.length !== 1) return;
+
+      const t = e.touches[0];
+      const dx = t.clientX - sx;
+      const dy = t.clientY - sy;
+
+      if (!locked) {
+        if (Math.abs(dx) > LOCK_START || Math.abs(dy) > LOCK_START) {
+          locked = (Math.abs(dx) > Math.abs(dy)) ? "h" : "v";
+        }
       }
-      cur.style.transform = `translateX(${dx}px)`;
-      gh.style.transform = `translateX(${(delta > 0 ? area.clientWidth : -area.clientWidth) + dx}px)`;
-    }, {passive:false});
+
+      if (locked !== "h") return;
+
+      e.preventDefault();
+
+      if (dx < 0) prepareGhost(+1);
+      else prepareGhost(-1);
+
+      const w = area.clientWidth || window.innerWidth;
+
+      setX(currentLayer, dx);
+      setX(ghostLayer, (activeDelta > 0 ? w : -w) + dx);
+    }, { passive: false });
 
     area.addEventListener("touchend", (e) => {
-      if(!tracking || !locked) { tracking=false; return; }
-      tracking = false; const dx = e.changedTouches[0].clientX - sx;
-      
-      cur.style.transition = gh.style.transition = "transform 0.2s ease-out";
-      if(Math.abs(dx) > 60) {
-        haptic.commit();
-        cur.style.transform = `translateX(${delta > 0 ? -area.clientWidth : area.clientWidth}px)`;
-        gh.style.transform = `translateX(0)`;
-        setTimeout(() => {
-          $("monthPick").value = addMonths(getCurrentMonthYM(), delta); renderAll();
-          cur.style.transition = gh.style.transition = ""; cur.style.transform = "translateX(0)";
-          gh.style.display = "none"; delta = 0;
-        }, 200);
-      } else {
-        cur.style.transform = "translateX(0)";
-        gh.style.transform = `translateX(${delta > 0 ? area.clientWidth : -area.clientWidth}px)`;
-        setTimeout(() => { cur.style.transition = gh.style.transition = ""; gh.style.display = "none"; delta = 0; }, 200);
+      if (!tracking) return;
+      tracking = false;
+
+      if (locked !== "h" || !prepared) {
+        resetLayers(false);
+        return;
       }
-    });
+
+      const t = e.changedTouches[0];
+      const dx = t.clientX - sx;
+
+      if (Math.abs(dx) >= THRESH_X) {
+        if (dx < 0) commit(+1);
+        else commit(-1);
+      } else {
+        resetLayers(true);
+      }
+    }, { passive: true });
+
+    area.addEventListener("touchcancel", () => {
+      if (!tracking) return;
+      tracking = false;
+      resetLayers(true);
+    }, { passive: true });
   })();
 
-  // INIT
+  // ===== INIT =====
   try {
-    normalize(); hydrateSettingsUI();
-    const t = todayISO(); $("monthPick").value = ym(t);
-    $("vacFrom").value = t; $("vacTo").value = t; $("bulkFrom").value = t; $("bulkTo").value = t;
+    normalize();
+    migrateIfNeeded();
+    hydrateSettingsUI();
+
+    const t = todayISO();
+    const monthPickEl = $("monthPick");
+    if (monthPickEl) monthPickEl.value = ym(t);
+
+    if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
+    if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
+
+    if ($("bulkFrom") && !$("bulkFrom").value) $("bulkFrom").value = t;
+    if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
+
     renderAll();
-  } catch (err) { showErr(err.message); }
+
+    const last = getLastBackupISO();
+    const ds = daysSince(last);
+
+    if (ds >= BACKUP_REMIND_EVERY_DAYS){
+      setTimeout(()=>{
+        const msg = last
+          ? `Ostatni backup: ${ds} dni temu.\nZrób kopię zapasową teraz?`
+          : `Nie wykryto żadnego backupu.\nZrób kopię zapasową teraz?`;
+
+        if (confirm(msg)){
+          $("backupJson").click();
+        }
+      }, 600);
+    }
+  } catch (err) {
+    const msg = (err && err.message) ? err.message : String(err);
+    const el = document.getElementById("status");
+    if (el) el.textContent = "BŁĄD INIT: " + msg;
+  }
 })();
 </script>
 </body>
