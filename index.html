@@ -4,986 +4,905 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Czas pracy</title>
-  <meta name="theme-color" content="#f6f7fb" />
+  <meta name="theme-color" content="#256f75" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
 
- <style>
-  *{box-sizing:border-box}
+  <style>
+    *{box-sizing:border-box}
 
-  :root{
-    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-
-    /* ===== SOFT GREEN / ORGANIZER ===== */
-    --bg:#eef3ee;
-    --bg-2:#f7faf6;
-
-    --surface:#ffffff;
-    --surface-soft:rgba(255,255,255,.78);
-    --surface-green:#f4f8f3;
-
-    --outline-soft:rgba(43,67,54,.11);
-    --outline-medium:rgba(43,67,54,.18);
-
-    --text:#17231b;
-    --text-soft:rgba(23,35,27,.64);
-    --text-muted:rgba(23,35,27,.52);
-
-    --primary:#54796a;
-    --primary-strong:#355e4f;
-    --primary-soft:rgba(84,121,106,.14);
-    --primary-softer:rgba(84,121,106,.08);
-
-    --danger:#c24137;
-    --danger-soft:rgba(194,65,55,.12);
-
-    --sat:rgba(23,35,27,.55);
-    --sun:#b64035;
-    --holiday:#b64035;
-
-    --bar-work:#4f8f63;
-    --bar-note:#d9a441;
-    --bar-vac:#4d82c8;
-
-    --vac-bg:rgba(77,130,200,.10);
-    --bulk-bg:rgba(84,121,106,.12);
-
-    --radius-xl:26px;
-    --radius-lg:22px;
-    --radius-md:17px;
-    --radius-sm:12px;
-
-    --shadow-soft:0 10px 30px rgba(37,58,45,.08);
-    --shadow-card:0 8px 24px rgba(37,58,45,.07);
-    --shadow-modal:0 18px 70px rgba(27,44,34,.24);
-
-    --wrapPad:18px;
-    --calEdgePad:2px;
-  }
-
-  html,body{
-    width:100%;
-    overflow-x:hidden;
-  }
-
-  body{
-    margin:0;
-    background:
-      radial-gradient(circle at top left, rgba(190,212,194,.55), transparent 34%),
-      linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 42%, #e7eee8 100%);
-    color:var(--text);
-    min-height:100dvh;
-  }
-
-  .wrap{
-    max-width:980px;
-    margin:18px auto;
-    padding:0 var(--wrapPad) 90px;
-  }
-
-  .section{
-    background:rgba(255,255,255,.48);
-    border:1px solid rgba(43,67,54,.08);
-    border-radius:var(--radius-xl);
-    padding:16px;
-    margin-bottom:14px;
-    box-shadow:var(--shadow-card);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-  }
-
-  .section:last-of-type{
-    margin-bottom:0;
-  }
-
-  .section.calSection{
-    padding:12px;
-  }
-
-  .appHeader{
-    text-align:center;
-    margin:14px 0 12px;
-  }
-
-  .appHeader h1{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    font-size:23px;
-    font-weight:850;
-    letter-spacing:-.3px;
-    margin:0;
-    padding:8px 16px;
-    color:var(--primary-strong);
-    background:rgba(255,255,255,.54);
-    border:1px solid rgba(43,67,54,.08);
-    border-radius:999px;
-    box-shadow:0 8px 20px rgba(37,58,45,.06);
-  }
-
-  .appHeader .emoji{
-    margin-left:0;
-    opacity:.78;
-    filter:saturate(.9);
-  }
-
-  label{
-    display:block;
-    font-size:12px;
-    font-weight:650;
-    color:var(--text-soft);
-    margin-bottom:6px;
-  }
-
-  .muted{
-    font-size:12.5px;
-    color:var(--text-muted);
-    line-height:1.35;
-  }
-
-  .row{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    flex-wrap:wrap;
-  }
-
-  .twoCols{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-  }
-
-  input,textarea,select{
-    width:100%;
-    padding:12px 14px;
-    border-radius:var(--radius-lg);
-    border:1px solid var(--outline-soft);
-    background:rgba(255,255,255,.82);
-    color:var(--text);
-    font-size:14px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
-    transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
-  }
-
-  textarea{
-    min-height:44px;
-    resize:vertical;
-  }
-
-  input:focus-visible,
-  textarea:focus-visible,
-  select:focus-visible{
-    border-color:rgba(84,121,106,.55);
-    background:#fff;
-    box-shadow:0 0 0 4px var(--primary-soft), inset 0 1px 0 rgba(255,255,255,.9);
-  }
-
-  button{
-    padding:12px 16px;
-    border-radius:var(--radius-lg);
-    border:none;
-    font-size:13px;
-    font-weight:700;
-    background:linear-gradient(180deg, #628879 0%, var(--primary) 100%);
-    color:#fff;
-    cursor:pointer;
-    box-shadow:0 8px 18px rgba(53,94,79,.16);
-    transition:filter .15s ease, transform .08s ease, box-shadow .15s ease;
-  }
-
-  button.secondary{
-    background:rgba(84,121,106,.13);
-    color:var(--primary-strong);
-    box-shadow:none;
-    border:1px solid rgba(84,121,106,.13);
-  }
-
-  button.danger{
-    background:var(--danger-soft);
-    color:#7b211b;
-    box-shadow:none;
-    border:1px solid rgba(194,65,55,.13);
-  }
-
-  button:active{
-    transform:scale(.98);
-    box-shadow:0 4px 12px rgba(53,94,79,.14);
-  }
-
-  button:disabled{
-    opacity:.5;
-    cursor:not-allowed;
-  }
-
-  .chev{
-    width:18px;
-    height:18px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    opacity:.55;
-    transition:transform .18s ease;
-  }
-
-  .chev::before{
-    content:"";
-    width:8px;
-    height:8px;
-    border-right:2px solid var(--text);
-    border-bottom:2px solid var(--text);
-    transform:rotate(45deg);
-  }
-
-  details[open] .chev{
-    transform:rotate(180deg);
-  }
-
-  details summary{
-    cursor:pointer;
-    font-weight:800;
-    color:var(--primary-strong);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    list-style:none;
-    padding:2px 0;
-  }
-
-  details summary::-webkit-details-marker{
-    display:none;
-  }
-
-  .panel{
-    margin-top:12px;
-    animation:panelIn .18s ease;
-  }
-
-  @keyframes panelIn{
-    from{opacity:.4; transform:translateY(-4px)}
-    to{opacity:1; transform:translateY(0)}
-  }
-
-  .topMonthBar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    padding:2px 0 0;
-  }
-
-  .monthTitle{
-    font-size:20px;
-    font-weight:900;
-    line-height:1.1;
-    letter-spacing:-.45px;
-    color:var(--primary-strong);
-  }
-
-  .monthActions{
-    display:flex;
-    gap:8px;
-    align-items:center;
-    position:relative;
-  }
-
-  .chip{
-    border:1px solid rgba(84,121,106,.16);
-    background:rgba(255,255,255,.72);
-    padding:9px 13px;
-    border-radius:999px;
-    font-weight:800;
-    font-size:13px;
-    color:var(--primary-strong);
-    cursor:pointer;
-    box-shadow:0 6px 16px rgba(37,58,45,.05);
-  }
-
-  .chip:active{
-    transform:scale(.98);
-  }
-
-  .iconCircle{
-    width:42px;
-    height:42px;
-    border-radius:999px;
-    border:1px solid rgba(84,121,106,.16);
-    background:rgba(255,255,255,.72);
-    cursor:pointer;
-    display:grid;
-    place-items:center;
-    position:relative;
-    color:var(--primary-strong);
-    box-shadow:0 6px 16px rgba(37,58,45,.05);
-  }
-
-  .iconCircle svg{
-    width:20px;
-    height:20px;
-    opacity:.88;
-  }
-
-  #monthPick{
-    position:absolute;
-    inset:0;
-    opacity:0;
-    cursor:pointer;
-    appearance:none;
-    -webkit-appearance:none;
-  }
-
-  /* ===== KALENDARZ ===== */
-
-  .calGrid{
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-    gap:4px;
-  }
-
-  .calDow{
-    text-align:center;
-    font-size:11.5px;
-    font-weight:750;
-    color:rgba(53,94,79,.62);
-    padding:3px 0;
-  }
-
-  .dayCell{
-    border-radius:13px;
-    background:rgba(255,255,255,.70);
-    border:1px solid rgba(43,67,54,.075);
-    padding:0;
-    gap:5px;
-    cursor:pointer;
-    position:relative;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    align-items:stretch;
-    overflow:hidden;
-    aspect-ratio:1 / 1.55;
-    min-height:0;
-    box-shadow:0 4px 12px rgba(37,58,45,.045);
-    transition:transform .08s ease, background .15s ease, box-shadow .15s ease, border-color .15s ease;
-  }
-
-  .dayCell:active{
-    transform:scale(.985);
-    background:#fff;
-  }
-
-  .blankCell{
-    border:none;
-    background:transparent;
-    box-shadow:none;
-    pointer-events:none;
-  }
-
-  .dayTop{
-    width:100%;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    padding-top:5px;
-  }
-
-  .dayNum{
-    min-width:21px;
-    height:21px;
-    padding:0 4px;
-    display:grid;
-    place-items:center;
-    border-radius:999px;
-    font-size:11.5px;
-    font-weight:800;
-    line-height:1;
-    letter-spacing:.1px;
-    color:var(--text);
-  }
-
-  .dayNum.saturday{
-    color:var(--sat);
-    font-weight:800;
-  }
-
-  .dayNum.sunday{
-    color:var(--sun);
-  }
-
-  .dayNum.holiday{
-    color:var(--holiday);
-  }
-
-  .dayNum.saturday.holiday{
-    color:var(--holiday);
-    font-weight:800;
-  }
-
-  .dayCell.today{
-    border-color:rgba(84,121,106,.32);
-    background:rgba(255,255,255,.92);
-    box-shadow:0 8px 20px rgba(53,94,79,.10);
-  }
-
-  .dayCell.today .dayNum{
-    background:var(--primary);
-    color:#fff;
-    font-weight:950;
-    box-shadow:0 5px 12px rgba(53,94,79,.22);
-  }
-
-  .pillStack{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    min-height:0;
-    flex:1;
-    padding-bottom:3px;
-  }
-
-  .pill{
-    height:11px;
-    width:100%;
-    font-size:7.5px;
-    font-weight:750;
-    line-height:1;
-    border-radius:3px;
-    display:flex;
-    align-items:center;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    border:none;
-    justify-content:center;
-  }
-
-  .pill.work{
-    background:rgba(79,143,99,.16);
-    color:#244b31;
-  }
-
-  .pill.vac{
-    background:rgba(77,130,200,.17);
-    color:#224b83;
-    font-weight:900;
-  }
-
-  .pill.unpaid{
-    background:rgba(23,35,27,.08);
-    color:rgba(23,35,27,.76);
-    font-weight:900;
-  }
-
-  .pill.sick{
-    background:rgba(194,65,55,.13);
-    color:#7b211b;
-    font-weight:900;
-  }
-
-  .pill.more{
-    background:rgba(84,121,106,.10);
-    color:var(--primary-strong);
-    font-weight:800;
-    justify-content:center;
-    padding:0 10px;
-  }
-
-  .noteDot{
-    position:absolute;
-    width:7px;
-    height:7px;
-    top:6px;
-    right:6px;
-    border-radius:999px;
-    background:var(--bar-note);
-    box-shadow:0 0 0 2px rgba(255,255,255,.9);
-    pointer-events:none;
-  }
-
-  .statBox{
-    background:linear-gradient(180deg, #ffffff 0%, #f5f9f4 100%);
-    border:1px solid rgba(84,121,106,.12);
-    border-radius:20px;
-    padding:13px 15px;
-    box-shadow:0 7px 20px rgba(37,58,45,.055);
-  }
-
-  .statValue{
-    font-size:23px;
-    font-weight:950;
-    letter-spacing:-.55px;
-    margin-top:4px;
-    color:var(--primary-strong);
-  }
-
-  /* ===== MODAL DNIA ===== */
-
-  dialog#dayDialog{
-    border:none;
-    padding:0;
-    width:100vw;
-    height:100dvh;
-    max-width:100vw;
-    max-height:100dvh;
-    margin:0;
-    border-radius:0;
-    box-shadow:var(--shadow-modal);
-    overflow:hidden;
-    background:var(--bg);
-    color:var(--text);
-  }
-
-  dialog#dayDialog::backdrop{
-    background:rgba(18,31,23,.48);
-  }
-
-  dialog#vacDialog,
-  dialog#bulkDialog{
-    border:none;
-    padding:0;
-    width:calc(100vw - 16px);
-    max-width:980px;
-    margin:auto;
-    border-radius:26px;
-    box-shadow:var(--shadow-modal);
-    overflow:hidden;
-    background:var(--bg);
-    color:var(--text);
-  }
-
-  dialog#vacDialog::backdrop,
-  dialog#bulkDialog::backdrop{
-    background:rgba(18,31,23,.48);
-  }
-
-  .modalHead{
-    background:rgba(247,250,246,.92);
-    padding:13px;
-    border-bottom:1px solid rgba(43,67,54,.10);
-    position:sticky;
-    top:0;
-    z-index:2;
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-  }
-
-  .modalHead h3{
-    color:var(--primary-strong);
-    font-weight:900;
-    letter-spacing:-.25px;
-  }
-
-  .modalBody{
-    padding:13px;
-    background:
-      radial-gradient(circle at top left, rgba(190,212,194,.42), transparent 38%),
-      var(--bg);
-  }
-
-  #vacDialog .modalBody{
-    background:
-      radial-gradient(circle at top left, rgba(77,130,200,.13), transparent 36%),
-      var(--vac-bg);
-  }
-
-  #bulkDialog .modalBody{
-    background:
-      radial-gradient(circle at top left, rgba(84,121,106,.18), transparent 36%),
-      var(--bulk-bg);
-  }
-
-  .backBtn{
-    width:44px;
-    height:44px;
-    padding:0;
-    border-radius:18px;
-    border:1px solid rgba(84,121,106,.16);
-    background:linear-gradient(180deg, #628879 0%, var(--primary) 100%);
-    color:#fff;
-    cursor:pointer;
-    display:grid;
-    place-items:center;
-    position:absolute;
-    top:10px;
-    right:12px;
-    left:auto;
-    box-shadow:0 8px 18px rgba(53,94,79,.16);
-  }
-
-  .backBtn.blue{
-    background:linear-gradient(180deg, #5b91d8 0%, var(--bar-vac) 100%);
-    border:1px solid rgba(77,130,200,.20);
-  }
-
-  .backBtn svg{
-    width:20px;
-    height:20px;
-    opacity:.94;
-  }
-
-  .modalHeadInner{
-    padding-right:58px;
-  }
-
-  .modalStats{
-    display:flex;
-    justify-content:space-between;
-    align-items:stretch;
-    gap:12px;
-    margin-bottom:14px;
-    flex-wrap:nowrap;
-  }
-
-  .statMini{
-    flex:1;
-    min-width:0;
-    background:linear-gradient(180deg, #ffffff 0%, #f5f9f4 100%);
-    border:1px solid rgba(84,121,106,.12);
-    border-radius:20px;
-    padding:12px 14px;
-    box-shadow:0 7px 20px rgba(37,58,45,.055);
-  }
-
-  .statMiniValue{
-    font-size:21px;
-    font-weight:950;
-    letter-spacing:-.5px;
-    margin-top:4px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    color:var(--primary-strong);
-  }
-
-  @media(max-width:380px){
-    .statMiniValue{
-      font-size:18px;
-    }
-  }
-
-  .modalStack{
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-  }
-
-  .timeGrid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-  }
-
-  @media(max-width:520px){
-    .timeGrid{
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-  }
-
-  .addBtnCenter{
-    width:min(320px, 100%);
-    margin:4px auto 0;
-    display:block;
-  }
-
-  .shiftList{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    margin-top:10px;
-  }
-
-  .shiftItem{
-    border:1px solid rgba(84,121,106,.12);
-    background:rgba(255,255,255,.68);
-    border-radius:20px;
-    padding:13px 13px;
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    align-items:flex-start;
-    box-shadow:0 6px 18px rgba(37,58,45,.05);
-  }
-
-  .shiftItem .times{
-    font-weight:850;
-    font-size:16px;
-    color:var(--primary-strong);
-  }
-
-  .shiftItem .mins{
-    font-size:12.5px;
-    color:var(--text-soft);
-    margin-top:4px;
-  }
-
-  .delIcon{
-    width:36px;
-    height:36px;
-    border-radius:18px;
-    border:1px solid rgba(194,65,55,.18);
-    background:rgba(194,65,55,.10);
-    cursor:pointer;
-    position:relative;
-    flex:0 0 auto;
-    box-shadow:none;
-  }
-
-  .delIcon::before,
-  .delIcon::after{
-    content:"";
-    position:absolute;
-    top:50%;
-    left:50%;
-    width:14px;
-    height:2px;
-    background:#7b211b;
-    border-radius:2px;
-    transform-origin:center;
-  }
-
-  .delIcon::before{
-    transform:translate(-50%,-50%) rotate(45deg);
-  }
-
-  .delIcon::after{
-    transform:translate(-50%,-50%) rotate(-45deg);
-  }
-
-  body.modal-open{
-    overflow:hidden;
-    height:100vh;
-    touch-action:none;
-  }
-
-  /* Przyciski pod kalendarzem */
-  .row.calBtns{
-    flex-wrap:nowrap;
-  }
-
-  .bulkBtn,
-  .vacBtn{
-    width:auto;
-    flex:1;
-    margin-bottom:4px;
-    box-shadow:none;
-    border:1px solid transparent;
-  }
-
-  .bulkBtn{
-    background:rgba(84,121,106,.14);
-    color:var(--primary-strong);
-    font-weight:800;
-    border-color:rgba(84,121,106,.12);
-  }
-
-  .vacBtn{
-    background:rgba(77,130,200,.13);
-    color:#254d82;
-    font-weight:800;
-    border-color:rgba(77,130,200,.12);
-  }
-
-  .rangeRow{
-    display:flex;
-    gap:10px;
-    flex-wrap:nowrap;
-    align-items:flex-end;
-  }
-
-  .rangeRow > *{
-    flex:1;
-    min-width:0;
-  }
-
-  @media(max-width:380px){
-    .rangeRow{
-      flex-wrap:wrap;
-    }
-
-    .rangeRow > *{
-      min-width:160px;
-    }
-  }
-
-  .actionRow{
-    display:flex;
-    gap:10px;
-    margin-top:12px;
-  }
-
-  .actionRow > *{
-    flex:1;
-  }
-
-  *{
-    -webkit-tap-highlight-color:transparent;
-  }
-
-  :focus{
-    outline:none;
-  }
-
-  :focus-visible{
-    outline:2px solid rgba(84,121,106,.65);
-    outline-offset:2px;
-    border-radius:12px;
-  }
-
-  /* ===== MOBILE ===== */
-
-  @media (max-width:640px){
     :root{
-      --wrapPad:7px;
-      --calEdgePad:2px;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+
+      --bg:#f4f7fb;
+      --bg-deep:#e9f0f7;
+      --surface:#ffffff;
+      --surface-2:#f7f9fc;
+      --surface-3:#eef3f8;
+      --glass:rgba(255,255,255,.72);
+
+      --text:#101828;
+      --text-soft:#5f6b7a;
+      --text-muted:#8b96a8;
+
+      --line:#e4eaf2;
+      --line-strong:#d6e0eb;
+
+      --primary:#16777f;
+      --primary-dark:#0f5962;
+      --primary-soft:rgba(22,119,127,.12);
+
+      --blue:#2f7df6;
+      --blue-soft:rgba(47,125,246,.13);
+
+      --green:#16a36b;
+      --green-soft:rgba(22,163,107,.13);
+
+      --orange:#f59e0b;
+      --orange-soft:rgba(245,158,11,.14);
+
+      --red:#d9342b;
+      --red-soft:rgba(217,52,43,.11);
+
+      --slate-soft:rgba(16,24,40,.07);
+
+      --sat:#7c8797;
+      --sun:#dc2626;
+      --holiday:#dc2626;
+
+      --bar-work:#16a36b;
+      --bar-note:#f59e0b;
+      --bar-vac:#2f7df6;
+
+      --shadow-xs:0 2px 8px rgba(16,24,40,.04);
+      --shadow-sm:0 8px 24px rgba(16,24,40,.07);
+      --shadow-md:0 18px 46px rgba(16,24,40,.10);
+      --shadow-lg:0 30px 90px rgba(16,24,40,.22);
+
+      --radius-xxl:36px;
+      --radius-xl:30px;
+      --radius-lg:24px;
+      --radius-md:18px;
+      --radius-sm:14px;
+
+      --wrapPad:18px;
+      --calEdgePad:0px;
     }
 
+    html,body{width:100%;overflow-x:hidden}
     body{
+      margin:0;
+      min-height:100vh;
+      color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(190,212,194,.45), transparent 32%),
-        linear-gradient(180deg, #f7faf6 0%, #eef3ee 44%, #e7eee8 100%);
+        radial-gradient(circle at 0% -10%, rgba(47,125,246,.13), transparent 32%),
+        radial-gradient(circle at 110% 6%, rgba(22,119,127,.13), transparent 30%),
+        linear-gradient(180deg,#fbfdff 0%,var(--bg) 46%,var(--bg-deep) 100%);
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
     }
 
     .wrap{
-      padding:0 var(--wrapPad) 90px;
-      margin:10px auto;
-    }
-
-    .appHeader{
-      margin:12px 0 10px;
+      max-width:1060px;
+      margin:0 auto;
+      padding:14px var(--wrapPad) 96px;
     }
 
     .section{
-      border-radius:24px;
-      padding:14px;
-      margin-bottom:12px;
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(228,234,242,.88);
+      border-radius:var(--radius-xxl);
+      box-shadow:var(--shadow-sm);
+      padding:18px;
+      margin-bottom:14px;
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+    }
+    .section:last-of-type{margin-bottom:0}
+
+    .appHeader.dashboardHero{
+      position:relative;
+      overflow:hidden;
+      text-align:left;
+      margin:0 0 14px;
+      padding:20px;
+      border-radius:38px;
+      color:#fff;
+      background:
+        radial-gradient(circle at 88% -14%, rgba(255,255,255,.24), transparent 28%),
+        radial-gradient(circle at 8% 100%, rgba(255,255,255,.13), transparent 30%),
+        linear-gradient(135deg,#173b68 0%,#15747c 50%,#14a083 100%);
+      box-shadow:0 28px 76px rgba(16,45,74,.22);
+      isolation:isolate;
+    }
+    .appHeader.dashboardHero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(90deg,rgba(255,255,255,.11) 0 1px,transparent 1px 100%),
+        linear-gradient(0deg,rgba(255,255,255,.08) 0 1px,transparent 1px 100%);
+      background-size:42px 42px;
+      opacity:.22;
+      mask-image:linear-gradient(120deg,#000,transparent 72%);
+      pointer-events:none;
+      z-index:-1;
+    }
+    .appHeader.dashboardHero::after{
+      content:"";
+      position:absolute;
+      width:230px;
+      height:230px;
+      right:-82px;
+      top:-90px;
+      border-radius:50%;
+      background:rgba(255,255,255,.13);
+      pointer-events:none;
+      z-index:-1;
     }
 
-    .section.calSection{
-      margin-left:calc(-1 * var(--wrapPad) + var(--calEdgePad));
-      margin-right:calc(-1 * var(--wrapPad) + var(--calEdgePad));
-      padding-left:var(--calEdgePad);
-      padding-right:var(--calEdgePad);
-      padding-top:10px;
-      padding-bottom:10px;
-      background:rgba(255,255,255,.36);
+    .dashTop{
+      position:relative;
+      z-index:1;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:flex-start;
+    }
+    .eyebrow{
+      font-size:11px;
+      font-weight:850;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:rgba(255,255,255,.72);
+      margin-bottom:8px;
+    }
+    .appHeader h1{
+      font-size:28px;
+      line-height:1.04;
+      font-weight:950;
+      margin:0;
+      letter-spacing:-.04em;
+    }
+    .appHeader .emoji{margin-left:6px;opacity:.95}
+    .heroSub{
+      color:rgba(255,255,255,.82);
+      margin-top:8px;
+      font-size:13px;
+      line-height:1.42;
+      max-width:430px;
+    }
+
+    label{
+      display:block;
+      font-size:12px;
+      font-weight:800;
+      color:var(--text-soft);
+      margin-bottom:8px;
+    }
+    .muted{font-size:12.5px;color:var(--text-soft)}
+    .dashboardHero .muted,
+    .dashboardHero .heroSub,
+    .dashboardHero .eyebrow{color:rgba(255,255,255,.82)}
+
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .twoCols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+    input,textarea,select{
+      width:100%;
+      padding:15px 16px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:#f7f9fc;
+      color:var(--text);
+      font-size:14px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+      transition:border-color .15s ease, box-shadow .15s ease, background .15s ease, transform .08s ease;
+    }
+    textarea{min-height:58px;resize:vertical;line-height:1.4}
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible{
+      border-color:rgba(47,125,246,.62);
+      box-shadow:0 0 0 4px rgba(47,125,246,.13), inset 0 1px 0 rgba(255,255,255,.9);
+      background:#fff;
+    }
+
+    button{
+      padding:13px 17px;
+      border-radius:999px;
+      border:none;
+      font-size:14px;
+      font-weight:850;
+      background:var(--primary);
+      color:#fff;
+      cursor:pointer;
+      transition:transform .10s ease, filter .15s ease, box-shadow .15s ease, background .15s ease;
+      box-shadow:0 12px 28px rgba(22,119,127,.20);
+    }
+    button.secondary{
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-xs);
+    }
+    button.danger{
+      background:var(--red-soft);
+      color:#a8322b;
       box-shadow:none;
     }
+    button:active{transform:scale(.985)}
+    button:disabled{opacity:.5;cursor:not-allowed}
 
-    .monthTitle{
-      font-size:19px;
+    .chev{
+      width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;opacity:.55;transition:transform .18s ease;
     }
+    .chev::before{
+      content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);
+    }
+    details[open] .chev{transform:rotate(180deg)}
+    details summary{
+      cursor:pointer;
+      font-weight:900;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      list-style:none;
+      padding:4px 0;
+      color:var(--text);
+      font-size:16px;
+    }
+    details summary::-webkit-details-marker{display:none}
+    .panel{margin-top:14px;animation:panelIn .18s ease}
+    @keyframes panelIn{from{opacity:.45;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
-    .twoCols{
+    .topMonthBar{
+      position:relative;
+      z-index:1;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
       gap:10px;
+      padding:16px 18px;
+      margin-top:18px;
+      border-radius:30px;
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
     }
+    .monthTitle{
+      font-size:24px;
+      font-weight:950;
+      line-height:1.05;
+      letter-spacing:-.035em;
+      color:#fff;
+    }
+    .monthActions{display:flex;gap:8px;align-items:center;position:relative;flex:0 0 auto}
+    .chip{
+      border:1px solid rgba(255,255,255,.20);
+      background:rgba(255,255,255,.15);
+      padding:11px 15px;
+      border-radius:999px;
+      font-weight:850;
+      font-size:14px;
+      color:#fff;
+      cursor:pointer;
+      box-shadow:none;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+    .chip:active{transform:scale(.98)}
 
+    .iconCircle{
+      width:46px;height:46px;border-radius:999px;border:1px solid rgba(255,255,255,.20);background:rgba(255,255,255,.15);color:#fff;cursor:pointer;display:grid;place-items:center;position:relative;box-shadow:none;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+    .iconCircle svg{width:20px;height:20px;opacity:.94}
+    #monthPick{position:absolute;inset:0;opacity:0;cursor:pointer;appearance:none;-webkit-appearance:none}
+
+    .dashboardStats{position:relative;z-index:1;margin-top:14px}
     .statBox{
-      padding:12px 13px;
-      border-radius:19px;
+      position:relative;
+      overflow:hidden;
+      background:rgba(255,255,255,.96);
+      border:1px solid rgba(255,255,255,.46);
+      border-radius:30px;
+      padding:17px 18px;
+      color:var(--text);
+      box-shadow:0 12px 30px rgba(16,24,40,.12);
+      min-height:102px;
     }
-
+    .statBox::after{
+      content:"";
+      position:absolute;
+      right:16px;
+      top:16px;
+      width:34px;
+      height:34px;
+      border-radius:16px;
+      background:linear-gradient(180deg,rgba(47,125,246,.13),rgba(22,119,127,.08));
+    }
+    .statBox .muted{color:#667387 !important;font-size:12px;font-weight:800}
     .statValue{
-      font-size:21px;
+      font-size:30px;
+      line-height:1;
+      font-weight:950;
+      margin-top:10px;
+      letter-spacing:-.045em;
+      color:#0f172a;
+    }
+    .dashboardHero #status{
+      position:relative;
+      z-index:1;
+      min-height:18px;
+      margin-top:12px !important;
+      color:rgba(255,255,255,.90);
     }
 
-    .calGrid{
-      gap:3px;
+    .quickActions{position:relative;z-index:1;margin-top:14px !important;flex-wrap:nowrap}
+    .bulkBtn,.vacBtn{width:auto;flex:1;min-height:52px;margin-bottom:0}
+    .bulkBtn{
+      background:rgba(255,255,255,.96);
+      color:var(--primary-dark);
+      box-shadow:0 12px 26px rgba(16,24,40,.12);
+    }
+    .vacBtn{
+      background:linear-gradient(180deg,#3a8dff 0%,#2f70e9 100%);
+      color:#fff;
+      box-shadow:0 14px 28px rgba(47,112,233,.26);
+    }
+
+    /* ===== KALENDARZ ===== */
+    .calSection{
+      padding:14px 14px 12px;
+      background:rgba(255,255,255,.88);
+    }
+    .calGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .calDow{
+      text-align:center;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.02em;
+      color:var(--text-muted);
+      padding:4px 0 7px;
     }
 
     .dayCell{
-      border-radius:12px;
-      box-shadow:0 3px 10px rgba(37,58,45,.04);
+      border-radius:22px;
+      background:#fbfcfe;
+      border:1px solid #e8eef6;
+      padding:0;
+      gap:6px;
+      cursor:pointer;
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      align-items:stretch;
+      overflow:hidden;
+      aspect-ratio:1 / 1.46;
+      min-height:0;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.78);
+      transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease, background .12s ease;
     }
-  }
+    .dayCell:hover{border-color:#d6e3f1;box-shadow:0 10px 24px rgba(16,24,40,.055)}
+    .dayCell:active{transform:scale(.987)}
+    .blankCell{border:none;background:transparent;box-shadow:none;pointer-events:none}
+    .dayTop{width:100%;display:flex;justify-content:center;align-items:flex-start;padding-top:8px}
+    .dayNum{
+      min-width:24px;height:24px;padding:0 6px;border-radius:999px;display:grid;place-items:center;font-size:11.5px;font-weight:950;line-height:1;letter-spacing:.1px;color:var(--text);
+    }
+    .dayNum.saturday{color:var(--sat)}
+    .dayNum.sunday{color:var(--sun)}
+    .dayNum.holiday{color:var(--holiday)}
+    .dayNum.saturday.holiday{color:var(--holiday)}
+    .dayCell.today{border-color:rgba(47,125,246,.36);background:#fff;box-shadow:0 10px 28px rgba(47,125,246,.12)}
+    .dayCell.today .dayNum{background:var(--blue);color:#fff}
+    .pillStack{display:flex;flex-direction:column;gap:4px;min-height:0;flex:1;padding:0 5px 6px}
+    .pill{
+      height:12px;width:100%;font-size:7.4px;font-weight:900;line-height:1;border-radius:999px;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:none;justify-content:center;padding:0 6px;
+    }
+    .pill.work{background:var(--green-soft);color:#0b7a4f}
+    .pill.vac{background:var(--blue-soft);color:#2465dc;font-weight:950}
+    .pill.unpaid{background:rgba(16,24,40,.08);color:#596579;font-weight:950}
+    .pill.sick{background:var(--red-soft);color:#bd312b;font-weight:950}
+    .pill.more{background:rgba(16,24,40,.06);color:#667387;font-weight:850}
+    .noteDot{
+      position:absolute;width:7px;height:7px;top:8px;right:8px;border-radius:999px;background:var(--orange);box-shadow:0 0 0 3px rgba(245,158,11,.16);pointer-events:none;
+    }
 
-  /* ===== Swipe kalendarza ===== */
-
-  #calSwipeArea{
-    touch-action:pan-y;
-    overflow:hidden;
-    position:relative;
-  }
-
-  .calLayer{
-    will-change:transform;
-  }
-
-  .calGhost{
-    position:absolute;
-    left:0;
-    right:0;
-    top:0;
-    pointer-events:none;
-    opacity:1;
-  }
-
-  .calFading{
-    opacity:.92;
-    transition:opacity 120ms ease;
-  }
-
-  /* ===== Scroll tylko w dolnej sekcji modala dnia ===== */
-
-  #dayDialog .modalBody{
-    display:flex;
-    flex-direction:column;
-    height:100dvh;
-    overflow:hidden;
-  }
-
-  #dlgShiftsBlock{
-    flex:1;
-    min-height:0;
-    overflow:auto;
-    -webkit-overflow-scrolling:touch;
-    padding-bottom:0;
-  }
-
-  #dlgShifts{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
-
-  #dlgShiftsBlock::after{
-    content:"";
-    display:block;
-    height:calc(45px + env(safe-area-inset-bottom, 0px));
-  }
-
-  #dlgShiftsTitle{
-    position:sticky;
-    top:0;
-    z-index:5;
-    display:block;
-    padding:10px 2px 10px;
-    margin:0 0 10px;
-    color:var(--primary-strong);
-    background:rgba(238,243,238,.94);
-    border-bottom:1px solid rgba(43,67,54,.10);
-  }
-
-  @supports ((backdrop-filter: blur(6px)) or (-webkit-backdrop-filter: blur(6px))){
-    #dlgShiftsTitle{
-      background:rgba(238,243,238,.88);
+    /* ===== NOWE MODALE / SHEETY ===== */
+    dialog{
+      color:var(--text);
+    }
+    dialog#vacDialog,
+    dialog#bulkDialog{
+      border:none;
+      padding:0;
+      width:calc(100vw - 32px);
+      max-width:720px;
+      max-height:calc(100dvh - 32px);
+      margin:auto;
+      border-radius:34px;
+      background:#fff;
+      box-shadow:var(--shadow-lg);
+      overflow:hidden;
+    }
+    dialog#vacDialog::backdrop,
+    dialog#bulkDialog::backdrop,
+    dialog#dayDialog::backdrop{
+      background:rgba(15,23,42,.50);
       backdrop-filter:blur(10px);
       -webkit-backdrop-filter:blur(10px);
     }
-  }
-</style>
+
+    .modalShell{
+      background:
+        radial-gradient(circle at 90% 0%, rgba(47,125,246,.10), transparent 26%),
+        linear-gradient(180deg,#ffffff 0%,#f7f9fd 100%);
+    }
+    .modalHead{
+      position:relative;
+      padding:18px 18px 12px;
+      border-bottom:1px solid rgba(228,234,242,.85);
+      background:transparent;
+      z-index:2;
+    }
+    .modalHandle{
+      width:52px;
+      height:5px;
+      border-radius:999px;
+      background:#dbe3ee;
+      margin:0 auto 16px;
+    }
+    .modalTitleRow{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding-right:56px;
+    }
+    .modalIcon{
+      width:46px;
+      height:46px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      font-size:22px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+    }
+    .modalIcon.bulk{background:var(--primary-soft);color:var(--primary-dark)}
+    .modalIcon.vac{background:var(--blue-soft);color:#2464d9}
+    .modalHead h3{
+      margin:0;
+      font-size:20px;
+      line-height:1.05;
+      font-weight:950;
+      letter-spacing:-.035em;
+      color:var(--text);
+    }
+    .modalHead .muted{
+      margin-top:5px;
+      line-height:1.35;
+      color:var(--text-soft);
+    }
+    .backBtn{
+      width:44px;
+      height:44px;
+      padding:0;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#f3f7fb;
+      color:#465568;
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      position:absolute;
+      top:18px;
+      right:18px;
+      left:auto;
+      box-shadow:none;
+    }
+    .backBtn.blue{
+      background:#edf4ff;
+      color:#2f70e9;
+      border-color:#dfeaff;
+    }
+    .backBtn svg{width:20px;height:20px;opacity:.96}
+
+    .modalBody{
+      padding:16px 18px 20px;
+      background:transparent;
+    }
+    .sheetCard{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:16px;
+      box-shadow:var(--shadow-xs);
+    }
+    .sheetCard + .sheetCard{margin-top:12px}
+    .fieldGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .fieldGrid.single{grid-template-columns:1fr}
+    .fieldBox{
+      background:#f8fafc;
+      border:1px solid #edf1f7;
+      border-radius:24px;
+      padding:12px;
+    }
+    .fieldBox label{margin-bottom:8px}
+    .fieldBox input,
+    .fieldBox select,
+    .fieldBox textarea{
+      background:#fff;
+      border-color:#e7edf4;
+      box-shadow:none;
+    }
+    .actionRow{
+      display:flex;
+      gap:10px;
+      margin-top:14px;
+    }
+    .actionRow > *{flex:1;min-height:50px}
+    #bulkApply,
+    #setVacationRange,
+    #dlgAddShift{
+      background:linear-gradient(180deg,#1b8b91 0%,#16777f 100%) !important;
+      color:#fff !important;
+      box-shadow:0 14px 30px rgba(22,119,127,.22) !important;
+    }
+    #setVacationRange{
+      background:linear-gradient(180deg,#3a8dff 0%,#2f70e9 100%) !important;
+      box-shadow:0 14px 30px rgba(47,112,233,.24) !important;
+    }
+    #bulkRemove,
+    #clearVacationRange{
+      background:#f7eeee !important;
+      color:#a9322b !important;
+      box-shadow:none !important;
+    }
+    .sheetHint{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:22px;
+      background:#f7f9fc;
+      color:var(--text-soft);
+      font-size:12.5px;
+      line-height:1.35;
+      border:1px solid #edf1f7;
+    }
+    .sheetHint::before{
+      content:"i";
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      font-size:12px;
+      font-weight:950;
+      color:#fff;
+      background:#9aa6b6;
+      margin-top:1px;
+    }
+
+    /* ===== MODAL DNIA ===== */
+    dialog#dayDialog{
+      border:none;
+      padding:0;
+      width:100vw;
+      height:100dvh;
+      max-width:100vw;
+      max-height:100dvh;
+      margin:0;
+      border-radius:0;
+      background:#f4f7fb;
+      box-shadow:none;
+      overflow:hidden;
+    }
+    .dayModalShell{
+      height:100dvh;
+      display:flex;
+      flex-direction:column;
+      background:
+        radial-gradient(circle at 0% 0%,rgba(47,125,246,.10),transparent 26%),
+        linear-gradient(180deg,#fbfdff 0%,#f4f7fb 100%);
+    }
+    #dayDialog .modalHead{
+      position:relative;
+      flex:0 0 auto;
+      padding:16px 18px 14px;
+      border-bottom:none;
+      background:
+        radial-gradient(circle at 95% 0%,rgba(255,255,255,.18),transparent 30%),
+        linear-gradient(135deg,#173b68 0%,#15747c 54%,#14a083 100%);
+      color:#fff;
+      box-shadow:0 18px 48px rgba(16,45,74,.18);
+    }
+    #dayDialog .modalHead .modalHandle{background:rgba(255,255,255,.34);margin-bottom:14px}
+    #dayDialog .modalHeadInner{padding-right:56px}
+    #dayDialog h3{
+      margin:0;
+      color:#fff;
+      font-size:25px;
+      line-height:1.05;
+      font-weight:950;
+      letter-spacing:-.04em;
+    }
+    #dayDialog #dlgMeta{
+      margin-top:6px;
+      color:rgba(255,255,255,.82);
+      font-weight:700;
+    }
+    #dayDialog .backBtn{
+      background:rgba(255,255,255,.16);
+      color:#fff;
+      border-color:rgba(255,255,255,.20);
+      top:18px;
+      right:18px;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+    #dayDialog .modalBody{
+      flex:1;
+      min-height:0;
+      overflow:hidden;
+      padding:14px;
+      background:transparent;
+      display:flex;
+      flex-direction:column;
+    }
+    .modalStats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-bottom:12px;
+      flex:0 0 auto;
+    }
+    .statMini{
+      position:relative;
+      overflow:hidden;
+      min-width:0;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:15px;
+      box-shadow:var(--shadow-xs);
+    }
+    .statMini::after{
+      content:"";
+      position:absolute;
+      right:14px;
+      top:14px;
+      width:30px;
+      height:30px;
+      border-radius:14px;
+      background:linear-gradient(180deg,rgba(47,125,246,.12),rgba(22,119,127,.08));
+    }
+    .statMini .muted{font-size:12px;color:#667387;font-weight:800}
+    .statMiniValue{
+      font-size:24px;
+      line-height:1;
+      font-weight:950;
+      margin-top:8px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      letter-spacing:-.04em;
+      color:#0f172a;
+    }
+    .modalStack{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:30px;
+      padding:16px;
+      box-shadow:var(--shadow-xs);
+      flex:0 0 auto;
+    }
+    .timeGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .addBtnCenter{
+      width:100%;
+      margin:2px auto 0;
+      display:block;
+      min-height:50px;
+    }
+    #dlgShiftsBlock{
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      padding:12px 0 0;
+    }
+    #dlgShifts{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    #dlgShiftsBlock::after{
+      content:"";
+      display:block;
+      height:calc(36px + env(safe-area-inset-bottom, 0px));
+    }
+    #dlgShiftsTitle{
+      position:sticky;
+      top:0;
+      z-index:5;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 4px 12px;
+      margin:0 0 8px;
+      color:var(--text);
+      background:rgba(244,247,251,.86);
+      border-bottom:1px solid rgba(228,234,242,.75);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      font-size:15px;
+      font-weight:950;
+      letter-spacing:-.01em;
+    }
+    .shiftList{display:flex;flex-direction:column;gap:10px;margin-top:0}
+    .shiftItem{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:24px;
+      padding:14px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      box-shadow:var(--shadow-xs);
+    }
+    .shiftItem .times{font-weight:950;font-size:17px;letter-spacing:-.02em}
+    .shiftItem .mins{font-size:12.5px;color:var(--text-soft);margin-top:5px;font-weight:650}
+    .delIcon{
+      width:42px;
+      height:42px;
+      border-radius:999px;
+      border:1px solid rgba(217,52,43,.12);
+      background:var(--red-soft);
+      cursor:pointer;
+      position:relative;
+      flex:0 0 auto;
+      box-shadow:none;
+    }
+    .delIcon::before,.delIcon::after{
+      content:"";
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:15px;
+      height:2px;
+      background:#a9322b;
+      border-radius:2px;
+      transform-origin:center;
+    }
+    .delIcon::before{transform:translate(-50%,-50%) rotate(45deg)}
+    .delIcon::after{transform:translate(-50%,-50%) rotate(-45deg)}
+
+    .rangeRow{display:flex;gap:12px;flex-wrap:nowrap;align-items:flex-end}
+    .rangeRow > *{flex:1;min-width:0}
+
+    body.modal-open{overflow:hidden;height:100vh;touch-action:none}
+
+    .section .panel .row button.secondary{background:#f7f9fc}
+    .section .panel .row button.danger{background:#f8eeee}
+    *{-webkit-tap-highlight-color:transparent}
+    :focus{outline:none}
+    :focus-visible{outline:2px solid rgba(47,125,246,.75);outline-offset:2px;border-radius:14px}
+
+    #calSwipeArea{touch-action:pan-y;overflow:hidden;position:relative}
+    .calLayer{will-change:transform}
+    .calGhost{position:absolute;left:0;right:0;top:0;pointer-events:none;opacity:1}
+    .calFading{opacity:.92;transition:opacity 120ms ease}
+
+    @media (max-width:720px){
+      :root{--wrapPad:12px}
+      .wrap{padding:10px var(--wrapPad) 92px}
+      .appHeader.dashboardHero{padding:18px;border-radius:32px}
+      .appHeader h1{font-size:25px}
+      .heroSub{max-width:260px}
+      .topMonthBar{padding:14px 16px;border-radius:26px}
+      .monthTitle{font-size:21px}
+      .statBox{padding:15px 16px;border-radius:28px;min-height:94px}
+      .statValue{font-size:26px}
+      .section.calSection{
+        margin-left:calc(-1 * var(--wrapPad));
+        margin-right:calc(-1 * var(--wrapPad));
+        border-left:none;
+        border-right:none;
+        border-radius:30px;
+        padding-left:10px;
+        padding-right:10px;
+      }
+      .calGrid{gap:6px}
+      .dayCell{border-radius:19px;aspect-ratio:1 / 1.55}
+      .pillStack{padding:0 4px 5px;gap:4px}
+      .pill{height:11px;font-size:7px}
+
+      dialog#vacDialog,
+      dialog#bulkDialog{
+        width:100vw;
+        max-width:100vw;
+        max-height:calc(100dvh - 18px);
+        margin:0;
+        border-radius:32px 32px 0 0;
+        position:fixed;
+        left:0;
+        right:0;
+        bottom:0;
+      }
+      .modalHead{padding:16px 16px 12px}
+      .modalBody{padding:16px}
+      .fieldGrid{gap:10px}
+    }
+
+    @media (max-width:560px){
+      .twoCols{grid-template-columns:1fr 1fr;gap:10px}
+      .dashTop{align-items:flex-start}
+      .quickActions{gap:8px}
+      .bulkBtn,.vacBtn{padding-left:10px;padding-right:10px;font-size:13px;min-height:50px}
+      .monthActions{gap:6px}
+      .chip{padding:10px 12px;font-size:13px}
+      .iconCircle{width:44px;height:44px}
+      .topMonthBar{margin-top:16px}
+      .calDow{font-size:10px}
+      .dayNum{min-width:22px;height:22px;font-size:11px}
+      .fieldGrid{grid-template-columns:1fr}
+      .rangeRow{flex-wrap:wrap}
+      .rangeRow > *{min-width:100%}
+      .actionRow{gap:9px}
+      #dayDialog .modalHead{padding:16px 16px 14px}
+      #dayDialog h3{font-size:23px}
+      #dayDialog .modalBody{padding:12px}
+      .modalStack{border-radius:28px;padding:14px}
+      .timeGrid{grid-template-columns:1fr 1fr;gap:10px}
+      .statMini{padding:14px;border-radius:24px}
+      .statMiniValue{font-size:21px}
+    }
+
+    @media (max-width:400px){
+      .appHeader.dashboardHero{padding:16px}
+      .heroSub{font-size:12.5px;max-width:220px}
+      .monthTitle{font-size:19px}
+      .statBox{padding:14px;min-height:88px}
+      .statValue{font-size:22px}
+      .modalIcon{width:42px;height:42px;border-radius:16px}
+      .modalHead h3{font-size:18px}
+      .modalHead .muted{font-size:12px}
+      .fieldBox{padding:10px;border-radius:22px}
+      input,textarea,select{padding:13px 14px;border-radius:20px}
+    }
+  </style>
+
 </head>
 
 <body>
   <div class="wrap">
-    <header class="appHeader">
-      <h1>Czas pracy <span class="emoji">⏱️</span></h1>
-    </header>
-
-    <div class="section">
-      <div class="topMonthBar">
-        <div class="monthTitle" id="monthLabelText">—</div>
+    <header class="appHeader dashboardHero">
+      <div class="dashTop">
+        <div>
+          <div class="eyebrow">Dashboard pracy</div>
+          <h1>Czas pracy <span class="emoji">⏱️</span></h1>
+          <div class="heroSub">Szybki podgląd godzin, wypłaty, urlopu i wpisów w kalendarzu.</div>
+        </div>
 
         <div class="monthActions">
           <button class="chip" id="todayBtn" type="button">Dzisiaj</button>
@@ -997,19 +916,31 @@
         </div>
       </div>
 
-      <div class="twoCols" style="margin-top:12px;">
+      <div class="topMonthBar">
+        <div>
+          <div class="muted">Aktualny miesiąc</div>
+          <div class="monthTitle" id="monthLabelText">—</div>
+        </div>
+      </div>
+
+      <div class="twoCols dashboardStats">
         <div class="statBox">
           <div class="muted">Suma godzin w miesiącu</div>
           <div class="statValue" id="sumHours">0:00</div>
         </div>
         <div class="statBox">
-          <div class="muted">Wypłata</div>
+          <div class="muted">Szacowana wypłata</div>
           <div class="statValue" id="sumPay">0,00 zł</div>
         </div>
       </div>
 
       <div class="muted" id="status" style="margin-top:10px;"></div>
-    </div>
+
+      <div class="row calBtns quickActions" style="margin-top:14px;">
+        <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
+        <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
+      </div>
+    </header>
 
     <!-- KALENDARZ -->
     <div class="section calSection">
@@ -1025,10 +956,6 @@
         </div>
       </div>
 
-      <div class="row calBtns" style="margin-top:14px;">
-        <button class="bulkBtn" id="openBulkDialog" type="button">Dodaj wiele godzin</button>
-        <button class="vacBtn" id="openVacDialog" type="button">Dodaj urlop</button>
-      </div>
     </div>
 
     <div class="section">
@@ -1079,154 +1006,169 @@
 
   <!-- MODAL URLOPU -->
   <dialog id="vacDialog">
-    <div class="modalHead" style="position:relative;">
-      <div class="modalHeadInner">
-        <h3 style="margin:0;">Dodaj urlop</h3>
-        <div class="muted" style="margin-top:3px;">Ustaw status w zakresie dat. Status nie usuwa godzin pracy (możesz mieć godziny i urlop jednocześnie).</div>
-      </div>
-
-      <button class="backBtn blue" id="vacBack" aria-label="Zamknij" type="button" title="Zamknij">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="modalBody">
-      <div class="rangeRow">
-        <div>
-          <label>Od</label>
-          <input id="vacFrom" type="date" />
+    <div class="modalShell">
+      <div class="modalHead">
+        <div class="modalHandle" aria-hidden="true"></div>
+        <div class="modalTitleRow">
+          <div class="modalIcon vac" aria-hidden="true">🌴</div>
+          <div>
+            <h3>Dodaj urlop</h3>
+            <div class="muted">Wybierz zakres dni i typ nieobecności. Godziny pracy zostają bez zmian.</div>
+          </div>
         </div>
-        <div>
-          <label>Do</label>
-          <input id="vacTo" type="date" />
+
+        <button class="backBtn blue" id="vacBack" aria-label="Zamknij" type="button" title="Zamknij">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modalBody">
+        <div class="sheetCard">
+          <div class="fieldGrid">
+            <div class="fieldBox">
+              <label>Od</label>
+              <input id="vacFrom" type="date" />
+            </div>
+            <div class="fieldBox">
+              <label>Do</label>
+              <input id="vacTo" type="date" />
+            </div>
+          </div>
+
+          <div class="fieldGrid single" style="margin-top:12px;">
+            <div class="fieldBox">
+              <label>Rodzaj nieobecności</label>
+              <select id="vacType">
+                <option value="paid">Urlop płatny</option>
+                <option value="unpaid">Urlop b/z</option>
+                <option value="sick">L4</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="actionRow">
+            <button id="setVacationRange" type="button">Ustaw status</button>
+            <button class="danger" id="clearVacationRange" type="button">Usuń status</button>
+          </div>
         </div>
       </div>
-
-      <div style="margin-top:12px;">
-        <label>Rodzaj</label>
-        <select id="vacType">
-          <option value="paid">Urlop płatny</option>
-          <option value="unpaid">Urlop b/z</option>
-          <option value="sick">L4</option>
-        </select>
-      </div>
-
-      <div class="actionRow">
-        <button id="setVacationRange" type="button" style="background:var(--bar-vac); font-weight:900;">Ustaw</button>
-        <button class="danger" id="clearVacationRange" type="button" style="font-weight:900;">Usuń status</button>
-      </div>
-
-      <div style="height:6px;"></div>
     </div>
   </dialog>
 
   <!-- MODAL WIELE GODZIN -->
   <dialog id="bulkDialog">
-    <div class="modalHead" style="position:relative;">
-      <div class="modalHeadInner">
-        <h3 style="margin:0;">Dodaj wiele godzin</h3>
-        <div class="muted" style="margin-top:3px;">Ustaw zakres dat i jedną parę wejścia/wyjścia dla wszystkich dni.</div>
-      </div>
-
-      <button class="backBtn" id="bulkBack" aria-label="Zamknij" type="button" title="Zamknij">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="modalBody">
-      <div class="rangeRow">
-        <div>
-          <label>Od</label>
-          <input id="bulkFrom" type="date" />
+    <div class="modalShell">
+      <div class="modalHead">
+        <div class="modalHandle" aria-hidden="true"></div>
+        <div class="modalTitleRow">
+          <div class="modalIcon bulk" aria-hidden="true">＋</div>
+          <div>
+            <h3>Dodaj wiele godzin</h3>
+            <div class="muted">Ustaw zakres dat i jedną parę wejścia/wyjścia dla wszystkich wybranych dni.</div>
+          </div>
         </div>
-        <div>
-          <label>Do</label>
-          <input id="bulkTo" type="date" />
+
+        <button class="backBtn" id="bulkBack" aria-label="Zamknij" type="button" title="Zamknij">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modalBody">
+        <div class="sheetCard">
+          <div class="fieldGrid">
+            <div class="fieldBox">
+              <label>Od</label>
+              <input id="bulkFrom" type="date" />
+            </div>
+            <div class="fieldBox">
+              <label>Do</label>
+              <input id="bulkTo" type="date" />
+            </div>
+          </div>
+
+          <div class="fieldGrid" style="margin-top:12px;">
+            <div class="fieldBox">
+              <label>Godzina wejścia</label>
+              <input id="bulkStart" type="time" />
+            </div>
+            <div class="fieldBox">
+              <label>Godzina wyjścia</label>
+              <input id="bulkEnd" type="time" />
+            </div>
+          </div>
+
+          <div class="actionRow">
+            <button id="bulkApply" type="button">Dodaj</button>
+            <button id="bulkRemove" type="button" class="danger">Usuń godziny</button>
+          </div>
+
+          <div class="sheetHint">
+            „Dodaj” dopisuje zakres do każdego dnia. „Usuń godziny” usuwa dokładnie ten sam zakres, jeśli już istnieje.
+          </div>
         </div>
       </div>
-
-      <div class="timeGrid" style="margin-top:12px;">
-        <div>
-          <label>Godzina wejścia</label>
-          <input id="bulkStart" type="time" />
-        </div>
-        <div>
-          <label>Godzina wyjścia</label>
-          <input id="bulkEnd" type="time" />
-        </div>
-      </div>
-
-      <div class="actionRow">
-        <button id="bulkApply" type="button" style="background:var(--primary); font-weight:900;">Dodaj</button>
-        <button id="bulkRemove" type="button" class="danger" style="font-weight:900;">Usuń godziny</button>
-      </div>
-
-      <div class="muted" style="margin-top:10px; line-height:1.35;">
-        Uwaga: „Dodaj” dopisuje zakres do każdego dnia (nie nadpisuje istniejących). „Usuń godziny” usuwa w tych dniach dokładnie ten sam zakres (jeśli istnieje).
-      </div>
-
-      <div style="height:6px;"></div>
     </div>
   </dialog>
 
   <!-- MODAL DNIA -->
   <dialog id="dayDialog">
-    <div class="modalHead" style="position:relative;">
-      <div class="modalHeadInner">
-        <h3 id="dlgTitle" style="margin:0;">Dzień</h3>
-        <div class="muted" id="dlgMeta" style="margin-top:3px;"></div>
+    <div class="dayModalShell">
+      <div class="modalHead">
+        <div class="modalHandle" aria-hidden="true"></div>
+        <div class="modalHeadInner">
+          <h3 id="dlgTitle">Dzień</h3>
+          <div class="muted" id="dlgMeta"></div>
+        </div>
+
+        <button class="backBtn" id="dlgBack" aria-label="Wróć" type="button" title="Wróć">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
+          </svg>
+        </button>
       </div>
 
-      <button class="backBtn" id="dlgBack" aria-label="Wróć" type="button" title="Wróć">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path fill="currentColor" d="M14.7 6.3a1 1 0 0 1 0 1.4L10.41 12l4.3 4.3a1 1 0 1 1-1.42 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.41 0Z"/>
-        </svg>
-      </button>
-    </div>
-
-    <div class="modalBody">
-      <div class="modalStats">
-        <div class="statMini">
-          <div class="muted">Suma godzin</div>
-          <div class="statMiniValue" id="dlgSumHM">0:00</div>
-        </div>
-        <div class="statMini">
-          <div class="muted">Dniówka</div>
-          <div class="statMiniValue" id="dlgSumPay">0,00 zł</div>
-        </div>
-      </div>
-
-      <div class="modalStack" id="dlgWorkBlock">
-        <div class="timeGrid">
-          <div>
-            <label>Godzina wejścia</label>
-            <input id="dlgStart" type="time" />
+      <div class="modalBody">
+        <div class="modalStats">
+          <div class="statMini">
+            <div class="muted">Suma godzin</div>
+            <div class="statMiniValue" id="dlgSumHM">0:00</div>
           </div>
-          <div>
-            <label>Godzina wyjścia</label>
-            <input id="dlgEnd" type="time" />
+          <div class="statMini">
+            <div class="muted">Dniówka</div>
+            <div class="statMiniValue" id="dlgSumPay">0,00 zł</div>
           </div>
         </div>
 
-        <div>
-          <label>Notatka</label>
-          <textarea id="dlgNote"></textarea>
-          <div class="muted" style="margin-top:6px;">Notatka zapisuje się automatycznie.</div>
+        <div class="modalStack" id="dlgWorkBlock">
+          <div class="timeGrid">
+            <div>
+              <label>Godzina wejścia</label>
+              <input id="dlgStart" type="time" />
+            </div>
+            <div>
+              <label>Godzina wyjścia</label>
+              <input id="dlgEnd" type="time" />
+            </div>
+          </div>
+
+          <div>
+            <label>Notatka</label>
+            <textarea id="dlgNote" placeholder="Dodaj krótką notatkę do dnia..."></textarea>
+            <div class="muted" style="margin-top:7px;">Notatka zapisuje się automatycznie.</div>
+          </div>
+
+          <button id="dlgAddShift" type="button" class="addBtnCenter">Dodaj zakres</button>
         </div>
 
-        <button id="dlgAddShift" type="button" class="addBtnCenter">Dodaj</button>
+        <div id="dlgShiftsBlock">
+          <strong id="dlgShiftsTitle">Godziny pracy w ciągu dnia</strong>
+          <div class="shiftList" id="dlgShifts"></div>
+        </div>
       </div>
-
-      <div style="margin-top:16px;" id="dlgShiftsBlock">
-        <strong id="dlgShiftsTitle">Godziny pracy w ciągu dnia</strong>
-        <div class="shiftList" id="dlgShifts"></div>
-      </div>
-
-      <div style="height:14px;"></div>
     </div>
   </dialog>
 
