@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 3.5.2 clean stable</title>
+  <title>Czas pracy 3.5.3</title>
   <meta name="theme-color" content="#f8fafd" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2640,6 +2640,145 @@ dialog:focus-visible{
   transition:none !important;
 }
 
+  
+/* ===== Czas pracy 3.5.3: clean/stable + stała siatka 6 tygodni ===== */
+
+/* Stała geometria kalendarza: 42 komórki, identyczna wysokość miesiąca */
+#calGrid,
+#calGridGhost{
+  grid-template-rows:repeat(6, var(--day-height)) !important;
+  align-items:stretch !important;
+}
+
+#calGrid .dayCell,
+#calGridGhost .dayCell,
+#calGrid .blankCell,
+#calGridGhost .blankCell{
+  min-height:var(--day-height) !important;
+  height:var(--day-height) !important;
+  max-height:var(--day-height) !important;
+}
+
+/* Podczas swipe nie pozwalamy, żeby style current/ghost różniły się o choćby kilka px */
+#calSwipeArea.is-swiping{
+  overflow:hidden !important;
+  contain:layout paint style !important;
+}
+
+#calSwipeArea.is-swiping #calLayerCurrent,
+#calSwipeArea.is-swiping #calLayerGhost{
+  width:100% !important;
+  min-width:100% !important;
+  will-change:transform;
+  backface-visibility:hidden;
+}
+
+#calSwipeArea.is-swiping #calGrid,
+#calSwipeArea.is-swiping #calGridGhost{
+  grid-template-rows:repeat(6, var(--day-height)) !important;
+  gap:4px !important;
+}
+
+#calSwipeArea.is-swiping .dayCell,
+#calSwipeArea.is-swiping .blankCell{
+  min-height:var(--day-height) !important;
+  height:var(--day-height) !important;
+  max-height:var(--day-height) !important;
+  transition:none !important;
+  transform:none !important;
+}
+
+#calSwipeArea.is-swiping .pill{
+  height:var(--pill-height) !important;
+  min-height:var(--pill-height) !important;
+  max-height:var(--pill-height) !important;
+  font-size:var(--pill-size) !important;
+  transition:none !important;
+}
+
+/* Stopka wersji w menu */
+.menuFooter{
+  margin:10px 24px 0;
+  padding-top:14px;
+  border-top:1px solid var(--outline-soft);
+  color:#6f7785;
+  font-size:12px;
+  line-height:1.3;
+}
+
+/* Informacje o aplikacji */
+.appInfoCard{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  border:1px solid var(--outline-soft);
+  border-radius:22px;
+  background:var(--surface-low);
+  overflow:hidden;
+}
+
+.infoRow{
+  min-height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:0 16px;
+  border-bottom:1px solid var(--outline-soft);
+}
+
+.infoRow:last-child{
+  border-bottom:none;
+}
+
+.infoRow span{
+  font-size:14px;
+  color:#5f6368;
+}
+
+.infoRow strong{
+  font-size:15px;
+  color:#202124;
+  font-weight:600;
+  text-align:right;
+}
+
+.appErrorBox{
+  margin-top:14px;
+  padding:12px;
+  border-radius:16px;
+  background:#fce8e6;
+  color:#202124;
+  font-size:13px;
+  line-height:1.35;
+}
+
+.errorLine{
+  padding:8px 0;
+  border-bottom:1px solid rgba(0,0,0,.08);
+}
+
+.errorLine:last-child{
+  border-bottom:none;
+}
+
+.errorLine strong,
+.errorLine span,
+.errorLine small{
+  display:block;
+}
+
+.errorLine strong{
+  font-size:12px;
+  color:#5f6368;
+  margin-bottom:3px;
+}
+
+.errorLine small{
+  margin-top:3px;
+  color:#5f6368;
+}
+
   </style>
 
 </head>
@@ -2729,6 +2868,47 @@ dialog:focus-visible{
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3l4.1 4.1-2.9 2.9L1.7 4.6C.6 7 .9 10 3 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.4-.4.4-1 0-1.4Z"/></svg>
         <span>Narzędzia systemowe<span class="desc">PDF, kopia zapasowa i czyszczenie miesiąca</span></span>
       </button>
+
+      <button class="menu-item" id="openAppInfo" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11 17h2v-6h-2v6Zm1-14a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 16a7 7 0 1 1 0-14 7 7 0 0 1 0 14ZM11 9h2V7h-2v2Z"/></svg>
+        <span>Informacje o aplikacji<span class="desc">Wersja, autor i podgląd błędów</span></span>
+      </button>
+
+      <div class="menuFooter">Wersja 3.5.3</div>
+    </div>
+  </dialog>
+
+
+  <dialog id="appInfoDialog">
+    <div class="drag-handle"></div>
+    <div class="modalHead">
+      <div class="modalHeadInner">
+        <h3>Informacje o aplikacji</h3>
+        <div class="muted">Podstawowe dane techniczne aktualnie wczytanej wersji.</div>
+      </div>
+    </div>
+
+    <div class="modalBody">
+      <div class="appInfoCard">
+        <div class="infoRow">
+          <span>Wersja</span>
+          <strong id="appVersionLabel">3.5.3</strong>
+        </div>
+        <div class="infoRow">
+          <span>Autor</span>
+          <strong>Jakub Sip</strong>
+        </div>
+        <div class="infoRow">
+          <span>Status błędów</span>
+          <strong id="appErrorState">Brak błędów</strong>
+        </div>
+      </div>
+
+      <div class="appErrorBox" id="appErrorBox" hidden></div>
+
+      <div class="actionRow">
+        <button class="tonal" id="appInfoClose" type="button">Zamknij</button>
+      </div>
     </div>
   </dialog>
 
@@ -3474,10 +3654,10 @@ dialog:focus-visible{
       `);
     }
 
-    const mod = cells.length % 7;
-    if (mod !== 0) {
-      const need = 7 - mod;
-      for (let i = 0; i < need; i++) cells.push(`<div class="blankCell"></div>`);
+    // Stała siatka 6 tygodni / 42 komórki.
+    // Dzięki temu miesiące nie zmieniają wysokości przy swipe i kafelki nie "skaczą".
+    while (cells.length < 42) {
+      cells.push(`<div class="blankCell"></div>`);
     }
 
     gridEl.innerHTML = cells.join("");
@@ -4257,6 +4437,26 @@ dialog:focus-visible{
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
+  const APP_VERSION = "3.5.3";
+  window.__appErrors = window.__appErrors || [];
+
+  function logAppError(message, source) {
+    const item = {
+      time: new Date().toLocaleString("pl-PL"),
+      message: String(message || "Nieznany błąd"),
+      source: source || ""
+    };
+    window.__appErrors.push(item);
+    if (window.__appErrors.length > 10) window.__appErrors.shift();
+  }
+
+  window.addEventListener("error", (e) => {
+    logAppError(e.message, e.filename ? (e.filename + ":" + e.lineno) : "");
+  });
+
+  window.addEventListener("unhandledrejection", (e) => {
+    logAppError(e.reason?.message || e.reason || "Nieobsłużony promise rejection", "promise");
+  });
 
   function openDialog(dlg){
     if (!dlg) return;
@@ -4302,6 +4502,7 @@ dialog:focus-visible{
   const mainMenu = $("mainMenuDialog");
   const settingsDialog = $("settingsDialog");
   const toolsDialog = $("toolsDialog");
+  const appInfoDialog = $("appInfoDialog");
 
   if (menuBtn && mainMenu) menuBtn.addEventListener("click", () => openDialog(mainMenu));
 
@@ -4315,10 +4516,47 @@ dialog:focus-visible{
     setTimeout(() => openDialog(toolsDialog), 120);
   });
 
+  function refreshAppInfo() {
+    const versionEl = $("appVersionLabel");
+    const stateEl = $("appErrorState");
+    const box = $("appErrorBox");
+
+    if (versionEl) versionEl.textContent = APP_VERSION;
+
+    const errors = window.__appErrors || [];
+    if (!errors.length) {
+      if (stateEl) stateEl.textContent = "Brak błędów";
+      if (box) {
+        box.hidden = true;
+        box.textContent = "";
+      }
+      return;
+    }
+
+    if (stateEl) stateEl.textContent = errors.length === 1 ? "1 błąd" : `${errors.length} błędów`;
+    if (box) {
+      box.hidden = false;
+      box.innerHTML = errors.map((err) => `
+        <div class="errorLine">
+          <strong>${err.time}</strong>
+          <span>${err.message}</span>
+          ${err.source ? `<small>${err.source}</small>` : ""}
+        </div>
+      `).join("");
+    }
+  }
+
+  $("openAppInfo")?.addEventListener("click", () => {
+    closeDialog(mainMenu);
+    refreshAppInfo();
+    setTimeout(() => openDialog(appInfoDialog), 120);
+  });
+
   $("settingsClose")?.addEventListener("click", () => closeDialog(settingsDialog));
   $("toolsClose")?.addEventListener("click", () => closeDialog(toolsDialog));
+  $("appInfoClose")?.addEventListener("click", () => closeDialog(appInfoDialog));
 
-  ["fabMenuDialog","mainMenuDialog","settingsDialog","toolsDialog","vacDialog","bulkDialog","dayDialog"].forEach((id) => {
+  ["fabMenuDialog","mainMenuDialog","settingsDialog","toolsDialog","appInfoDialog","vacDialog","bulkDialog","dayDialog"].forEach((id) => {
     const dlg = $(id);
     if (!dlg) return;
     dlg.addEventListener("click", (e) => {
@@ -4403,7 +4641,7 @@ dialog:focus-visible{
     handle.addEventListener("pointercancel", reset);
   }
 
-  ["dayDialog","vacDialog","bulkDialog","fabMenuDialog","mainMenuDialog","settingsDialog","toolsDialog"].forEach((id) => {
+  ["dayDialog","vacDialog","bulkDialog","fabMenuDialog","mainMenuDialog","settingsDialog","toolsDialog","appInfoDialog"].forEach((id) => {
     enableSwipeDownToClose($(id));
   });
 
