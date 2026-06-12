@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 3.5.2</title>
+  <title>Czas pracy 3.5.2 clean stable</title>
   <meta name="theme-color" content="#f8fafd" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2596,6 +2596,50 @@ body{
   }
 }
 
+  
+/* ===== 3.5.2 CLEAN/STABLE: stabilizacja po czyszczeniu skryptów ===== */
+dialog:focus,
+dialog:focus-visible{
+  outline:none !important;
+}
+
+/* Utrzymanie spójnych wymiarów przy swipe */
+#calSwipeArea.is-swiping{
+  overflow:hidden !important;
+}
+
+#calSwipeArea.is-swiping #calLayerCurrent,
+#calSwipeArea.is-swiping #calLayerGhost{
+  width:100% !important;
+  min-width:100% !important;
+  will-change:transform;
+  backface-visibility:hidden;
+}
+
+#calSwipeArea.is-swiping #calGrid,
+#calSwipeArea.is-swiping #calGridGhost{
+  gap:4px !important;
+}
+
+#calSwipeArea.is-swiping #calLayerCurrent .dayCell,
+#calSwipeArea.is-swiping #calLayerGhost .dayCell,
+#calSwipeArea.is-swiping #calLayerCurrent .blankCell,
+#calSwipeArea.is-swiping #calLayerGhost .blankCell{
+  min-height:var(--day-height) !important;
+  height:var(--day-height) !important;
+  max-height:var(--day-height) !important;
+  transition:none !important;
+}
+
+#calSwipeArea.is-swiping #calLayerCurrent .pill,
+#calSwipeArea.is-swiping #calLayerGhost .pill{
+  height:var(--pill-height) !important;
+  min-height:var(--pill-height) !important;
+  max-height:var(--pill-height) !important;
+  font-size:var(--pill-size) !important;
+  transition:none !important;
+}
+
   </style>
 
 </head>
@@ -2904,6 +2948,8 @@ body{
       </div>
     </div>
   </dialog>
+
+
 
 <script>
 (() => {
@@ -4363,87 +4409,5 @@ body{
 
 })();
 </script>
-
-
-
-<script>
-(() => {
-  const $ = (id) => document.getElementById(id);
-
-  function openDialog(dlg){
-    if (!dlg) return;
-    if (typeof dlg.showModal === "function") dlg.showModal();
-    else dlg.setAttribute("open", "");
-  }
-  function closeDialog(dlg){
-    if (!dlg) return;
-    if (typeof dlg.close === "function" && dlg.open) dlg.close();
-    else dlg.removeAttribute("open");
-  }
-
-  const mainFab = $("mainFab");
-  const fabMenu = $("fabMenuDialog");
-  const openBulk = $("openBulkDialog");
-  const openVac = $("openVacDialog");
-  const openToday = $("openTodayDialog");
-
-  if (mainFab && fabMenu) {
-    mainFab.addEventListener("click", () => openDialog(fabMenu));
-    fabMenu.addEventListener("click", (e) => {
-      if (e.target === fabMenu) closeDialog(fabMenu);
-    });
-  }
-
-  if (openToday) {
-    openToday.addEventListener("click", () => {
-      closeDialog(fabMenu);
-      setTimeout(() => {
-        if (window.openWorkDay && window.workTodayISO) {
-          window.openWorkDay(window.workTodayISO());
-        }
-      }, 120);
-    }, { capture:true });
-  }
-
-  [openBulk, openVac].forEach((btn) => {
-    if (!btn || !fabMenu) return;
-    btn.addEventListener("click", () => closeDialog(fabMenu), { capture:true });
-  });
-
-  const menuBtn = $("mainMenuBtn");
-  const mainMenu = $("mainMenuDialog");
-  const settingsDialog = $("settingsDialog");
-  const toolsDialog = $("toolsDialog");
-
-  if (menuBtn && mainMenu) menuBtn.addEventListener("click", () => openDialog(mainMenu));
-
-  $("openEmployerSettings")?.addEventListener("click", () => {
-    closeDialog(mainMenu);
-    setTimeout(() => openDialog(settingsDialog), 120);
-  });
-
-  $("openSystemTools")?.addEventListener("click", () => {
-    closeDialog(mainMenu);
-    setTimeout(() => openDialog(toolsDialog), 120);
-  });
-
-  $("settingsClose")?.addEventListener("click", () => closeDialog(settingsDialog));
-  $("toolsClose")?.addEventListener("click", () => closeDialog(toolsDialog));
-
-  ["fabMenuDialog","mainMenuDialog","settingsDialog","toolsDialog","vacDialog","bulkDialog","dayDialog"].forEach((id) => {
-    const dlg = $(id);
-    if (!dlg) return;
-    dlg.addEventListener("click", (e) => {
-      if (e.target !== dlg) return;
-      if (id === "dayDialog") $("dlgBack")?.click();
-      else if (id === "vacDialog") $("vacBack")?.click();
-      else if (id === "bulkDialog") $("bulkBack")?.click();
-      else closeDialog(dlg);
-    });
-  });
-})();
-</script>
-
-
 </body>
 </html>
