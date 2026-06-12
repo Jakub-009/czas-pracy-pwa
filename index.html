@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.0.1</title>
+  <title>Czas pracy 4.0.2</title>
   <meta name="theme-color" content="#f8fafd" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2373,6 +2373,93 @@ dialog#fabMenuDialog{
   }
 }
 
+  
+/* ===== Czas pracy 4.0.2: poprawki FAB, haptics i blokady tła ===== */
+
+/* Mniejsze pigułki szybkich akcji */
+.fabActionPill{
+  min-height:52px !important;
+  height:52px !important;
+  padding:0 20px 0 16px !important;
+  gap:13px !important;
+  font-size:17px !important;
+  font-weight:550 !important;
+}
+.fabActionPill svg{
+  width:24px !important;
+  height:24px !important;
+}
+
+/* FAB: X mniejszy i dokładnie wyśrodkowany */
+.fabGoogle .fab{
+  width:60px !important;
+  height:60px !important;
+  min-height:60px !important;
+  border-radius:20px !important;
+  display:grid !important;
+  place-items:center !important;
+  gap:0 !important;
+}
+.fabGoogle .fab svg{
+  grid-area:1 / 1;
+  margin:auto !important;
+  display:block;
+}
+.fabGoogle .fabPlusIcon{
+  width:28px !important;
+  height:28px !important;
+}
+.fabGoogle .fabCloseIcon{
+  width:25px !important;
+  height:25px !important;
+  transform:none !important;
+}
+
+/* Gdy otwarty jest modal, tło za nim nie powinno się przesuwać */
+body.modal-open{
+  overflow:hidden !important;
+  height:100dvh !important;
+  position:fixed !important;
+  inset:0 !important;
+  width:100% !important;
+  touch-action:none !important;
+}
+dialog#vacDialog .modalBody,
+dialog#bulkDialog .modalBody{
+  max-height:calc(92dvh - 74px) !important;
+  overflow-y:auto !important;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+
+/* Stary dialog FAB nie powinien nigdy łapać kliknięć */
+dialog#fabMenuDialog{
+  pointer-events:none !important;
+}
+
+@media(max-width:430px){
+  .fabActionPill{
+    min-height:50px !important;
+    height:50px !important;
+    padding:0 18px 0 15px !important;
+    gap:12px !important;
+    font-size:16.5px !important;
+  }
+  .fabActionPill svg{
+    width:23px !important;
+    height:23px !important;
+  }
+  .fabGoogle .fab{
+    width:58px !important;
+    height:58px !important;
+    min-height:58px !important;
+  }
+  .fabGoogle .fabCloseIcon{
+    width:24px !important;
+    height:24px !important;
+  }
+}
+
   </style>
 
 </head>
@@ -2865,6 +2952,7 @@ dialog#fabMenuDialog{
     warning: () => vibe([12, 40, 12]),
     danger:  () => vibe([20, 50, 20]),
   };
+  window.haptic = haptic;
 
   const todayISO = () => {
     const d = new Date();
@@ -3853,6 +3941,7 @@ dialog#fabMenuDialog{
     const t = todayISO();
     if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
     if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
+    document.body.classList.add("modal-open");
     if (typeof vacDlg.showModal === "function") vacDlg.showModal();
     else vacDlg.setAttribute("open", "");
   }
@@ -3861,8 +3950,12 @@ dialog#fabMenuDialog{
     if (!vacDlg) return;
     if (typeof vacDlg.close === "function") vacDlg.close();
     else vacDlg.removeAttribute("open");
+    document.body.classList.remove("modal-open");
   }
-  if (vacDlg) vacDlg.addEventListener("cancel", (e) => { e.preventDefault(); closeVac(); });
+  if (vacDlg) {
+    vacDlg.addEventListener("cancel", (e) => { e.preventDefault(); closeVac(); });
+    vacDlg.addEventListener("close", () => document.body.classList.remove("modal-open"));
+  }
 
   const bulkDlg = $("bulkDialog");
   function openBulk() {
@@ -3871,6 +3964,7 @@ dialog#fabMenuDialog{
     const t = todayISO();
     if ($("bulkFrom") && !$("bulkFrom").value) $("bulkFrom").value = t;
     if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
+    document.body.classList.add("modal-open");
     if (typeof bulkDlg.showModal === "function") bulkDlg.showModal();
     else bulkDlg.setAttribute("open", "");
   }
@@ -3879,8 +3973,12 @@ dialog#fabMenuDialog{
     if (!bulkDlg) return;
     if (typeof bulkDlg.close === "function") bulkDlg.close();
     else bulkDlg.removeAttribute("open");
+    document.body.classList.remove("modal-open");
   }
-  if (bulkDlg) bulkDlg.addEventListener("cancel", (e) => { e.preventDefault(); closeBulk(); });
+  if (bulkDlg) {
+    bulkDlg.addEventListener("cancel", (e) => { e.preventDefault(); closeBulk(); });
+    bulkDlg.addEventListener("close", () => document.body.classList.remove("modal-open"));
+  }
 
   // ===== RAPORT PDF =====
   function escapeHtml(s) {
@@ -4536,6 +4634,13 @@ dialog#fabMenuDialog{
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
+  const haptic = window.haptic || {
+    tap: () => {},
+    commit: () => {},
+    success: () => {},
+    warning: () => {},
+    danger: () => {}
+  };
   const APP_TITLE = document.title || "Czas pracy";
   const APP_VERSION = (APP_TITLE.match(/(\d+(?:\.\d+)*(?:\s*[a-zA-Z]+)?)/) || ["", "dev"])[1];
   window.__appErrors = window.__appErrors || [];
@@ -4598,14 +4703,14 @@ dialog#fabMenuDialog{
     mainFab.addEventListener("click", () => {
       const next = !fabContainer?.classList.contains("is-open");
       setFabOpen(next);
-      haptic.tap?.();
+      haptic.tap();
     });
   }
 
   if (fabScrim) {
     fabScrim.addEventListener("click", () => {
       closeFabMenu();
-      haptic.tap?.();
+      haptic.tap();
     });
   }
 
