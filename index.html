@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 3.5.3 stable</title>
+  <title>Czas pracy 3.5.4</title>
   <meta name="theme-color" content="#f8fafd" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2646,7 +2646,7 @@ dialog:focus-visible{
 /* Stała geometria kalendarza: 42 komórki, identyczna wysokość miesiąca */
 #calGrid,
 #calGridGhost{
-  grid-template-rows:repeat(6, var(--day-height)) !important;
+  grid-template-rows:none !important;
   align-items:stretch !important;
 }
 
@@ -2675,7 +2675,7 @@ dialog:focus-visible{
 
 #calSwipeArea.is-swiping #calGrid,
 #calSwipeArea.is-swiping #calGridGhost{
-  grid-template-rows:repeat(6, var(--day-height)) !important;
+  grid-template-rows:none !important;
   gap:4px !important;
 }
 
@@ -2819,6 +2819,29 @@ dialog:focus-visible{
   transition:none !important;
 }
 
+  
+/* ===== 3.5.3 FIX: naprawa ReferenceError i stabilizacja swipe bez 42 komórek ===== */
+#calGrid,
+#calGridGhost{
+  grid-template-rows:none !important;
+}
+
+#calSwipeArea.is-swiping{
+  overflow:hidden !important;
+}
+
+#calSwipeArea.is-swiping .dayCell,
+#calSwipeArea.is-swiping .blankCell{
+  height:var(--swipe-cell-height) !important;
+  min-height:var(--swipe-cell-height) !important;
+  max-height:var(--swipe-cell-height) !important;
+  transition:none !important;
+}
+
+#calSwipeArea.is-swiping .pill{
+  transition:none !important;
+}
+
   </style>
 
 </head>
@@ -2914,7 +2937,7 @@ dialog:focus-visible{
         <span>Informacje o aplikacji<span class="desc">Wersja, autor i podgląd błędów</span></span>
       </button>
 
-      <div class="menuFooter">Wersja 3.5.3 stable</div>
+      <div class="menuFooter">Wersja 3.5.3 fix fix</div>
     </div>
   </dialog>
 
@@ -2932,7 +2955,7 @@ dialog:focus-visible{
       <div class="appInfoCard">
         <div class="infoRow">
           <span>Wersja</span>
-          <strong id="appVersionLabel">3.5.3 stable</strong>
+          <strong id="appVersionLabel">3.5.3 fix</strong>
         </div>
         <div class="infoRow">
           <span>Autor</span>
@@ -4287,6 +4310,51 @@ dialog:focus-visible{
 
     function setX(el, x) { el.style.transform = `translateX(${x}px)`; }
 
+
+    function freezeSwipeGeometry(area, currentLayer, ghostLayer) {
+      if (!area || !currentLayer || !ghostLayer) return;
+
+      const currentCell = currentLayer.querySelector(".dayCell") || currentLayer.querySelector(".blankCell");
+      const h = currentCell ? Math.round(currentCell.getBoundingClientRect().height) : 0;
+
+      if (h > 0) {
+        area.style.setProperty("--swipe-cell-height", h + "px");
+
+        currentLayer.querySelectorAll(".dayCell,.blankCell").forEach((el) => {
+          el.style.height = h + "px";
+          el.style.minHeight = h + "px";
+          el.style.maxHeight = h + "px";
+        });
+
+        ghostLayer.querySelectorAll(".dayCell,.blankCell").forEach((el) => {
+          el.style.height = h + "px";
+          el.style.minHeight = h + "px";
+          el.style.maxHeight = h + "px";
+        });
+      }
+
+      const currentHeight = currentLayer.scrollHeight;
+      const ghostHeight = ghostLayer.scrollHeight;
+      area.style.height = Math.max(currentHeight, ghostHeight) + "px";
+      area.classList.add("is-swiping");
+    }
+
+    function unfreezeSwipeGeometry(area, currentLayer, ghostLayer) {
+      if (!area || !currentLayer || !ghostLayer) return;
+
+      area.classList.remove("is-swiping");
+      area.style.height = "";
+      area.style.removeProperty("--swipe-cell-height");
+
+      [currentLayer, ghostLayer].forEach((layer) => {
+        layer.querySelectorAll(".dayCell,.blankCell").forEach((el) => {
+          el.style.height = "";
+          el.style.minHeight = "";
+          el.style.maxHeight = "";
+        });
+      });
+    }
+
     function prepareGhost(delta) {
       if (prepared && activeDelta === delta) return;
 
@@ -4473,7 +4541,7 @@ dialog:focus-visible{
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
-  const APP_VERSION = "3.5.3 stable";
+  const APP_VERSION = "3.5.3 fix";
   window.__appErrors = window.__appErrors || [];
 
   function logAppError(message, source) {
