@@ -1740,6 +1740,141 @@ textarea{
   display:none !important;
 }
 
+  
+/* ===== Czas pracy 4.0: funkcje praktyczne ===== */
+
+/* Szablony godzin w ustawieniach */
+.settingsSection{
+  margin-top:22px;
+  padding-top:18px;
+  border-top:1px solid var(--outline-soft);
+}
+.sectionTitle{
+  margin-bottom:6px;
+  font-size:16px;
+  font-weight:650;
+  color:#202124;
+}
+.templateList{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin:14px 0 12px;
+}
+.templateRow{
+  min-height:46px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:0 0 0 14px;
+  border-radius:14px;
+  background:#f6f8fb;
+  border:1px solid #e2e6ed;
+}
+.templateRow span{
+  font-size:15px;
+  font-weight:600;
+  color:#202124;
+}
+.templateRemove{
+  width:42px;
+  height:42px;
+  min-height:42px;
+  padding:0;
+  border-radius:50%;
+  background:transparent;
+  color:#a50e0e;
+  position:relative;
+}
+.templateRemove:hover{
+  background:#fce8e6;
+}
+.templateRemove::before,
+.templateRemove::after{
+  content:"";
+  position:absolute;
+  width:16px;
+  height:3px;
+  background:currentColor;
+  border-radius:2px;
+  left:50%;
+  top:50%;
+}
+.templateRemove::before{
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+.templateRemove::after{
+  transform:translate(-50%,-50%) rotate(-45deg);
+}
+.templateAddGrid{
+  margin-top:12px;
+  margin-bottom:10px;
+}
+.templateAddBtn{
+  width:100%;
+  min-height:48px;
+}
+.emptyTemplateHint,
+.templateMuted{
+  color:#5f6368;
+  font-size:14px;
+  line-height:1.35;
+}
+
+/* Szybkie szablony w modalu dnia i wielu godzin */
+.quickTemplatesBlock{
+  margin:0 0 14px;
+}
+.quickTemplatesTitle{
+  margin-bottom:8px;
+  color:#3c4043;
+  font-size:13px;
+  font-weight:650;
+}
+.quickTemplates{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.templateChip{
+  min-height:36px;
+  padding:0 12px;
+  border-radius:999px;
+  background:#e8f0fe;
+  color:#174ea6;
+  font-size:13px;
+  font-weight:650;
+  box-shadow:none;
+}
+.templateChip:hover{
+  background:#d3e3fd;
+}
+.bulkTemplateBlock{
+  margin-top:-2px;
+  margin-bottom:14px;
+}
+
+/* Walidacja i klawiatura */
+dialog input,
+dialog textarea,
+dialog select{
+  scroll-margin-bottom:180px;
+}
+body.keyboard-open dialog[open],
+body.keyboard-focus dialog[open]{
+  max-height:92dvh !important;
+}
+body.keyboard-open #dayDialog .modalBody,
+body.keyboard-focus #dayDialog .modalBody{
+  max-height:calc(92dvh - 70px) !important;
+  padding-bottom:calc(36px + env(safe-area-inset-bottom)) !important;
+}
+body.keyboard-open .modalBody,
+body.keyboard-focus .modalBody{
+  padding-bottom:calc(28px + env(safe-area-inset-bottom)) !important;
+}
+
   </style>
 
 </head>
@@ -1894,6 +2029,26 @@ textarea{
         <div class="muted" id="leaveCounter" style="margin-top:8px;">—</div>
       </div>
 
+      <div class="settingsSection">
+        <div class="sectionTitle">Szablony godzin pracy</div>
+        <div class="muted">Szybkie zakresy dostępne później w modalu dnia i w wielu godzinach.</div>
+
+        <div class="templateList" id="templateList"></div>
+
+        <div class="fieldGrid templateAddGrid">
+          <div>
+            <label>Wejście</label>
+            <input id="tplStart" type="time" />
+          </div>
+          <div>
+            <label>Wyjście</label>
+            <input id="tplEnd" type="time" />
+          </div>
+        </div>
+
+        <button class="tonal templateAddBtn" id="tplAdd" type="button">Dodaj szablon</button>
+      </div>
+
       <div class="actionRow">
         <button class="tonal" id="settingsClose" type="button">Zamknij</button>
       </div>
@@ -1932,7 +2087,7 @@ textarea{
     <div style="padding-bottom:20px;">
       <button class="menu-item" id="openTodayDialog" type="button">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V9h14v10Zm-7-2.5c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3ZM19 7H5V5h14v2Z"/></svg>
-        <span>Dodaj godziny pracy<span class="desc">Otwórz dzisiejszy dzień</span></span>
+        <span>Dodaj godziny z dziś<span class="desc">Otwórz dzisiejszy dzień</span></span>
       </button>
       <button class="menu-item" id="openBulkDialog" type="button">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V9h14v10Zm0-12H5V5h14v2ZM7 11h5v5H7v-5Z"/></svg>
@@ -2017,6 +2172,11 @@ textarea{
         </div>
       </div>
 
+      <div class="quickTemplatesBlock bulkTemplateBlock" id="bulkTemplatesBlock">
+        <div class="quickTemplatesTitle">Szybkie godziny</div>
+        <div class="quickTemplates" id="bulkTemplates"></div>
+      </div>
+
       <div class="bulkOptions">
         <div class="bulkOptionsTitle">Uwzględnij przy operacji</div>
         <label class="checkRow">
@@ -2081,6 +2241,11 @@ textarea{
       </button>
 
       <div class="modalStack addShiftPanel" id="dlgWorkBlock">
+        <div class="quickTemplatesBlock" id="dayTemplatesBlock">
+          <div class="quickTemplatesTitle">Szybkie godziny</div>
+          <div class="quickTemplates" id="dayTemplates"></div>
+        </div>
+
         <div class="timeGrid">
           <div>
             <label>Wejście</label>
@@ -2230,6 +2395,16 @@ textarea{
     db.settings = db.settings || {};
     db.settings.rate = Number(db.settings.rate ?? 40);
     db.settings.leaveQuota = Number(db.settings.leaveQuota ?? 26);
+    if (!Array.isArray(db.settings.shiftTemplates)) {
+      db.settings.shiftTemplates = [
+        { start: "06:00", end: "14:00" },
+        { start: "14:00", end: "22:00" },
+        { start: "22:00", end: "06:00" }
+      ];
+    }
+    db.settings.shiftTemplates = db.settings.shiftTemplates
+      .filter(t => t && /^\d{2}:\d{2}$/.test(t.start || "") && /^\d{2}:\d{2}$/.test(t.end || ""))
+      .slice(0, 8);
 
     db.entries = Array.isArray(db.entries) ? db.entries : [];
     for (const e of db.entries) {
@@ -2269,6 +2444,180 @@ textarea{
     return Math.round((b - a) / 60000);
   }
 
+  function shiftAbsRange(dateISO, start, end) {
+    if (!dateISO || !start || !end) return null;
+    const [y, m, d] = dateISO.split("-").map(Number);
+    const [sh, sm] = start.split(":").map(Number);
+    const [eh, em] = end.split(":").map(Number);
+    if ([y,m,d,sh,sm,eh,em].some(v => !Number.isFinite(v))) return null;
+
+    const a = new Date(y, m - 1, d, sh, sm, 0, 0).getTime();
+    let b = new Date(y, m - 1, d, eh, em, 0, 0).getTime();
+    if (b <= a) b = new Date(y, m - 1, d + 1, eh, em, 0, 0).getTime();
+
+    if (b <= a) return null;
+    return { startMs: a, endMs: b };
+  }
+
+  function rangesOverlap(a, b) {
+    return a && b && Math.max(a.startMs, b.startMs) < Math.min(a.endMs, b.endMs);
+  }
+
+  function validateShiftNoOverlap(dateISO, start, end, options = {}) {
+    const candidate = shiftAbsRange(dateISO, start, end);
+    if (!candidate) return { ok:false, message:"Uzupełnij poprawnie godzinę wejścia i wyjścia." };
+
+    for (const day of db.entries || []) {
+      if (!day?.date || !Array.isArray(day.shifts)) continue;
+
+      for (let i = 0; i < day.shifts.length; i++) {
+        if (options.skipDate === day.date && options.skipIndex === i) continue;
+
+        const s = day.shifts[i];
+        if (!s?.start || !s?.end) continue;
+
+        const existing = shiftAbsRange(day.date, s.start, s.end);
+        if (rangesOverlap(candidate, existing)) {
+          return {
+            ok:false,
+            message:`Ten zakres nachodzi na istniejące godziny: ${fmtDMYText(day.date)} ${s.start}–${s.end}.`
+          };
+        }
+      }
+    }
+
+    return { ok:true };
+  }
+
+  function getShiftTemplates() {
+    normalize();
+    return Array.isArray(db.settings.shiftTemplates) ? db.settings.shiftTemplates : [];
+  }
+
+  function templateKey(t) {
+    return `${t.start}–${t.end}`;
+  }
+
+  function addShiftTemplate(start, end) {
+    if (!start || !end) return { ok:false, message:"Uzupełnij wejście i wyjście." };
+    if (!shiftAbsRange(todayISO(), start, end)) return { ok:false, message:"Nieprawidłowy zakres godzin." };
+
+    const list = getShiftTemplates();
+    if (list.some(t => t.start === start && t.end === end)) {
+      return { ok:false, message:"Taki szablon już istnieje." };
+    }
+
+    if (list.length >= 8) {
+      return { ok:false, message:"Maksymalnie możesz dodać 8 szablonów." };
+    }
+
+    db.settings.shiftTemplates = [...list, { start, end }];
+    save();
+    renderShiftTemplatesUI();
+    renderQuickTemplatesUI();
+    return { ok:true };
+  }
+
+  function removeShiftTemplate(index) {
+    const list = getShiftTemplates();
+    if (index < 0 || index >= list.length) return;
+    db.settings.shiftTemplates = list.filter((_, i) => i !== index);
+    save();
+    renderShiftTemplatesUI();
+    renderQuickTemplatesUI();
+  }
+
+  function renderShiftTemplatesUI() {
+    const box = $("templateList");
+    if (!box) return;
+    const list = getShiftTemplates();
+
+    if (!list.length) {
+      box.innerHTML = `<div class="emptyTemplateHint">Brak szablonów. Dodaj pierwszy zakres poniżej.</div>`;
+      return;
+    }
+
+    box.innerHTML = list.map((t, idx) => `
+      <div class="templateRow">
+        <span>${templateKey(t)}</span>
+        <button class="templateRemove" type="button" data-remove-template="${idx}" aria-label="Usuń szablon"></button>
+      </div>
+    `).join("");
+
+    box.querySelectorAll("[data-remove-template]").forEach(btn => {
+      btn.onclick = () => {
+        removeShiftTemplate(Number(btn.getAttribute("data-remove-template")));
+        haptic.warning();
+      };
+    });
+  }
+
+  function renderQuickTemplatesUI() {
+    const list = getShiftTemplates();
+
+    const renderButtons = (targetId, mode) => {
+      const box = $(targetId);
+      if (!box) return;
+
+      if (!list.length) {
+        box.innerHTML = `<span class="templateMuted">Brak szablonów</span>`;
+        return;
+      }
+
+      box.innerHTML = list.map((t, idx) => `
+        <button class="templateChip" type="button" data-template-mode="${mode}" data-template-index="${idx}">
+          ${templateKey(t)}
+        </button>
+      `).join("");
+
+      box.querySelectorAll("[data-template-index]").forEach(btn => {
+        btn.onclick = () => {
+          const t = list[Number(btn.getAttribute("data-template-index"))];
+          if (!t) return;
+
+          if (mode === "day") {
+            addShiftFromTemplate(t.start, t.end);
+          } else {
+            if ($("bulkStart")) $("bulkStart").value = t.start;
+            if ($("bulkEnd")) $("bulkEnd").value = t.end;
+            haptic.tap();
+          }
+        };
+      });
+    };
+
+    renderButtons("dayTemplates", "day");
+    renderButtons("bulkTemplates", "bulk");
+  }
+
+  function addShiftFromTemplate(start, end) {
+    if (!dlgDate) return;
+
+    const validation = validateShiftNoOverlap(dlgDate, start, end);
+    if (!validation.ok) {
+      haptic.warning();
+      alert(validation.message);
+      return;
+    }
+
+    const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
+    day.shifts.push({ start, end });
+    day.shifts.sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+
+    upsertDay(dlgDate, day);
+    save();
+    renderAll();
+    renderDayDialog();
+
+    if (dlg) {
+      dlg.classList.add("is-preview-only");
+      dlg.classList.remove("is-form-open", "is-empty-day");
+    }
+
+    setStatus(`Dodano zakres z szablonu: ${start}–${end}.`);
+    haptic.success();
+  }
+
   function fmtHM(mins) {
     const h = Math.floor(mins / 60);
     const m = mins % 60;
@@ -2289,6 +2638,9 @@ textarea{
 
     const qEl = $("leaveQuota");
     if (qEl) qEl.value = db.settings.leaveQuota;
+
+    renderShiftTemplatesUI();
+    renderQuickTemplatesUI();
   }
 
   function getDay(date) { return db.entries.find(e => e.date === date) || null; }
@@ -2414,6 +2766,7 @@ textarea{
     let cur = a;
     let changedDays = 0;
     let skippedDays = 0;
+    let conflictDays = 0;
 
     const includeSat = !!options.includeSat;
     const includeSun = !!options.includeSun;
@@ -2440,6 +2793,13 @@ textarea{
       day.shifts = Array.isArray(day.shifts) ? day.shifts : [];
 
       if (mode === "add") {
+        const validation = validateShiftNoOverlap(dISO, start, end);
+        if (!validation.ok) {
+          conflictDays++;
+          cur = addDays(cur, 1);
+          continue;
+        }
+
         day.shifts.push({ start, end });
         day.shifts.sort((x, y) => (x.start || "").localeCompare(y.start || ""));
         upsertDay(dISO, day);
@@ -2463,13 +2823,14 @@ textarea{
     if (dlgDate) renderDayDialog();
 
     const skippedText = skippedDays ? ` Pominięto ${skippedDays} dni wolnych.` : "";
+    const conflictText = conflictDays ? ` Pominięto ${conflictDays} dni z konfliktem godzin.` : "";
     setStatus(
       mode === "add"
-        ? `Dodano godziny (zakres) w ${changedDays} dniach.${skippedText}`
+        ? `Dodano godziny (zakres) w ${changedDays} dniach.${skippedText}${conflictText}`
         : `Usunięto godziny (zakres) w ${changedDays} dniach.${skippedText}`
     );
 
-    return { ok: true, changedDays, skippedDays };
+    return { ok: true, changedDays, skippedDays, conflictDays };
   }
 
   function leaveLabel(t) {
@@ -2745,6 +3106,7 @@ textarea{
       if (!dlg) return;
       dlg.classList.add("is-form-open");
       dlg.classList.remove("is-preview-only");
+      renderQuickTemplatesUI();
       setTimeout(() => $("dlgStart")?.focus(), 80);
       haptic.tap();
     };
@@ -2869,6 +3231,7 @@ textarea{
     renderDow();
     renderCalendar(monthYM);
     renderTotals(monthYM);
+    renderQuickTemplatesUI();
   }
 
   // ===== MODALE: STATUS / BULK =====
@@ -3079,6 +3442,13 @@ textarea{
       const end = $("dlgEnd")?.value;
       if (!start || !end) return alert("Uzupełnij godzinę wejścia i wyjścia.");
 
+      const validation = validateShiftNoOverlap(dlgDate, start, end);
+      if (!validation.ok) {
+        haptic.warning();
+        alert(validation.message);
+        return;
+      }
+
       const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
       day.shifts.push({ start, end });
       day.shifts.sort((a, b) => (a.start || "").localeCompare(b.start || ""));
@@ -3270,6 +3640,24 @@ textarea{
   if (leaveQuotaEl) {
     leaveQuotaEl.addEventListener("input", renderAll);
     leaveQuotaEl.addEventListener("change", renderAll);
+  }
+
+  const tplAddBtn = $("tplAdd");
+  if (tplAddBtn) {
+    tplAddBtn.onclick = () => {
+      const start = $("tplStart")?.value;
+      const end = $("tplEnd")?.value;
+      const res = addShiftTemplate(start, end);
+      if (!res.ok) {
+        haptic.warning();
+        alert(res.message);
+        return;
+      }
+      if ($("tplStart")) $("tplStart").value = "";
+      if ($("tplEnd")) $("tplEnd").value = "";
+      haptic.success();
+      setStatus("Dodano szablon godzin pracy.");
+    };
   }
 
   // ===== Swipe „jak Google” z ghost (live preview) + haptic =====
@@ -3739,6 +4127,40 @@ textarea{
   ["dayDialog","vacDialog","bulkDialog","fabMenuDialog","mainMenuDialog","settingsDialog","toolsDialog","appInfoDialog"].forEach((id) => {
     enableSwipeDownToClose($(id));
   });
+
+
+  function setupKeyboardFriendlyModals() {
+    const controls = document.querySelectorAll("dialog input, dialog textarea, dialog select");
+
+    controls.forEach((el) => {
+      el.addEventListener("focus", () => {
+        document.body.classList.add("keyboard-focus");
+        setTimeout(() => {
+          try {
+            el.scrollIntoView({ block: "center", behavior: "smooth" });
+          } catch {
+            el.scrollIntoView();
+          }
+        }, 260);
+      });
+
+      el.addEventListener("blur", () => {
+        setTimeout(() => document.body.classList.remove("keyboard-focus"), 120);
+      });
+    });
+
+    if (window.visualViewport) {
+      const update = () => {
+        const ratio = window.visualViewport.height / window.innerHeight;
+        document.body.classList.toggle("keyboard-open", ratio < 0.78);
+      };
+      window.visualViewport.addEventListener("resize", update);
+      window.visualViewport.addEventListener("scroll", update);
+      update();
+    }
+  }
+
+  setupKeyboardFriendlyModals();
 
   applyAppVersionLabels();
 })();
