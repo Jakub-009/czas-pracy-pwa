@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.0.7</title>
+  <title>Czas pracy 4.0.8</title>
   <meta name="theme-color" content="#e8eaed" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2421,7 +2421,13 @@ body.keyboard-focus .modalBody{
 
     const a = new Date(y, m - 1, d, sh, sm, 0, 0).getTime();
     let b = new Date(y, m - 1, d, eh, em, 0, 0).getTime();
-    if (b <= a) b = new Date(y, m - 1, d + 1, eh, em, 0, 0).getTime();
+
+    // Ten sam czas wejścia i wyjścia nie oznacza zmiany 24h.
+    // To błąd danych, więc zwracamy null i blokujemy zapis.
+    if (b === a) return null;
+
+    // Tylko realnie wcześniejsza godzina wyjścia oznacza zmianę przez północ.
+    if (b < a) b = new Date(y, m - 1, d + 1, eh, em, 0, 0).getTime();
 
     if (b <= a) return null;
     return { startMs: a, endMs: b };
@@ -2432,6 +2438,10 @@ body.keyboard-focus .modalBody{
   }
 
   function validateShiftNoOverlap(dateISO, start, end, options = {}) {
+    if (start && end && start === end) {
+      return { ok:false, message:"Godzina wejścia i wyjścia nie mogą być takie same." };
+    }
+
     const candidate = shiftAbsRange(dateISO, start, end);
     if (!candidate) return { ok:false, message:"Uzupełnij poprawnie godzinę wejścia i wyjścia." };
 
@@ -2511,13 +2521,6 @@ body.keyboard-focus .modalBody{
         <button class="templateRemove" type="button" data-remove-template="${idx}" aria-label="Usuń szablon"></button>
       </div>
     `).join("");
-
-    box.querySelectorAll("[data-remove-template]").forEach(btn => {
-      btn.onclick = () => {
-        removeShiftTemplate(Number(btn.getAttribute("data-remove-template")));
-        haptic.warning();
-      };
-    });
   }
 
   function renderQuickTemplatesUI() {
@@ -2537,25 +2540,52 @@ body.keyboard-focus .modalBody{
           ${templateKey(t)}
         </button>
       `).join("");
-
-      box.querySelectorAll("[data-template-index]").forEach(btn => {
-        btn.onclick = () => {
-          const t = list[Number(btn.getAttribute("data-template-index"))];
-          if (!t) return;
-
-          if (mode === "day") {
-            addShiftFromTemplate(t.start, t.end);
-          } else {
-            if ($("bulkStart")) $("bulkStart").value = t.start;
-            if ($("bulkEnd")) $("bulkEnd").value = t.end;
-            haptic.tap();
-          }
-        };
-      });
     };
 
     renderButtons("dayTemplates", "day");
     renderButtons("bulkTemplates", "bulk");
+  }
+
+  function setupTemplateDelegation() {
+    const templateList = $("templateList");
+    if (templateList && !templateList.dataset.delegated) {
+      templateList.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-remove-template]");
+        if (!btn || !templateList.contains(btn)) return;
+
+        removeShiftTemplate(Number(btn.dataset.removeTemplate));
+        haptic.warning();
+      });
+
+      templateList.dataset.delegated = "1";
+    }
+
+    const setupQuickBox = (targetId, mode) => {
+      const box = $(targetId);
+      if (!box || box.dataset.delegated) return;
+
+      box.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-template-index]");
+        if (!btn || !box.contains(btn)) return;
+
+        const t = getShiftTemplates()[Number(btn.dataset.templateIndex)];
+        if (!t) return;
+
+        if (mode === "day") {
+          addShiftFromTemplate(t.start, t.end);
+          return;
+        }
+
+        if ($("bulkStart")) $("bulkStart").value = t.start;
+        if ($("bulkEnd")) $("bulkEnd").value = t.end;
+        haptic.tap();
+      });
+
+      box.dataset.delegated = "1";
+    };
+
+    setupQuickBox("dayTemplates", "day");
+    setupQuickBox("bulkTemplates", "bulk");
   }
 
   function addShiftFromTemplate(start, end) {
@@ -2730,6 +2760,7 @@ body.keyboard-focus .modalBody{
     if (!a || !b) { alert("Uzupełnij poprawnie daty 'Od' i 'Do'."); return { ok: false }; }
     if (b < a) { alert("Data 'Do' nie może być wcześniejsza niż 'Od'."); return { ok: false }; }
     if (!start || !end) { alert("Uzupełnij godzinę wejścia i wyjścia."); return { ok: false }; }
+    if (mode === "add" && start === end) { alert("Godzina wejścia i wyjścia nie mogą być takie same."); return { ok: false }; }
 
     let cur = a;
     let changedDays = 0;
@@ -3915,6 +3946,7 @@ body.keyboard-focus .modalBody{
     normalize();
     migrateIfNeeded();
     hydrateSettingsUI();
+    setupTemplateDelegation();
 
     const t = todayISO();
     const monthPickEl = $("monthPick");
