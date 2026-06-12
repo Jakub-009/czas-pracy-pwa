@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.0.10</title>
+  <title>Czas pracy 4.0.11</title>
   <meta name="theme-color" content="#f8fafd" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -3092,6 +3092,103 @@ dialog#mainMenuDialog.drawerDialog .drawerFooter{
   display:none !important;
 }
 
+  
+/* ===== Czas pracy 4.0.11 — ergonomia drawera i spójne nazwy zakresu dni ===== */
+
+/* Strzałka drawera wyżej: ponad stopką i linią wersji */
+dialog#mainMenuDialog.drawerDialog .drawerBack{
+  bottom:calc(112px + env(safe-area-inset-bottom)) !important;
+}
+
+/* Więcej oddechu u góry w panelu zakresu dni */
+@media(max-width:679px){
+  dialog#bulkDialog{
+    max-height:91dvh !important;
+  }
+
+  dialog#bulkDialog .drag-handle{
+    margin-top:16px !important;
+    margin-bottom:12px !important;
+  }
+
+  dialog#bulkDialog .modalHead{
+    padding-top:24px !important;
+    padding-bottom:16px !important;
+  }
+
+  dialog#bulkDialog .modalBody{
+    max-height:calc(91dvh - 116px) !important;
+  }
+}
+
+/* Tryb zakresu dni — przygotowanie pod Urlop w 4.1 */
+.rangeModeTabs{
+  display:flex;
+  gap:8px;
+  padding:4px;
+  margin:0 0 16px;
+  border-radius:999px;
+  background:#f1f4f9;
+}
+
+.rangeModeTab{
+  flex:1 1 0;
+  min-height:38px;
+  height:38px;
+  padding:0 12px;
+  border-radius:999px;
+  background:transparent;
+  color:#3c4043;
+  box-shadow:none;
+  font-size:14px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.rangeModeTab.active{
+  background:#d7e3ff;
+  color:#174ea6;
+}
+
+.rangeModeTab.soon{
+  color:#6f7785;
+  opacity:.82;
+}
+
+.rangeModeTab.soon span{
+  display:inline-block;
+  margin-left:4px;
+  padding:3px 6px;
+  border-radius:999px;
+  background:#e8eaed;
+  color:#5f6368;
+  font-size:10.5px;
+  line-height:1;
+  font-weight:700;
+}
+
+.rangeModeTab:disabled{
+  cursor:default;
+}
+
+@media(max-width:430px){
+  .rangeModeTabs{
+    gap:6px;
+  }
+
+  .rangeModeTab{
+    min-height:36px;
+    height:36px;
+    padding:0 10px;
+    font-size:13px;
+  }
+
+  .rangeModeTab.soon span{
+    font-size:10px;
+    padding:3px 5px;
+  }
+}
+
   </style>
 
 </head>
@@ -3168,7 +3265,7 @@ dialog#mainMenuDialog.drawerDialog .drawerFooter{
 
       <button class="fabActionPill" id="fabBulkAction" type="button">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V8h14v11ZM7 10h5v5H7v-5Zm7 0h3v2h-3v-2Zm0 4h3v2h-3v-2Z"/></svg>
-        <span>Wiele dni</span>
+        <span>Zakres dni</span>
       </button>
 
       <button class="fabActionPill" id="fabTodayAction" type="button">
@@ -3344,17 +3441,21 @@ dialog#mainMenuDialog.drawerDialog .drawerFooter{
     </div>
   </dialog>
 
-  <!-- MODAL WIELE GODZIN -->
+  <!-- MODAL GODZINY DLA ZAKRESU DNI -->
   <dialog id="bulkDialog">
     <div class="drag-handle"></div>
     <div class="modalHead">
       <div class="modalHeadInner">
-        <h3>Wiele godzin</h3>
-        <div class="muted">Ustaw stałe godziny pracy dla wybranego zakresu dni.</div>
+        <h3>Godziny dla zakresu dni</h3>
+        <div class="muted">Ustaw te same godziny pracy dla wybranego zakresu dni.</div>
       </div>
     </div>
 
     <div class="modalBody">
+      <div class="rangeModeTabs" aria-label="Tryb zakresu dni">
+        <button class="rangeModeTab active" type="button" aria-pressed="true">Godziny pracy</button>
+        <button class="rangeModeTab soon" type="button" disabled>Urlop <span>wkrótce</span></button>
+      </div>
       <div class="fieldGrid">
         <div>
           <label>Od</label>
@@ -3986,7 +4087,7 @@ dialog#mainMenuDialog.drawerDialog .drawerFooter{
     return { ok: true, count };
   }
 
-  // ===== Wiele godzin: zakres =====
+  // ===== Godziny dla zakresu dni =====
   function applyBulkHours(fromISO, toISO, start, end, mode, options = {}) {
     const a = parseISODate(fromISO);
     const b = parseISODate(toISO);
