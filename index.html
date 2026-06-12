@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.0.4</title>
+  <title>Czas pracy 4.0.5</title>
   <meta name="theme-color" content="#f8fafd" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2830,6 +2830,99 @@ dialog#vacDialog .modalBody,dialog#bulkDialog .modalBody{max-height:calc(92dvh -
 #bulkRemove,#clearVacationRange,.backBtn,#dlgBack{min-height:42px !important;padding:0 16px !important;font-size:15px !important;border-radius:999px !important}
 #dlgAddShift.addBtnCenter{width:auto !important;min-width:210px !important;max-width:100% !important;margin-left:auto !important;margin-right:0 !important}
 
+  
+/* ===== Czas pracy 4.0.5: poprawka strzałki drawer + mniejsze ikony FAB + mocniejszy scroll lock ===== */
+
+/* Blokujemy również html, żeby tło nie łapało przewijania pod overlayami */
+html.scroll-locked-root,
+html.scroll-locked-root body{
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+  touch-action:none !important;
+}
+
+/* Drawer i scrim nie przepuszczają gestu przewijania do tła */
+dialog#mainMenuDialog.drawerDialog{
+  overscroll-behavior:none !important;
+  touch-action:none !important;
+}
+.drawerPanel,
+.drawerContent{
+  overscroll-behavior:contain !important;
+  touch-action:pan-y !important;
+}
+.fabScrim{
+  overscroll-behavior:none !important;
+  touch-action:none !important;
+}
+
+/* Strzałka w drawerze zawsze działa jako: zamknij menu / wróć */
+.drawerBack{
+  display:grid !important;
+  place-items:center !important;
+}
+.drawerBack[hidden]{
+  display:none !important;
+}
+
+/* FAB — symbol mniejszy i identyczny stylistycznie w stanie + oraz X */
+.fabGoogle .fab{
+  width:56px !important;
+  height:56px !important;
+  min-height:56px !important;
+  border-radius:19px !important;
+}
+
+.fabGoogle .fab::before,
+.fabGoogle .fab::after{
+  width:20px !important;
+  height:3px !important;
+  border-radius:2px !important;
+  left:50% !important;
+  top:50% !important;
+  background:#fff !important;
+  transform-origin:center !important;
+}
+
+.fabGoogle .fab::before{
+  transform:translate(-50%,-50%) rotate(0deg) !important;
+}
+.fabGoogle .fab::after{
+  transform:translate(-50%,-50%) rotate(90deg) !important;
+}
+
+.fabGoogle.is-open .fab::before{
+  width:19px !important;
+  height:3px !important;
+  transform:translate(-50%,-50%) rotate(45deg) !important;
+}
+.fabGoogle.is-open .fab::after{
+  width:19px !important;
+  height:3px !important;
+  transform:translate(-50%,-50%) rotate(-45deg) !important;
+}
+
+@media(max-width:430px){
+  .fabGoogle .fab{
+    width:54px !important;
+    height:54px !important;
+    min-height:54px !important;
+    border-radius:18px !important;
+  }
+
+  .fabGoogle .fab::before,
+  .fabGoogle .fab::after{
+    width:19px !important;
+    height:2.8px !important;
+  }
+
+  .fabGoogle.is-open .fab::before,
+  .fabGoogle.is-open .fab::after{
+    width:18px !important;
+    height:2.8px !important;
+  }
+}
+
   </style>
 
 </head>
@@ -4939,7 +5032,10 @@ dialog#vacDialog .modalBody,dialog#bulkDialog .modalBody{max-height:calc(92dvh -
   function lockPageScroll(reason = "ui") {
     lockReasons.add(reason);
     if (document.body.classList.contains("scroll-locked")) return;
+
     lockY = window.scrollY || document.documentElement.scrollTop || 0;
+
+    document.documentElement.classList.add("scroll-locked-root");
     document.body.style.top = `-${lockY}px`;
     document.body.classList.add("scroll-locked");
   }
@@ -4947,7 +5043,10 @@ dialog#vacDialog .modalBody,dialog#bulkDialog .modalBody{max-height:calc(92dvh -
   function unlockPageScroll(reason = "ui") {
     lockReasons.delete(reason);
     if (lockReasons.size) return;
+
+    document.documentElement.classList.remove("scroll-locked-root");
     document.body.classList.remove("scroll-locked", "modal-open", "drawer-open", "fab-open");
+
     const y = lockY;
     document.body.style.top = "";
     window.scrollTo(0, y);
@@ -5013,6 +5112,7 @@ dialog#vacDialog .modalBody,dialog#bulkDialog .modalBody{max-height:calc(92dvh -
   });
 
   $("fabScrim")?.addEventListener("click", () => { closeFabMenu(); haptic.tap(); });
+  $("fabScrim")?.addEventListener("touchmove", (e) => e.preventDefault(), { passive:false });
   $("fabTodayAction")?.addEventListener("click", () => {
     closeFabMenu();
     setTimeout(() => window.openWorkDay?.(window.workTodayISO?.()), 80);
@@ -5053,19 +5153,32 @@ dialog#vacDialog .modalBody,dialog#bulkDialog .modalBody{max-height:calc(92dvh -
   }
 
   const drawerMeta = {
-    main: { title:"Czas pracy", sub:"Kalendarz godzin i urlopów", back:false, footer:true },
-    settings: { title:"Ustawienia", sub:"Stawka, urlop i szablony pracy", back:true, footer:false },
-    tools: { title:"Narzędzia", sub:"Raporty, kopia danych i czyszczenie", back:true, footer:false },
-    info: { title:"Informacje", sub:"Wersja aplikacji i status błędów", back:true, footer:false }
+    main: { title:"Czas pracy", sub:"Kalendarz godzin i urlopów", footer:true },
+    settings: { title:"Ustawienia", sub:"Stawka, urlop i szablony pracy", footer:false },
+    tools: { title:"Narzędzia", sub:"Raporty, kopia danych i czyszczenie", footer:false },
+    info: { title:"Informacje", sub:"Wersja aplikacji i status błędów", footer:false }
   };
+
+  let currentDrawerView = "main";
 
   function showDrawerView(name) {
     const meta = drawerMeta[name] || drawerMeta.main;
+    currentDrawerView = drawerMeta[name] ? name : "main";
+
     document.querySelectorAll(".drawerView").forEach(v => v.classList.remove("active"));
-    $("drawerView" + name.charAt(0).toUpperCase() + name.slice(1))?.classList.add("active");
+    $("drawerView" + currentDrawerView.charAt(0).toUpperCase() + currentDrawerView.slice(1))?.classList.add("active");
+
     if (drawerTitle) drawerTitle.textContent = meta.title;
     if (drawerSubtitle) drawerSubtitle.textContent = meta.sub;
-    if (drawerBack) drawerBack.hidden = !meta.back;
+
+    // Strzałka jest zawsze widoczna:
+    // - w menu głównym zamyka drawer,
+    // - w ustawieniach/narzędziach/info wraca do menu głównego.
+    if (drawerBack) {
+      drawerBack.hidden = false;
+      drawerBack.setAttribute("aria-label", currentDrawerView === "main" ? "Zamknij menu" : "Wróć do menu");
+    }
+
     if (drawerFooter) drawerFooter.hidden = !meta.footer;
     if (name === "info") refreshAppInfo();
   }
@@ -5085,9 +5198,14 @@ dialog#vacDialog .modalBody,dialog#bulkDialog .modalBody{max-height:calc(92dvh -
 
   $("mainMenuBtn")?.addEventListener("click", () => { openDrawer(); haptic.tap(); });
   drawer?.addEventListener("click", (e) => { if (e.target === drawer) closeDrawer(); });
+  drawer?.addEventListener("touchmove", (e) => { if (e.target === drawer) e.preventDefault(); }, { passive:false });
   drawer?.addEventListener("cancel", (e) => { e.preventDefault(); closeDrawer(); });
   drawer?.addEventListener("close", () => { document.body.classList.remove("drawer-open"); unlockPageScroll("drawer"); });
-  drawerBack?.addEventListener("click", () => { showDrawerView("main"); haptic.tap(); });
+  drawerBack?.addEventListener("click", () => {
+    if (currentDrawerView === "main") closeDrawer();
+    else showDrawerView("main");
+    haptic.tap();
+  });
 
   $("drawerMonthView")?.addEventListener("click", () => { closeDrawer(); document.querySelector(".calCard")?.scrollIntoView({ behavior:"smooth", block:"start" }); });
   ["drawerWeekView","drawerDayView","drawerYearSummary"].forEach((id) => {
