@@ -2458,6 +2458,144 @@ body{
   border-radius:3px !important;
 }
 
+  
+/* ===== 3.5.2 FIX: brak skakania przy swipe + prawdziwy chevron Google ===== */
+
+/* Podczas swipe obie warstwy mają identyczną geometrię */
+#calSwipeArea.is-swiping{
+  overflow:hidden !important;
+  contain:layout paint style !important;
+}
+
+#calSwipeArea.is-swiping #calLayerCurrent,
+#calSwipeArea.is-swiping #calLayerGhost{
+  width:100% !important;
+  min-width:100% !important;
+  transform:translateZ(0);
+  will-change:transform;
+  backface-visibility:hidden;
+}
+
+/* Gridy muszą mieć identyczne przerwy i brak dodatkowych przeliczeń */
+#calSwipeArea.is-swiping #dowRow,
+#calSwipeArea.is-swiping #dowRowGhost,
+#calSwipeArea.is-swiping #calGrid,
+#calSwipeArea.is-swiping #calGridGhost{
+  width:100% !important;
+  min-width:100% !important;
+  gap:4px !important;
+}
+
+/* Najważniejsze: dokładnie ten sam wymiar kafelków i pastylek w current oraz ghost */
+#calSwipeArea.is-swiping #calLayerCurrent .dayCell,
+#calSwipeArea.is-swiping #calLayerGhost .dayCell,
+#calSwipeArea.is-swiping #calLayerCurrent .blankCell,
+#calSwipeArea.is-swiping #calLayerGhost .blankCell{
+  min-height:var(--day-height) !important;
+  height:var(--day-height) !important;
+  max-height:var(--day-height) !important;
+  flex:0 0 auto !important;
+  border-radius:6px !important;
+  background:#f8f9fa !important;
+  transition:none !important;
+  transform:none !important;
+}
+
+#calSwipeArea.is-swiping #calLayerCurrent .dayNum,
+#calSwipeArea.is-swiping #calLayerGhost .dayNum{
+  min-width:var(--day-num-box) !important;
+  width:var(--day-num-box) !important;
+  height:var(--day-num-box) !important;
+  max-height:var(--day-num-box) !important;
+  font-size:var(--day-num-size) !important;
+  transition:none !important;
+}
+
+#calSwipeArea.is-swiping #calLayerCurrent .dayCell.today .dayNum,
+#calSwipeArea.is-swiping #calLayerGhost .dayCell.today .dayNum{
+  min-width:var(--today-badge-w) !important;
+  width:auto !important;
+  height:var(--today-badge-h) !important;
+  max-height:var(--today-badge-h) !important;
+}
+
+#calSwipeArea.is-swiping #calLayerCurrent .pill,
+#calSwipeArea.is-swiping #calLayerGhost .pill{
+  min-height:var(--pill-height) !important;
+  height:var(--pill-height) !important;
+  max-height:var(--pill-height) !important;
+  font-size:var(--pill-size) !important;
+  line-height:1 !important;
+  border-radius:3px !important;
+  padding:0 3px !important;
+  transition:none !important;
+}
+
+/* Chevron Google: rozwarte V z dwóch kresek, bez półksiężyca */
+.drag-handle{
+  width:52px !important;
+  height:28px !important;
+  margin:7px auto 5px !important;
+  background:transparent !important;
+  border:none !important;
+  border-radius:999px !important;
+  display:grid !important;
+  place-items:center !important;
+  cursor:pointer !important;
+  touch-action:none !important;
+  position:relative !important;
+}
+
+.drag-handle:hover{
+  background:rgba(60,64,67,.04) !important;
+}
+
+.drag-handle::before,
+.drag-handle::after{
+  content:"" !important;
+  position:absolute !important;
+  top:12px !important;
+  width:20px !important;
+  height:4px !important;
+  background:#d5d9df !important;
+  border:none !important;
+  border-radius:999px !important;
+  transform-origin:center !important;
+}
+
+.drag-handle::before{
+  left:8px !important;
+  transform:rotate(22deg) !important;
+}
+
+.drag-handle::after{
+  right:8px !important;
+  transform:rotate(-22deg) !important;
+}
+
+/* Mniejszy wariant na Samsungu, nadal rozwarte V */
+@media(max-width:430px){
+  .drag-handle{
+    width:48px !important;
+    height:26px !important;
+  }
+
+  .drag-handle::before,
+  .drag-handle::after{
+    top:11px !important;
+    width:18px !important;
+    height:4px !important;
+  }
+
+  .drag-handle::before{
+    left:8px !important;
+  }
+
+  .drag-handle::after{
+    right:8px !important;
+  }
+}
+
   </style>
 
 </head>
@@ -3896,7 +4034,7 @@ body{
       renderCalendarInto(nextYM, gridGhost, false);
 
       area.classList.add("is-swiping");
-      area.style.height = currentLayer.offsetHeight + "px";
+      area.style.height = Math.max(currentLayer.offsetHeight, ghostLayer.offsetHeight) + "px";
       ghostLayer.style.display = "block";
 
       const w = area.clientWidth || window.innerWidth;
