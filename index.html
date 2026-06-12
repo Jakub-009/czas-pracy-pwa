@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.0.3</title>
+  <title>Czas pracy 4.0.4</title>
   <meta name="theme-color" content="#f8fafd" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2683,6 +2683,153 @@ body.drawer-open{
   }
 }
 
+  
+/* ===== Czas pracy 4.0.4: drawer jako panel treści, czysty FAB i globalny scroll lock ===== */
+body.scroll-locked{
+  position:fixed !important;
+  left:0 !important;
+  right:0 !important;
+  width:100% !important;
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+  touch-action:none !important;
+}
+
+/* Drawer: zawsze z lewego boku, bez animacji bottom sheet */
+dialog#mainMenuDialog.drawerDialog[open]{
+  animation:none !important;
+}
+dialog#mainMenuDialog.drawerDialog{
+  width:100vw !important;
+  max-width:100vw !important;
+  height:100dvh !important;
+  max-height:100dvh !important;
+  margin:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  overflow:hidden !important;
+}
+.drawerPanel{
+  width:min(342px, 90vw) !important;
+  height:100dvh !important;
+  background:#fff !important;
+  display:flex !important;
+  flex-direction:column !important;
+  animation:drawerFromLeft404 .24s cubic-bezier(.2,0,0,1) !important;
+  transform-origin:left center !important;
+  box-shadow:0 12px 34px rgba(60,64,67,.28) !important;
+}
+@keyframes drawerFromLeft404{
+  from{transform:translateX(-100%)}
+  to{transform:translateX(0)}
+}
+.drawerHeader{
+  min-height:80px;
+  padding:14px 20px 12px !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:12px !important;
+  flex:0 0 auto;
+}
+.drawerBack{
+  width:42px;
+  height:42px;
+  min-height:42px;
+  padding:0;
+  border-radius:50%;
+  background:transparent;
+  color:#202124;
+  box-shadow:none;
+  flex:0 0 auto;
+}
+.drawerBack:hover{background:#f1f3f4}
+.drawerBack svg{width:24px;height:24px;fill:currentColor}
+.drawerTitleBlock{min-width:0}
+.drawerAppName{font-size:24px;line-height:1.1;font-weight:500;letter-spacing:-.025em;color:#202124}
+.drawerAppSub{margin-top:4px;font-size:13px;color:#5f6368}
+.drawerContent{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:14px;
+}
+.drawerView{display:none;padding:0 12px 12px}
+.drawerView.active{display:block}
+.drawerFooter{flex:0 0 auto;margin-top:0 !important;padding:12px 24px calc(16px + env(safe-area-inset-bottom)) !important}
+.drawerToolGrid{display:grid;grid-template-columns:1fr;gap:10px;padding:6px 12px 0}
+.drawerToolGrid button{width:100%;min-height:48px;justify-content:center}
+.drawerInfoList{margin:6px 12px 0}
+.drawerInfoList .sheetListRow{min-height:54px}
+
+/* Accordiony ustawień w drawerze */
+.settingsAccordion{border-top:1px solid var(--outline-soft);margin:0 8px}
+.settingsAccordion:last-of-type{border-bottom:1px solid var(--outline-soft)}
+.settingsAccordion summary{min-height:56px;padding:0;display:flex;align-items:center;justify-content:space-between;gap:14px;list-style:none;cursor:pointer}
+.settingsAccordion summary::-webkit-details-marker{display:none}
+.settingsAccordion summary span{font-size:15.5px;font-weight:650;color:#202124}
+.settingsChevron{width:22px;height:22px;position:relative;transition:transform .18s ease}
+.settingsChevron::before{content:"";position:absolute;left:6px;top:5px;width:9px;height:9px;border-right:2px solid #5f6368;border-bottom:2px solid #5f6368;transform:rotate(45deg)}
+.settingsAccordion[open] .settingsChevron{transform:rotate(180deg)}
+.settingsAccordionBody{padding:0 0 16px}
+.settingsSoon{margin-top:12px;padding:11px 13px;border-radius:14px;background:#f6f8fb;border:1px solid #e2e6ed;color:#5f6368;font-size:13.5px;line-height:1.35}
+.templateAddBtn{width:100%;min-height:44px !important}
+
+/* FAB: plus i X z tych samych kresek, bez SVG */
+.fabGoogle .fab{
+  width:58px !important;
+  height:58px !important;
+  min-height:58px !important;
+  padding:0 !important;
+  border-radius:20px !important;
+  display:grid !important;
+  place-items:center !important;
+  position:relative !important;
+  overflow:hidden !important;
+}
+.fabGoogle .fab svg{display:none !important}
+.fabGoogle .fab::before,
+.fabGoogle .fab::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:26px;
+  height:3.4px;
+  border-radius:2px;
+  background:#fff;
+  transform-origin:center;
+  transition:transform .18s cubic-bezier(.2,0,0,1), width .18s cubic-bezier(.2,0,0,1);
+}
+.fabGoogle .fab::before{transform:translate(-50%,-50%) rotate(0deg)}
+.fabGoogle .fab::after{transform:translate(-50%,-50%) rotate(90deg)}
+.fabGoogle.is-open .fab::before{transform:translate(-50%,-50%) rotate(45deg);width:24px}
+.fabGoogle.is-open .fab::after{transform:translate(-50%,-50%) rotate(-45deg);width:24px}
+.fabActionPill{min-height:46px !important;height:46px !important;padding:0 17px 0 14px !important;gap:11px !important;font-size:15.5px !important;font-weight:550 !important;border-radius:999px !important}
+.fabActionPill svg{width:21px !important;height:21px !important}
+.templateChip{min-height:29px !important;height:29px !important;padding:0 9px !important;font-size:12px !important;font-weight:650 !important}
+
+/* Margines i przewijanie dużych bottom sheetów */
+@media(max-width:679px){
+  dialog#vacDialog,dialog#bulkDialog,dialog#dayDialog{
+    width:calc(100vw - 18px) !important;
+    max-width:calc(100vw - 18px) !important;
+    margin:auto 9px 9px 9px !important;
+    border-radius:30px !important;
+  }
+  dialog#vacDialog .modalHead,dialog#bulkDialog .modalHead,dialog#dayDialog .modalHead,
+  dialog#vacDialog .modalBody,dialog#bulkDialog .modalBody,dialog#dayDialog .modalBody{
+    padding-left:22px !important;
+    padding-right:22px !important;
+  }
+}
+dialog#vacDialog,dialog#bulkDialog{max-height:92dvh !important}
+dialog#vacDialog .modalBody,dialog#bulkDialog .modalBody{max-height:calc(92dvh - 92px) !important;overflow-y:auto !important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#bulkApply,#setVacationRange,#dlgAddShift{min-height:46px !important;padding:0 20px !important;font-size:15px !important;border-radius:999px !important}
+#bulkRemove,#clearVacationRange,.backBtn,#dlgBack{min-height:42px !important;padding:0 16px !important;font-size:15px !important;border-radius:999px !important}
+#dlgAddShift.addBtnCenter{width:auto !important;min-width:210px !important;max-width:100% !important;margin-left:auto !important;margin-right:0 !important}
+
   </style>
 
 </head>
@@ -2778,201 +2925,125 @@ body.drawer-open{
   <dialog id="mainMenuDialog" class="drawerDialog">
     <div class="drawerPanel">
       <div class="drawerHeader">
-        <div class="drawerAppName">Czas pracy</div>
-        <div class="drawerAppSub">Kalendarz godzin i urlopów</div>
+        <button class="drawerBack" id="drawerBack" type="button" aria-label="Wróć" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg>
+        </button>
+        <div class="drawerTitleBlock">
+          <div class="drawerAppName" id="drawerTitle">Czas pracy</div>
+          <div class="drawerAppSub" id="drawerSubtitle">Kalendarz godzin i urlopów</div>
+        </div>
       </div>
 
-      <div class="drawerSection">
-        <button class="drawerItem active" id="drawerMonthView" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V9h14v10ZM5 7V5h14v2H5Z"/></svg>
-          <span>Miesiąc</span>
-        </button>
+      <div class="drawerContent">
+        <div class="drawerView active" id="drawerViewMain">
+          <div class="drawerSection">
+            <button class="drawerItem active" id="drawerMonthView" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V9h14v10ZM5 7V5h14v2H5Z"/></svg>
+              <span>Miesiąc</span>
+            </button>
 
-        <button class="drawerItem soon" id="drawerWeekView" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 2v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-2V2h-2v2H9V2H7Zm12 18H5V9h14v11Z"/></svg>
-          <span>Tydzień <em>wkrótce</em></span>
-        </button>
+            <button class="drawerItem soon" id="drawerWeekView" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 2v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-2V2h-2v2H9V2H7Zm12 18H5V9h14v11Z"/></svg>
+              <span>Tydzień <em>wkrótce</em></span>
+            </button>
 
-        <button class="drawerItem soon" id="drawerDayView" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V8h14v11ZM7 10h10v2H7v-2Zm0 4h7v2H7v-2Z"/></svg>
-          <span>Dzień <em>wkrótce</em></span>
-        </button>
+            <button class="drawerItem soon" id="drawerDayView" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V8h14v11ZM7 10h10v2H7v-2Zm0 4h7v2H7v-2Z"/></svg>
+              <span>Dzień <em>wkrótce</em></span>
+            </button>
 
-        <button class="drawerItem soon" id="drawerYearSummary" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 9.2h3V19H5V9.2Zm5.5-4.2h3V19h-3V5Zm5.5 8h3v6h-3v-6Z"/></svg>
-          <span>Rok / statystyki <em>wkrótce</em></span>
-        </button>
+            <button class="drawerItem soon" id="drawerYearSummary" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 9.2h3V19H5V9.2Zm5.5-4.2h3V19h-3V5Zm5.5 8h3v6h-3v-6Z"/></svg>
+              <span>Rok / statystyki <em>wkrótce</em></span>
+            </button>
+          </div>
+
+          <div class="drawerDivider"></div>
+
+          <div class="drawerSection">
+            <button class="drawerItem" id="openEmployerSettings" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.02-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.37-.31-.6-.22l-2.49 1a7.28 7.28 0 0 0-1.69-.98L14.5 2.42A.49.49 0 0 0 14 2h-4c-.25 0-.46.18-.5.42L9.12 5.07c-.61.24-1.18.56-1.69.98l-2.49-1a.5.5 0 0 0-.6.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.08.65-.08.98s.03.66.08.98l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.12.22.37.31.6.22l2.49-1c.51.4 1.08.73 1.69.98l.38 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.61-.24 1.18-.56 1.69-.98l2.49 1c.23.08.48 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.64l-2.11-1.65ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/></svg>
+              <span>Ustawienia</span>
+            </button>
+
+            <button class="drawerItem" id="openSystemTools" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3l4.1 4.1-2.9 2.9L1.7 4.6C.6 7 .9 10 3 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.4-.4.4-1 0-1.4Z"/></svg>
+              <span>Narzędzia systemowe</span>
+            </button>
+
+            <button class="drawerItem" id="openAppInfo" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11 17h2v-6h-2v6Zm1-14a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 16a7 7 0 1 1 0-14 7 7 0 0 1 0 14ZM11 9h2V7h-2v2Z"/></svg>
+              <span>Informacje o aplikacji</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="drawerView" id="drawerViewSettings">
+          <details class="settingsAccordion" open>
+            <summary><span>Szczegóły pracodawcy</span><i class="settingsChevron" aria-hidden="true"></i></summary>
+            <div class="settingsAccordionBody">
+              <div style="margin-bottom:16px;">
+                <label>Stawka godzinowa (PLN)</label>
+                <input id="rate" type="number" step="0.01" min="0" placeholder="Wpisz stawkę" />
+              </div>
+
+              <div>
+                <label>Limit urlopu płatnego (dni / rok)</label>
+                <input id="leaveQuota" type="number" step="1" min="0" placeholder="np. 26" />
+                <div class="muted" id="leaveCounter" style="margin-top:8px;">—</div>
+              </div>
+
+              <div class="settingsSoon">Więcej ustawień wkrótce.</div>
+            </div>
+          </details>
+
+          <details class="settingsAccordion">
+            <summary><span>Szablony godzin pracy</span><i class="settingsChevron" aria-hidden="true"></i></summary>
+            <div class="settingsAccordionBody">
+              <div class="muted">Szybkie zakresy dostępne w modalu dnia i przy dodawaniu wielu dni.</div>
+              <div class="templateList" id="templateList"></div>
+              <div class="fieldGrid templateAddGrid">
+                <div>
+                  <label>Wejście</label>
+                  <input id="tplStart" type="time" />
+                </div>
+                <div>
+                  <label>Wyjście</label>
+                  <input id="tplEnd" type="time" />
+                </div>
+              </div>
+              <button class="tonal templateAddBtn" id="tplAdd" type="button">Dodaj szablon</button>
+            </div>
+          </details>
+        </div>
+
+        <div class="drawerView" id="drawerViewTools">
+          <div class="drawerToolGrid">
+            <button class="tonal" id="reportPdf" type="button">Generuj PDF</button>
+            <button class="tonal" id="backupJson" type="button">Pobierz kopię</button>
+            <input id="restoreJson" type="file" accept="application/json" style="display:none" />
+            <button class="tonal" id="restoreBtn" type="button">Wczytaj dane</button>
+            <button class="error-tonal" id="clearMonth" type="button">Wyczyść miesiąc</button>
+          </div>
+        </div>
+
+        <div class="drawerView" id="drawerViewInfo">
+          <div class="sheetList drawerInfoList">
+            <div class="sheetListRow"><span>Wersja aplikacji</span><strong id="appVersionLabel"></strong></div>
+            <div class="sheetListRow"><span>Autor</span><strong>Jakub Sip</strong></div>
+            <div class="sheetListRow"><span>Status błędów</span><strong id="appErrorState">Brak błędów</strong></div>
+          </div>
+          <div class="appErrorBox sheetErrorBox" id="appErrorBox" hidden></div>
+        </div>
       </div>
 
-      <div class="drawerDivider"></div>
-
-      <div class="drawerSection">
-        <button class="drawerItem" id="openEmployerSettings" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.02-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.37-.31-.6-.22l-2.49 1a7.28 7.28 0 0 0-1.69-.98L14.5 2.42A.49.49 0 0 0 14 2h-4c-.25 0-.46.18-.5.42L9.12 5.07c-.61.24-1.18.56-1.69.98l-2.49-1a.5.5 0 0 0-.6.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.08.65-.08.98s.03.66.08.98l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.12.22.37.31.6.22l2.49-1c.51.4 1.08.73 1.69.98l.38 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.61-.24 1.18-.56 1.69-.98l2.49 1c.23.08.48 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.64l-2.11-1.65ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/></svg>
-          <span>Ustawienia</span>
-        </button>
-
-        <button class="drawerItem" id="openSystemTools" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3l4.1 4.1-2.9 2.9L1.7 4.6C.6 7 .9 10 3 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.4-.4.4-1 0-1.4Z"/></svg>
-          <span>Narzędzia systemowe</span>
-        </button>
-
-        <button class="drawerItem" id="openAppInfo" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11 17h2v-6h-2v6Zm1-14a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 16a7 7 0 1 1 0-14 7 7 0 0 1 0 14ZM11 9h2V7h-2v2Z"/></svg>
-          <span>Informacje o aplikacji</span>
-        </button>
-      </div>
-
-      <div class="drawerFooter">
+      <div class="drawerFooter" id="drawerFooter">
         <div id="appVersionFooter"></div>
         <div>Jakub Sip</div>
       </div>
     </div>
   </dialog>
 
-  <dialog id="appInfoDialog">
-    <div class="drag-handle"></div>
-    <div class="modalHead">
-      <div class="modalHeadInner">
-        <h3>Informacje o aplikacji</h3>
-        <div class="muted">Podstawowe dane aktualnie wczytanej wersji.</div>
-      </div>
-    </div>
-
-    <div class="modalBody appInfoBody">
-      <div class="sheetList">
-        <div class="sheetListRow">
-          <span>Wersja aplikacji</span>
-          <strong id="appVersionLabel"></strong>
-        </div>
-        <div class="sheetListRow">
-          <span>Autor</span>
-          <strong>Jakub Sip</strong>
-        </div>
-        <div class="sheetListRow">
-          <span>Status błędów</span>
-          <strong id="appErrorState">Brak błędów</strong>
-        </div>
-      </div>
-
-      <div class="appErrorBox sheetErrorBox" id="appErrorBox" hidden></div>
-
-      <div class="actionRow">
-        <button class="tonal" id="appInfoClose" type="button">Zamknij</button>
-      </div>
-    </div>
-  </dialog>
-
-  <dialog id="settingsDialog">
-    <div class="drag-handle"></div>
-    <div class="modalHead">
-      <div class="modalHeadInner">
-        <h3>Ustawienia</h3>
-        <div class="muted">Stawka, limit urlopu i podstawowe opcje pracy.</div>
-      </div>
-    </div>
-
-    <div class="modalBody settingsBody">
-      <details class="settingsAccordion" open>
-        <summary>
-          <span>Szczegóły pracodawcy</span>
-          <i class="settingsChevron" aria-hidden="true"></i>
-        </summary>
-
-        <div class="settingsAccordionBody">
-          <div style="margin-bottom:16px;">
-            <label>Stawka godzinowa (PLN)</label>
-            <input id="rate" type="number" step="0.01" min="0" placeholder="Wpisz stawkę" />
-          </div>
-
-          <div>
-            <label>Limit urlopu płatnego (dni / rok)</label>
-            <input id="leaveQuota" type="number" step="1" min="0" placeholder="np. 26" />
-            <div class="muted" id="leaveCounter" style="margin-top:8px;">—</div>
-          </div>
-
-          <div class="settingsSoon">Więcej ustawień wkrótce.</div>
-        </div>
-      </details>
-
-      <details class="settingsAccordion">
-        <summary>
-          <span>Szablony godzin pracy</span>
-          <i class="settingsChevron" aria-hidden="true"></i>
-        </summary>
-
-        <div class="settingsAccordionBody">
-          <div class="muted">Szybkie zakresy dostępne w modalu dnia i przy dodawaniu wielu dni.</div>
-
-          <div class="templateList" id="templateList"></div>
-
-          <div class="fieldGrid templateAddGrid">
-            <div>
-              <label>Wejście</label>
-              <input id="tplStart" type="time" />
-            </div>
-            <div>
-              <label>Wyjście</label>
-              <input id="tplEnd" type="time" />
-            </div>
-          </div>
-
-          <button class="tonal templateAddBtn" id="tplAdd" type="button">Dodaj szablon</button>
-        </div>
-      </details>
-
-      <div class="actionRow settingsCloseRow">
-        <button class="tonal" id="settingsClose" type="button">Zamknij</button>
-      </div>
-    </div>
-  </dialog>
-
-  <dialog id="toolsDialog">
-    <div class="drag-handle"></div>
-    <div class="modalHead">
-      <div class="modalHeadInner">
-        <h3>Narzędzia systemowe</h3>
-        <div class="muted">Raporty, kopie zapasowe i operacje na danych.</div>
-      </div>
-    </div>
-
-    <div class="modalBody">
-      <div class="toolGrid">
-        <button class="tonal" id="reportPdf" type="button">Generuj PDF</button>
-        <button class="tonal" id="backupJson" type="button">Pobierz kopię</button>
-
-        <input id="restoreJson" type="file" accept="application/json" style="display:none" />
-        <button class="tonal" id="restoreBtn" type="button">Wczytaj dane</button>
-
-        <button class="error-tonal" id="clearMonth" type="button">Wyczyść miesiąc</button>
-      </div>
-
-      <div class="actionRow">
-        <button class="tonal" id="toolsClose" type="button">Zamknij</button>
-      </div>
-    </div>
-  </dialog>
-
-
-  <dialog id="fabMenuDialog">
-    <div class="drag-handle"></div>
-    <div style="padding-bottom:20px;">
-      <button class="menu-item" id="openTodayDialog" type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V9h14v10Zm-7-2.5c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3ZM19 7H5V5h14v2Z"/></svg>
-        <span>Dodaj godziny z dziś<span class="desc">Otwórz dzisiejszy dzień</span></span>
-      </button>
-      <button class="menu-item" id="openBulkDialog" type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V9h14v10Zm0-12H5V5h14v2ZM7 11h5v5H7v-5Z"/></svg>
-        <span>Dodaj wiele godzin<span class="desc">Ten sam zakres dla kilku dni</span></span>
-      </button>
-      <button class="menu-item" id="openVacDialog" type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-2.34-5.66L14 10h8V2l-2.93 2.93A9.97 9.97 0 0 0 12 2Zm-1 5v6l5 3 .9-1.48-4.4-2.62V7H11Z"/></svg>
-        <span>Ustaw urlop lub L4<span class="desc">Status w wybranym zakresie dat</span></span>
-      </button>
-    </div>
-  </dialog>
-
-  <!-- MODAL URLOPU -->
   <dialog id="vacDialog">
     <div class="drag-handle"></div>
     <div class="modalHead">
@@ -4000,7 +4071,7 @@ body.drawer-open{
 
     if (dlg && typeof dlg.showModal === "function") dlg.showModal();
     else if (dlg) dlg.setAttribute("open", "");
-    document.body.classList.add("modal-open");
+    if (window.lockPageScroll) window.lockPageScroll("modal"); else document.body.classList.add("modal-open");
   }
 
   window.openWorkDay = openDay;
@@ -4010,7 +4081,7 @@ body.drawer-open{
     dlgDate = null;
     if (dlg && typeof dlg.close === "function") dlg.close();
     else if (dlg) dlg.removeAttribute("open");
-    document.body.classList.remove("modal-open");
+    if (window.unlockPageScroll) window.unlockPageScroll("modal"); else document.body.classList.remove("modal-open");
   }
 
   if (dlg) {
@@ -4164,7 +4235,7 @@ body.drawer-open{
     const t = todayISO();
     if ($("vacFrom") && !$("vacFrom").value) $("vacFrom").value = t;
     if ($("vacTo") && !$("vacTo").value) $("vacTo").value = t;
-    document.body.classList.add("modal-open");
+    if (window.lockPageScroll) window.lockPageScroll("modal"); else document.body.classList.add("modal-open");
     if (typeof vacDlg.showModal === "function") vacDlg.showModal();
     else vacDlg.setAttribute("open", "");
   }
@@ -4173,7 +4244,7 @@ body.drawer-open{
     if (!vacDlg) return;
     if (typeof vacDlg.close === "function") vacDlg.close();
     else vacDlg.removeAttribute("open");
-    document.body.classList.remove("modal-open");
+    if (window.unlockPageScroll) window.unlockPageScroll("modal"); else document.body.classList.remove("modal-open");
   }
   if (vacDlg) {
     vacDlg.addEventListener("cancel", (e) => { e.preventDefault(); closeVac(); });
@@ -4187,7 +4258,7 @@ body.drawer-open{
     const t = todayISO();
     if ($("bulkFrom") && !$("bulkFrom").value) $("bulkFrom").value = t;
     if ($("bulkTo") && !$("bulkTo").value) $("bulkTo").value = t;
-    document.body.classList.add("modal-open");
+    if (window.lockPageScroll) window.lockPageScroll("modal"); else document.body.classList.add("modal-open");
     if (typeof bulkDlg.showModal === "function") bulkDlg.showModal();
     else bulkDlg.setAttribute("open", "");
   }
@@ -4196,7 +4267,7 @@ body.drawer-open{
     if (!bulkDlg) return;
     if (typeof bulkDlg.close === "function") bulkDlg.close();
     else bulkDlg.removeAttribute("open");
-    document.body.classList.remove("modal-open");
+    if (window.unlockPageScroll) window.unlockPageScroll("modal"); else document.body.classList.remove("modal-open");
   }
   if (bulkDlg) {
     bulkDlg.addEventListener("cancel", (e) => { e.preventDefault(); closeBulk(); });
@@ -4857,16 +4928,33 @@ body.drawer-open{
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
-  const haptic = window.haptic || {
-    tap: () => {},
-    commit: () => {},
-    success: () => {},
-    warning: () => {},
-    danger: () => {}
-  };
+  const haptic = window.haptic || { tap(){}, commit(){}, success(){}, warning(){}, danger(){} };
   const APP_TITLE = document.title || "Czas pracy";
   const APP_VERSION = (APP_TITLE.match(/(\d+(?:\.\d+)*(?:\s*[a-zA-Z]+)?)/) || ["", "dev"])[1];
   window.__appErrors = window.__appErrors || [];
+
+  const lockReasons = new Set();
+  let lockY = 0;
+
+  function lockPageScroll(reason = "ui") {
+    lockReasons.add(reason);
+    if (document.body.classList.contains("scroll-locked")) return;
+    lockY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.body.style.top = `-${lockY}px`;
+    document.body.classList.add("scroll-locked");
+  }
+
+  function unlockPageScroll(reason = "ui") {
+    lockReasons.delete(reason);
+    if (lockReasons.size) return;
+    document.body.classList.remove("scroll-locked", "modal-open", "drawer-open", "fab-open");
+    const y = lockY;
+    document.body.style.top = "";
+    window.scrollTo(0, y);
+  }
+
+  window.lockPageScroll = lockPageScroll;
+  window.unlockPageScroll = unlockPageScroll;
 
   function applyAppVersionLabels() {
     const footer = $("appVersionFooter");
@@ -4885,131 +4973,69 @@ body.drawer-open{
     if (window.__appErrors.length > 10) window.__appErrors.shift();
   }
 
-  window.addEventListener("error", (e) => {
-    logAppError(e.message, e.filename ? (e.filename + ":" + e.lineno) : "");
-  });
+  window.addEventListener("error", (e) => logAppError(e.message, e.filename ? `${e.filename}:${e.lineno}` : ""));
+  window.addEventListener("unhandledrejection", (e) => logAppError(e.reason?.message || e.reason || "Nieobsłużony promise rejection", "promise"));
 
-  window.addEventListener("unhandledrejection", (e) => {
-    logAppError(e.reason?.message || e.reason || "Nieobsłużony promise rejection", "promise");
-  });
-
-  function openDialog(dlg){
+  function openDialog(dlg) {
     if (!dlg) return;
     if (typeof dlg.showModal === "function") dlg.showModal();
     else dlg.setAttribute("open", "");
   }
-  function closeDialog(dlg){
+
+  function closeDialog(dlg) {
     if (!dlg) return;
-    if (dlg.id === "mainMenuDialog") document.body.classList.remove("drawer-open");
     if (typeof dlg.close === "function" && dlg.open) dlg.close();
     else dlg.removeAttribute("open");
   }
 
-  const mainFab = $("mainFab");
-  const fabActions = $("fabActions");
-  const fabScrim = $("fabScrim");
-  const fabContainer = $("fabContainer");
-
   function setFabOpen(open) {
+    const mainFab = $("mainFab");
+    const fabActions = $("fabActions");
+    const fabScrim = $("fabScrim");
+    const fabContainer = $("fabContainer");
     if (!mainFab || !fabActions || !fabScrim || !fabContainer) return;
+
     fabContainer.classList.toggle("is-open", open);
     mainFab.setAttribute("aria-expanded", open ? "true" : "false");
     fabActions.hidden = !open;
     fabScrim.hidden = !open;
     document.body.classList.toggle("fab-open", open);
+    if (open) lockPageScroll("fab");
+    else unlockPageScroll("fab");
   }
 
-  function closeFabMenu() {
-    setFabOpen(false);
-  }
+  function closeFabMenu() { setFabOpen(false); }
 
-  if (mainFab) {
-    mainFab.addEventListener("click", () => {
-      const next = !fabContainer?.classList.contains("is-open");
-      setFabOpen(next);
-      haptic.tap();
-    });
-  }
+  $("mainFab")?.addEventListener("click", () => {
+    const next = !$("fabContainer")?.classList.contains("is-open");
+    setFabOpen(next);
+    haptic.tap();
+  });
 
-  if (fabScrim) {
-    fabScrim.addEventListener("click", () => {
-      closeFabMenu();
-      haptic.tap();
-    });
-  }
-
+  $("fabScrim")?.addEventListener("click", () => { closeFabMenu(); haptic.tap(); });
   $("fabTodayAction")?.addEventListener("click", () => {
     closeFabMenu();
-    setTimeout(() => {
-      if (window.openWorkDay && window.workTodayISO) {
-        window.openWorkDay(window.workTodayISO());
-      }
-    }, 80);
+    setTimeout(() => window.openWorkDay?.(window.workTodayISO?.()), 80);
   });
+  $("fabBulkAction")?.addEventListener("click", () => { closeFabMenu(); setTimeout(() => $("openBulkDialog")?.click(), 80); });
+  $("fabVacationAction")?.addEventListener("click", () => { closeFabMenu(); setTimeout(() => $("openVacDialog")?.click(), 80); });
 
-  $("fabBulkAction")?.addEventListener("click", () => {
-    closeFabMenu();
-    setTimeout(() => $("openBulkDialog")?.click(), 80);
-  });
-
-  $("fabVacationAction")?.addEventListener("click", () => {
-    closeFabMenu();
-    setTimeout(() => $("openVacDialog")?.click(), 80);
-  });
-
-  const menuBtn = $("mainMenuBtn");
-  const mainMenu = $("mainMenuDialog");
-  const settingsDialog = $("settingsDialog");
-  const toolsDialog = $("toolsDialog");
-  const appInfoDialog = $("appInfoDialog");
-
-  if (menuBtn && mainMenu) {
-    menuBtn.addEventListener("click", () => {
-      document.body.classList.add("drawer-open");
-      openDialog(mainMenu);
-    });
-    mainMenu.addEventListener("close", () => document.body.classList.remove("drawer-open"));
-    mainMenu.addEventListener("cancel", () => document.body.classList.remove("drawer-open"));
-  }
-
-  $("drawerMonthView")?.addEventListener("click", () => {
-    closeDialog(mainMenu);
-    document.querySelector(".calCard")?.scrollIntoView({ behavior:"smooth", block:"start" });
-  });
-
-  ["drawerWeekView","drawerDayView","drawerYearSummary"].forEach((id) => {
-    $(id)?.addEventListener("click", () => {
-      closeDialog(mainMenu);
-      const label = id === "drawerYearSummary" ? "Widok roczny / statystyki" : (id === "drawerWeekView" ? "Widok tygodnia" : "Widok dnia");
-      const st = $("status");
-      if (st) st.textContent = `${label} — wkrótce.`;
-    });
-  });
-
-  $("openEmployerSettings")?.addEventListener("click", () => {
-    closeDialog(mainMenu);
-    setTimeout(() => openDialog(settingsDialog), 120);
-  });
-
-  $("openSystemTools")?.addEventListener("click", () => {
-    closeDialog(mainMenu);
-    setTimeout(() => openDialog(toolsDialog), 120);
-  });
+  const drawer = $("mainMenuDialog");
+  const drawerBack = $("drawerBack");
+  const drawerTitle = $("drawerTitle");
+  const drawerSubtitle = $("drawerSubtitle");
+  const drawerFooter = $("drawerFooter");
 
   function refreshAppInfo() {
     const versionEl = $("appVersionLabel");
     const stateEl = $("appErrorState");
     const box = $("appErrorBox");
-
     if (versionEl) versionEl.textContent = APP_VERSION;
 
     const errors = window.__appErrors || [];
     if (!errors.length) {
       if (stateEl) stateEl.textContent = "Brak błędów";
-      if (box) {
-        box.hidden = true;
-        box.textContent = "";
-      }
+      if (box) { box.hidden = true; box.textContent = ""; }
       return;
     }
 
@@ -5026,37 +5052,62 @@ body.drawer-open{
     }
   }
 
-  $("openAppInfo")?.addEventListener("click", () => {
-    closeDialog(mainMenu);
-    refreshAppInfo();
-    setTimeout(() => openDialog(appInfoDialog), 120);
-  });
+  const drawerMeta = {
+    main: { title:"Czas pracy", sub:"Kalendarz godzin i urlopów", back:false, footer:true },
+    settings: { title:"Ustawienia", sub:"Stawka, urlop i szablony pracy", back:true, footer:false },
+    tools: { title:"Narzędzia", sub:"Raporty, kopia danych i czyszczenie", back:true, footer:false },
+    info: { title:"Informacje", sub:"Wersja aplikacji i status błędów", back:true, footer:false }
+  };
 
-  $("settingsClose")?.addEventListener("click", () => closeDialog(settingsDialog));
-  $("toolsClose")?.addEventListener("click", () => closeDialog(toolsDialog));
-  $("appInfoClose")?.addEventListener("click", () => closeDialog(appInfoDialog));
+  function showDrawerView(name) {
+    const meta = drawerMeta[name] || drawerMeta.main;
+    document.querySelectorAll(".drawerView").forEach(v => v.classList.remove("active"));
+    $("drawerView" + name.charAt(0).toUpperCase() + name.slice(1))?.classList.add("active");
+    if (drawerTitle) drawerTitle.textContent = meta.title;
+    if (drawerSubtitle) drawerSubtitle.textContent = meta.sub;
+    if (drawerBack) drawerBack.hidden = !meta.back;
+    if (drawerFooter) drawerFooter.hidden = !meta.footer;
+    if (name === "info") refreshAppInfo();
+  }
 
-  ["fabMenuDialog","mainMenuDialog","settingsDialog","toolsDialog","appInfoDialog","vacDialog","bulkDialog","dayDialog"].forEach((id) => {
-    const dlg = $(id);
-    if (!dlg) return;
-    dlg.addEventListener("click", (e) => {
-      if (e.target !== dlg) return;
-      if (id === "dayDialog") $("dlgBack")?.click();
-      else if (id === "vacDialog") $("vacBack")?.click();
-      else if (id === "bulkDialog") $("bulkBack")?.click();
-      else closeDialog(dlg);
+  function openDrawer() {
+    showDrawerView("main");
+    document.body.classList.add("drawer-open");
+    lockPageScroll("drawer");
+    openDialog(drawer);
+  }
+
+  function closeDrawer() {
+    document.body.classList.remove("drawer-open");
+    unlockPageScroll("drawer");
+    closeDialog(drawer);
+  }
+
+  $("mainMenuBtn")?.addEventListener("click", () => { openDrawer(); haptic.tap(); });
+  drawer?.addEventListener("click", (e) => { if (e.target === drawer) closeDrawer(); });
+  drawer?.addEventListener("cancel", (e) => { e.preventDefault(); closeDrawer(); });
+  drawer?.addEventListener("close", () => { document.body.classList.remove("drawer-open"); unlockPageScroll("drawer"); });
+  drawerBack?.addEventListener("click", () => { showDrawerView("main"); haptic.tap(); });
+
+  $("drawerMonthView")?.addEventListener("click", () => { closeDrawer(); document.querySelector(".calCard")?.scrollIntoView({ behavior:"smooth", block:"start" }); });
+  ["drawerWeekView","drawerDayView","drawerYearSummary"].forEach((id) => {
+    $(id)?.addEventListener("click", () => {
+      closeDrawer();
+      const label = id === "drawerYearSummary" ? "Widok roczny / statystyki" : (id === "drawerWeekView" ? "Widok tygodnia" : "Widok dnia");
+      const st = $("status");
+      if (st) st.textContent = `${label} — wkrótce.`;
     });
   });
+  $("openEmployerSettings")?.addEventListener("click", () => { showDrawerView("settings"); haptic.tap(); });
+  $("openSystemTools")?.addEventListener("click", () => { showDrawerView("tools"); haptic.tap(); });
+  $("openAppInfo")?.addEventListener("click", () => { showDrawerView("info"); haptic.tap(); });
 
-  function enableSwipeDownToClose(dlg){
+  function enableSwipeDownToClose(dlg) {
     if (!dlg) return;
     const handle = dlg.querySelector(".drag-handle");
     if (!handle) return;
 
-    let startY = 0;
-    let currentY = 0;
-    let dragging = false;
-    let moved = false;
+    let startY = 0, currentY = 0, dragging = false, moved = false;
 
     const reset = () => {
       dragging = false;
@@ -5072,22 +5123,13 @@ body.drawer-open{
       else closeDialog(dlg);
     };
 
-    handle.addEventListener("click", (e) => {
-      if (moved) return;
-      e.preventDefault();
-      closeThisDialog();
-    });
-
+    handle.addEventListener("click", (e) => { if (!moved) { e.preventDefault(); closeThisDialog(); } });
     handle.addEventListener("pointerdown", (e) => {
       if (!dlg.open) return;
-      dragging = true;
-      moved = false;
-      startY = e.clientY;
-      currentY = startY;
+      dragging = true; moved = false; startY = e.clientY; currentY = startY;
       dlg.style.transition = "none";
       handle.setPointerCapture?.(e.pointerId);
     });
-
     handle.addEventListener("pointermove", (e) => {
       if (!dragging) return;
       currentY = e.clientY;
@@ -5095,7 +5137,6 @@ body.drawer-open{
       if (dy > 6) moved = true;
       dlg.style.transform = `translateY(${dy}px)`;
     });
-
     handle.addEventListener("pointerup", (e) => {
       if (!dragging) return;
       const dy = Math.max(0, currentY - startY);
@@ -5105,47 +5146,27 @@ body.drawer-open{
         dlg.style.transition = "transform .18s cubic-bezier(.2,0,0,1), opacity .18s cubic-bezier(.2,0,0,1)";
         dlg.style.transform = "translateY(110%)";
         dlg.style.opacity = "0";
-        setTimeout(() => {
-          dlg.style.opacity = "";
-          closeThisDialog();
-          if (dlg.id === "dayDialog") document.body.classList.remove("modal-open");
-          reset();
-        }, 170);
+        setTimeout(() => { dlg.style.opacity = ""; closeThisDialog(); reset(); }, 170);
       } else {
         dlg.style.transition = "transform .18s cubic-bezier(.2,0,0,1)";
         dlg.style.transform = "translateY(0)";
         setTimeout(reset, 180);
       }
     });
-
     handle.addEventListener("pointercancel", reset);
   }
 
-  ["dayDialog","vacDialog","bulkDialog","fabMenuDialog","mainMenuDialog","settingsDialog","toolsDialog","appInfoDialog"].forEach((id) => {
-    enableSwipeDownToClose($(id));
-  });
-
+  ["dayDialog","vacDialog","bulkDialog"].forEach((id) => enableSwipeDownToClose($(id)));
 
   function setupKeyboardFriendlyModals() {
     const controls = document.querySelectorAll("dialog input, dialog textarea, dialog select");
-
     controls.forEach((el) => {
       el.addEventListener("focus", () => {
         document.body.classList.add("keyboard-focus");
-        setTimeout(() => {
-          try {
-            el.scrollIntoView({ block: "center", behavior: "smooth" });
-          } catch {
-            el.scrollIntoView();
-          }
-        }, 260);
+        setTimeout(() => el.scrollIntoView?.({ block:"center", behavior:"smooth" }), 260);
       });
-
-      el.addEventListener("blur", () => {
-        setTimeout(() => document.body.classList.remove("keyboard-focus"), 120);
-      });
+      el.addEventListener("blur", () => setTimeout(() => document.body.classList.remove("keyboard-focus"), 120));
     });
-
     if (window.visualViewport) {
       const update = () => {
         const ratio = window.visualViewport.height / window.innerHeight;
@@ -5158,7 +5179,6 @@ body.drawer-open{
   }
 
   setupKeyboardFriendlyModals();
-
   applyAppVersionLabels();
 })();
 </script>
