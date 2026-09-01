@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.5.11</title>
+  <title>Czas pracy 4.5.12</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2414,21 +2414,36 @@ dialog.googlePanel[open],
 .appToast{
   position:fixed;
   left:50%;
-  bottom:calc(18px + env(safe-area-inset-bottom));
-  transform:translate(-50%, 18px);
+  top:calc(12px + env(safe-area-inset-top));
+  transform:translate(-50%, -18px);
   z-index:90;
   max-width:min(520px, calc(100vw - 28px));
-  padding:12px 16px;
+  min-height:44px;
+  padding:10px 16px 10px 14px;
   border-radius:999px;
-  background:#202124;
-  color:#fff;
-  box-shadow:0 8px 24px rgba(32,33,36,.26);
+  background:#fff;
+  color:#202124;
+  border:1px solid #dfe3eb;
+  box-shadow:0 8px 24px rgba(60,64,67,.16);
   font-size:14px;
   line-height:1.25;
-  font-weight:550;
+  font-weight:650;
   opacity:0;
   pointer-events:none;
-  transition:opacity .18s ease, transform .18s ease;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  transition:opacity .18s ease, transform .18s var(--motion-ease);
+}
+
+.appToast::before{
+  content:"";
+  width:10px;
+  height:10px;
+  flex:0 0 auto;
+  border-radius:999px;
+  background:#1a73e8;
+  box-shadow:0 0 0 5px #e8f0fe;
 }
 
 .appToast.show{
@@ -5293,6 +5308,16 @@ dialog#dayDialog .dayCloseRow{
   }
 
   let db = load() || createEmptyDB();
+  let dataRevision = 0;
+  const viewSwipePreviewCache = {
+    day:null,
+    week:null
+  };
+
+  function clearViewSwipePreviewCache() {
+    viewSwipePreviewCache.day = null;
+    viewSwipePreviewCache.week = null;
+  }
 
   const calendarHtmlCache = new Map();
   function clearCalendarHtmlCache() {
@@ -5321,6 +5346,8 @@ dialog#dayDialog .dayCloseRow{
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
       clearCalendarHtmlCache();
+      clearViewSwipePreviewCache();
+      dataRevision += 1;
       return true;
     } catch (err) {
       warnStorageWriteError(err);
@@ -5435,6 +5462,7 @@ dialog#dayDialog .dayCloseRow{
       setTimeout(() => { toast.hidden = true; }, 180);
     }, 3200);
   }
+  Object.assign(window.CPApp, { showToast });
 
   function setStatus(t) {
     const el = $("status");
@@ -6711,6 +6739,7 @@ dialog#dayDialog .dayCloseRow{
     if ($("dayViewEventsCount")) $("dayViewEventsCount").textContent = rendered.count
       ? `${rendered.count} ${pluralPL(rendered.count, "wpis", "wpisy", "wpis\u00f3w")}`
       : "brak wpisów";
+    scheduleViewSwipePreviewCache("day", activeDayISO);
   }
 
   function startOfWeekISO(dateISO) {
@@ -6794,6 +6823,7 @@ dialog#dayDialog .dayCloseRow{
     if ($("weekViewHours")) $("weekViewHours").textContent = fmtHM(totalMinutes);
     if ($("weekViewPay")) $("weekViewPay").textContent = pln(totalPay);
     if ($("weekViewList")) $("weekViewList").innerHTML = listHTML;
+    scheduleViewSwipePreviewCache("week", activeDayISO);
   }
 
   function applyActiveView() {
@@ -7599,19 +7629,14 @@ dialog#dayDialog .dayCloseRow{
     const sumMin = computeMonthMinutes(monthYM);
     const pay = round2((sumMin / 60) * (db.settings.rate || 0));
 
-    // iOS/Safari blokuje window.open po await, więc rezerwujemy okno od razu po tapnięciu.
-    const w = window.open("", "_blank");
-
+    // Raport otwieramy dopiero po potwierdzeniu, aby nie zostawiac pustej karty na telefonie.
     const proceed = await openAppDialog({
       title:"Sprawdź przed eksportem",
       message:`${fmtMonthPL(monthYM)}\nGodziny: ${fmtHM(sumMin)}\nWypłata: ${pln(pay)}\nBraki dni roboczych: ${audit.missing}\nDni z notatką: ${audit.notes}\nUrlop/L4: ${audit.leaves}`,
       okText:"Generuj PDF",
       cancelText:"Anuluj"
     });
-    if (!proceed) {
-      try { if (w && !w.closed) w.close(); } catch {}
-      return;
-    }
+    if (!proceed) return;
 
     let html = "";
 
@@ -7619,27 +7644,27 @@ dialog#dayDialog .dayCloseRow{
       html = buildReportHTML(monthYM);
     } catch (err) {
       console.error("Nie udało się zbudować raportu PDF:", err);
-      try { if (w && !w.closed) w.close(); } catch {}
       notify("Nie udało się wygenerować raportu. Dane w aplikacji nie zostały zmienione.");
       return;
     }
 
-    if (!w) {
-      downloadTextFile(`czas-pracy_${monthYM}_raport.html`, html, "text/html;charset=utf-8");
-      notify("Przeglądarka zablokowała nowe okno, więc pobrałem raport jako plik HTML. Otwórz go i wybierz drukowanie / zapisz jako PDF.");
-      return;
-    }
-
     try {
-      w.document.open();
-      w.document.write(html);
-      w.document.close();
-      w.focus();
+      const blob = new Blob([html], { type:"text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const reportWindow = window.open(url, "_blank");
+      window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+      if (!reportWindow) {
+        downloadTextFile(`czas-pracy_${monthYM}_raport.html`, html, "text/html;charset=utf-8");
+        notify("Przegl\u0105darka zablokowa\u0142a nowe okno, wi\u0119c pobra\u0142em raport jako plik HTML. Otw\u00f3rz go i wybierz drukowanie / zapisz jako PDF.");
+        return;
+      }
+
+      try { reportWindow.focus(); } catch {}
     } catch (err) {
       console.error("Nie udało się otworzyć raportu w nowym oknie:", err);
-      try { if (!w.closed) w.close(); } catch {}
       downloadTextFile(`czas-pracy_${monthYM}_raport.html`, html, "text/html;charset=utf-8");
-      notify("Nie udało się otworzyć raportu w nowym oknie, więc pobrałem go jako plik HTML.");
+      notify("Nie uda\u0142o si\u0119 otworzy\u0107 raportu w nowym oknie, wi\u0119c pobra\u0142em go jako plik HTML.");
     }
   }
 
@@ -8306,6 +8331,68 @@ dialog#dayDialog .dayCloseRow{
     return root.innerHTML;
   }
 
+  const viewSwipePreviewTimers = {
+    day:0,
+    week:0
+  };
+
+  function clearViewSwipePreviewTimer(type) {
+    const id = viewSwipePreviewTimers[type];
+    if (!id) return;
+    if (window.cancelIdleCallback) window.cancelIdleCallback(id);
+    else clearTimeout(id);
+    viewSwipePreviewTimers[type] = 0;
+  }
+
+  function scheduleIdleWork(fn, delay = 90) {
+    if (window.requestIdleCallback) {
+      return window.requestIdleCallback(fn, { timeout:450 });
+    }
+    return window.setTimeout(fn, delay);
+  }
+
+  function scheduleViewSwipePreviewCache(type, dateISO) {
+    if (type !== "day" && type !== "week") return;
+    clearViewSwipePreviewTimer(type);
+
+    const revision = dataRevision;
+    viewSwipePreviewTimers[type] = scheduleIdleWork(() => {
+      viewSwipePreviewTimers[type] = 0;
+      if (revision !== dataRevision) return;
+      if (type === "day" && (activeView !== "day" || activeDayISO !== dateISO)) return;
+      if (type === "week" && (activeView !== "week" || activeDayISO !== dateISO)) return;
+
+      const surface = type === "day" ? $("dayViewSwipeSurface") : $("weekViewSwipeSurface");
+      if (!surface || surface.classList.contains("is-swipe-animating") || surface.classList.contains("is-horizontal-swipe")) return;
+
+      const base = parseISODate(dateISO) || new Date();
+      if (type === "day") {
+        viewSwipePreviewCache.day = {
+          dateISO,
+          revision,
+          prev:buildDaySwipeSnapshotHTML(surface, isoFromDate(addDays(base, -1))),
+          next:buildDaySwipeSnapshotHTML(surface, isoFromDate(addDays(base, 1)))
+        };
+      } else {
+        viewSwipePreviewCache.week = {
+          dateISO,
+          revision,
+          prev:buildWeekSwipeSnapshotHTML(surface, isoFromDate(addDays(base, -7))),
+          next:buildWeekSwipeSnapshotHTML(surface, isoFromDate(addDays(base, 7)))
+        };
+      }
+    });
+  }
+
+  function getViewSwipePreviewHTML(type, dateISO, direction, fallback) {
+    const cache = viewSwipePreviewCache[type];
+    const key = direction < 0 ? "next" : "prev";
+    if (cache && cache.dateISO === dateISO && cache.revision === dataRevision && cache[key]) {
+      return cache[key];
+    }
+    return typeof fallback === "function" ? fallback() : "";
+  }
+
   function prepareSwipeGhost(surface, direction, options = {}) {
     const ghost = options.ghost;
     const viewport = options.viewport || surface?.parentElement;
@@ -8425,7 +8512,7 @@ dialog#dayDialog .dayCloseRow{
     runSwipeChange(surface, direction, () => changeDay(target), {
       ghost,
       viewport,
-      previewHTML:() => buildDaySwipeSnapshotHTML(surface, target),
+      previewHTML:() => getViewSwipePreviewHTML("day", current, direction, () => buildDaySwipeSnapshotHTML(surface, target)),
       renderPreview:() => renderDayView(target),
       renderCurrent:() => renderDayView(current)
     });
@@ -8443,7 +8530,7 @@ dialog#dayDialog .dayCloseRow{
     runSwipeChange(surface, direction, () => changeWeek(delta), {
       ghost,
       viewport,
-      previewHTML:() => buildWeekSwipeSnapshotHTML(surface, target),
+      previewHTML:() => getViewSwipePreviewHTML("week", current, direction, () => buildWeekSwipeSnapshotHTML(surface, target)),
       renderPreview:() => renderWeekView(target),
       renderCurrent:() => renderWeekView(current)
     });
@@ -8457,7 +8544,7 @@ dialog#dayDialog .dayCloseRow{
       ghost:$("dayViewSwipeGhost"),
       viewport:$("dayViewSwipeViewport"),
       mode:"drag",
-      previewHTML:() => buildDaySwipeSnapshotHTML(surface, target),
+      previewHTML:() => getViewSwipePreviewHTML("day", current, direction, () => buildDaySwipeSnapshotHTML(surface, target)),
       renderPreview:() => renderDayView(target),
       renderCurrent:() => renderDayView(current)
     });
@@ -8471,7 +8558,7 @@ dialog#dayDialog .dayCloseRow{
       ghost:$("weekViewSwipeGhost"),
       viewport:$("weekViewSwipeViewport"),
       mode:"drag",
-      previewHTML:() => buildWeekSwipeSnapshotHTML(surface, target),
+      previewHTML:() => getViewSwipePreviewHTML("week", current, direction, () => buildWeekSwipeSnapshotHTML(surface, target)),
       renderPreview:() => renderWeekView(target),
       renderCurrent:() => renderWeekView(current)
     });
@@ -8483,7 +8570,7 @@ dialog#dayDialog .dayCloseRow{
     if (!page || page.dataset.swipeReady) return;
 
     let sx = 0, sy = 0, tracking = false, locked = null, previewDirection = 0;
-    let swipeFrame = 0, queuedDx = 0;
+    let swipeFrame = 0, queuedDx = 0, suppressClickUntil = 0;
     const LOCK_START = 10;
     const THRESH_X = 56;
     const swipeOptions = {
@@ -8505,9 +8592,15 @@ dialog#dayDialog .dayCloseRow{
       swipeFrame = 0;
     }
 
+    page.addEventListener("click", (e) => {
+      if (Date.now() < suppressClickUntil) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
     page.addEventListener("touchstart", (e) => {
       if (e.touches.length !== 1) return;
-      if (surface && !surface.contains(e.target)) return;
       if (e.target.closest?.("input,textarea,select,a")) return;
       if (surface?.classList.contains("is-swipe-animating")) return;
       const t = e.touches[0];
@@ -8526,7 +8619,10 @@ dialog#dayDialog .dayCloseRow{
 
       if (!locked && (Math.abs(dx) > LOCK_START || Math.abs(dy) > LOCK_START)) {
         locked = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
-        if (locked === "h") surface.classList.add("is-horizontal-swipe");
+        if (locked === "h") {
+          suppressClickUntil = Date.now() + 480;
+          surface.classList.add("is-horizontal-swipe");
+        }
       }
 
       if (locked === "h") {
@@ -8559,6 +8655,7 @@ dialog#dayDialog .dayCloseRow{
       }
 
       previewDirection = 0;
+      suppressClickUntil = Date.now() + 480;
       animateDayChange(dx < 0 ? 1 : -1);
     }, { passive:true });
 
@@ -8579,7 +8676,7 @@ dialog#dayDialog .dayCloseRow{
     if (!page || page.dataset.swipeReady) return;
 
     let sx = 0, sy = 0, tracking = false, locked = null, previewDirection = 0;
-    let swipeFrame = 0, queuedDx = 0;
+    let swipeFrame = 0, queuedDx = 0, suppressClickUntil = 0;
     const LOCK_START = 10;
     const THRESH_X = 56;
     const swipeOptions = {
@@ -8601,9 +8698,15 @@ dialog#dayDialog .dayCloseRow{
       swipeFrame = 0;
     }
 
+    page.addEventListener("click", (e) => {
+      if (Date.now() < suppressClickUntil) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
     page.addEventListener("touchstart", (e) => {
       if (e.touches.length !== 1) return;
-      if (surface && !surface.contains(e.target)) return;
       if (e.target.closest?.("input,textarea,select,a")) return;
       if (surface?.classList.contains("is-swipe-animating")) return;
       const t = e.touches[0];
@@ -8622,7 +8725,10 @@ dialog#dayDialog .dayCloseRow{
 
       if (!locked && (Math.abs(dx) > LOCK_START || Math.abs(dy) > LOCK_START)) {
         locked = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
-        if (locked === "h") surface.classList.add("is-horizontal-swipe");
+        if (locked === "h") {
+          suppressClickUntil = Date.now() + 480;
+          surface.classList.add("is-horizontal-swipe");
+        }
       }
 
       if (locked === "h") {
@@ -8655,6 +8761,7 @@ dialog#dayDialog .dayCloseRow{
       }
 
       previewDirection = 0;
+      suppressClickUntil = Date.now() + 480;
       animateWeekChange(dx < 0 ? 1 : -1);
     }, { passive:true });
 
@@ -9751,16 +9858,7 @@ dialog#dayDialog .dayCloseRow{
   onClick("clearAppErrors", () => {
     window.__appErrors = [];
     refreshAppInfo();
-    const toast = $("appToast");
-    if (toast) {
-      toast.textContent = "Lista błędów została wyczyszczona.";
-      toast.hidden = false;
-      requestAnimationFrame(() => toast.classList.add("show"));
-      setTimeout(() => {
-        toast.classList.remove("show");
-        setTimeout(() => { toast.hidden = true; }, 180);
-      }, 2400);
-    }
+    window.CPApp?.showToast?.("Lista b\u0142\u0119d\u00f3w zosta\u0142a wyczyszczona.");
     haptic.success();
   });
 
