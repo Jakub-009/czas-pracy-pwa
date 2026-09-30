@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.5.14</title>
+  <title>Czas pracy 4.5.15</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -516,8 +516,6 @@ dialog::backdrop{
 
 .backBtn::after{content:"Anuluj"}
 
-#dlgBack::after{content:"Zamknij"}
-
 .fieldGrid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -594,46 +592,6 @@ dialog::backdrop{
       -webkit-overflow-scrolling:touch;
     }
 
-.modalStats{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:28px;
-      margin:8px 0 26px;
-    }
-
-.statMini{
-      background:transparent;
-      border-radius:0;
-      padding:0 0 12px;
-      min-width:0;
-      border-bottom:1px solid var(--outline-soft);
-    }
-
-.statMini .muted{
-      font-size:14px;
-      color:var(--text-2);
-    }
-
-.statMiniValue{
-      display:block;
-      margin-top:8px;
-      font-size:30px;
-      line-height:1;
-      font-weight:500;
-      letter-spacing:-.03em;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      color:var(--text);
-    }
-
-.modalStack{
-      background:var(--surface-low);
-      border-radius:22px;
-      padding:20px;
-      margin-bottom:28px;
-    }
-
 .timeGrid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -648,20 +606,7 @@ dialog::backdrop{
       display:flex;
     }
 
-#dlgShiftsBlock{padding-top:0}
-
-#dlgShiftsTitle{
-      display:block;
-      margin:0 0 12px;
-      padding:0;
-      border:none;
-      background:transparent;
-      color:var(--text-2);
-      font-size:16px;
-      font-weight:600;
-    }
-
-.shiftList,#dlgShifts{
+.shiftList{
       display:flex;
       flex-direction:column;
     }
@@ -693,38 +638,6 @@ dialog::backdrop{
       color:var(--text-2);
       margin-top:8px;
     }
-
-.delIcon{
-      width:48px;
-      height:48px;
-      min-height:48px;
-      padding:0;
-      border-radius:50%;
-      background:transparent;
-      color:#a50e0e;
-      box-shadow:none;
-      position:relative;
-      flex:0 0 auto;
-      font-size:0;
-    }
-
-.delIcon:hover{background:var(--red-soft)}
-
-.delIcon::before,.delIcon::after{
-      content:"";
-      position:absolute;
-      width:18px;
-      height:3px;
-      background:currentColor;
-      border-radius:2px;
-      left:50%;
-      top:50%;
-      transform-origin:center;
-    }
-
-.delIcon::before{transform:translate(-50%,-50%) rotate(45deg)}
-
-.delIcon::after{transform:translate(-50%,-50%) rotate(-45deg)}
 
 html,body{
   width:100%;
@@ -845,14 +758,6 @@ dialog:focus-visible{
   -webkit-overflow-scrolling:touch;
 }
 
-#dlgShiftsTitle{
-  display:block;
-  margin:0 0 8px;
-  font-size:15px;
-  color:#3c4043;
-  font-weight:600;
-}
-
 .shiftList{
   display:flex;
   flex-direction:column;
@@ -863,7 +768,9 @@ dialog:focus-visible{
   position:relative;
   display:flex;
   align-items:center;
+  justify-content:flex-start;
   gap:10px;
+  width:100%;
   padding:9px 8px 9px 0;
   min-height:54px;
   border:none;
@@ -898,13 +805,6 @@ dialog:focus-visible{
   font-size:12.5px;
   line-height:1.2;
   color:#5f6368;
-}
-
-.shiftItem.googleEvent .delIcon{
-  width:38px;
-  height:38px;
-  min-height:38px;
-  flex:0 0 auto;
 }
 
 .shiftItem.googleEvent.workEvent{
@@ -953,28 +853,6 @@ dialog:focus-visible{
   color:#5f6368;
   font-size:14px;
   line-height:1.35;
-}
-
-.dayNotePreview{
-  margin:14px 0 4px;
-  padding:12px 14px;
-  border-radius:14px;
-  background:#f8fafd;
-  border:1px solid #e2e6ed;
-}
-
-.dayNotePreview strong{
-  display:block;
-  margin-bottom:4px;
-  font-size:12px;
-  color:#5f6368;
-}
-
-.dayNotePreview span{
-  display:block;
-  font-size:14px;
-  line-height:1.35;
-  color:#202124;
 }
 
 input,textarea,select{
@@ -1141,10 +1019,6 @@ textarea{
 
 .checkRow span{
   line-height:1.2;
-}
-
-.dayNotePreview{
-  display:none;
 }
 
 .sectionTitle{
@@ -1563,8 +1437,7 @@ dialog#mainMenuDialog.drawerDialog::backdrop{
 
 #bulkRemove,
 #clearVacationRange,
-.backBtn,
-#dlgBack{
+.backBtn{
   min-height:42px;
   padding:0 16px;
   font-size:15px;
@@ -1713,7 +1586,7 @@ dialog#mainMenuDialog.drawerDialog[open]{
 
 #bulkApply,#setVacationRange,#dlgAddShift{min-height:46px;padding:0 20px;font-size:15px;border-radius:999px}
 
-#bulkRemove,#clearVacationRange,.backBtn,#dlgBack{min-height:42px;padding:0 16px;font-size:15px;border-radius:999px}
+#bulkRemove,#clearVacationRange,.backBtn{min-height:42px;padding:0 16px;font-size:15px;border-radius:999px}
 
 #dlgAddShift.addBtnCenter{width:auto;min-width:210px;max-width:100%;margin-left:auto;margin-right:0}
 
@@ -2382,11 +2255,6 @@ dialog#mainMenuDialog.drawerDialog .drawerBack{
   margin-top:8px;
 }
 
-.shiftItem.googleEvent.leaveEvent .delIcon,
-.shiftItem.googleEvent.noteEvent .delIcon{
-  opacity:.88;
-}
-
 @keyframes googlePanelIn{
   from{transform:translateY(10px);opacity:.98}
   to{transform:translateY(0);opacity:1}
@@ -2653,6 +2521,21 @@ dialog.googlePanel[open],
   font-size:12.5px;
 }
 
+button.shiftItem.googleEvent{
+  appearance:none;
+  text-align:left;
+  color:inherit;
+}
+
+button.shiftItem.googleEvent:hover{
+  box-shadow:0 1px 4px rgba(60,64,67,.12);
+}
+
+button.shiftItem.googleEvent:focus-visible{
+  outline:3px solid #8ab4f8;
+  outline-offset:2px;
+}
+
 .statsTable th{
   background:#f8fafd;
 }
@@ -2716,13 +2599,6 @@ dialog.googlePanel[open],
 .viewSwipeGhost .heroCard:active,
 .viewSwipeGhost .listCard:active{
   transform:none;
-}
-
-.viewSwipeGhost [data-ghost-id="dayViewOpenModal"]{
-  background:#fff;
-  border:1px solid #dfe3eb;
-  color:#174ea6;
-  box-shadow:0 1px 2px rgba(60,64,67,.04);
 }
 
 .weekViewPage{
@@ -2929,8 +2805,6 @@ body,
 .timeGrid{grid-template-columns:1fr 1fr;gap:12px}
 .modalHead h3,.modalHeader h3{font-size:26px}
 .modalHead .muted,.modalHeader p{font-size:15px}
-.modalStats{gap:20px}
-.statMiniValue{font-size:28px}
 .shiftItem .times{font-size:21px}
 .shiftItem .mins{font-size:15px}
 }
@@ -3377,24 +3251,17 @@ body.view-stats{
 }
 
 .dayViewFooterActions{
-  justify-content:space-between;
+  justify-content:flex-end;
   gap:10px;
 }
 
 .dayViewFooterActions button{
-  flex:0 1 calc(50% - 5px);
-  min-width:0;
+  flex:0 0 auto;
+  min-width:136px;
   max-width:220px;
 }
 
-.dayViewFooterActions #dayViewOpenModal{
-  background:#fff;
-  border:1px solid #dfe3eb;
-  color:#174ea6;
-  box-shadow:0 1px 2px rgba(60,64,67,.04);
-}
-
-/* Wspólny szkielet paneli roboczych: Zbiorczy wpis, Dzisiejszy wpis / Edytuj dzień, Urlop/L4 */
+/* Wspólny szkielet paneli roboczych: wpis zakresowy, formularz wydarzenia dnia i Urlop/L4 */
 .workPanel{
   width:100vw;
   max-width:100vw;
@@ -3657,20 +3524,15 @@ dialog#vacDialog .rangeModeTab.active,
 
 /* Karty w panelach roboczych */
 dialog#bulkDialog .quickTemplatesBlock,
-dialog#dayDialog .quickTemplatesBlock,
 dialog#bulkDialog .bulkOptions,
-dialog#vacDialog .bulkOptions,
-dialog#dayDialog .modalStats,
-dialog#dayDialog .daySection,
-dialog#dayDialog .dayNotePreview{
+dialog#vacDialog .bulkOptions{
   background:#fff;
   border:1px solid #e4e8f1;
   border-radius:22px;
   box-shadow:0 1px 2px rgba(60,64,67,.045);
 }
 
-dialog#bulkDialog .quickTemplatesBlock,
-dialog#dayDialog .quickTemplatesBlock{
+dialog#bulkDialog .quickTemplatesBlock{
   margin:0 0 18px;
   padding:16px 18px;
 }
@@ -3769,118 +3631,8 @@ dialog#vacDialog #clearVacationRange{
   font-weight:760;
 }
 
-/* Dzisiejszy wpis / Edycja dnia */
-dialog#dayDialog .dayPreviewHead{
-  padding-bottom:14px;
-}
-
-dialog#dayDialog .dayPreviewBody{
-  padding-top:0;
-}
-
-dialog#dayDialog .dayPreviewStats{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin:0 0 18px;
-  padding:16px 18px;
-}
-
-dialog#dayDialog .statMini{
-  min-width:0;
-  background:transparent;
-  border:0;
-  padding:0;
-}
-
-dialog#dayDialog .statMiniValue{
-  display:block;
-  margin:0 0 6px;
-  font-size:clamp(26px,7vw,34px);
-  line-height:1;
-  font-weight:610;
-  letter-spacing:-.045em;
-  color:#111318;
-}
-
-dialog#dayDialog .statMini .muted{
-  font-size:13px;
-  color:#5f6368;
-}
-
-dialog#dayDialog #dlgShiftsBlock{
-  margin:0 0 16px;
-  padding:16px 18px;
-}
-
-dialog#dayDialog #dlgShiftsTitle{
-  display:block;
-  margin:0 0 12px;
-  color:#3c4043;
-  font-size:16px;
-  font-weight:780;
-}
-
-dialog#dayDialog .shiftItem.googleEvent{
-  min-height:64px;
-  border-radius:18px;
-}
-
-dialog#dayDialog .dayAddActions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin:18px 0;
-}
-
-dialog#dayDialog.googlePanel.is-form-open .dayAddActions,
-dialog#dayDialog.googlePanel.is-form-open .dayPreviewStats,
-dialog#dayDialog.googlePanel.is-form-open #dlgShiftsBlock,
-dialog#dayDialog.googlePanel.is-form-open #dlgNotePreview{
-  display:none;
-}
-
-dialog#dayDialog .dayAddTrigger{
-  width:auto;
-  min-width:0;
-  min-height:44px;
-  height:44px;
-  margin:0;
-  padding:0 18px 0 14px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:9px;
-  border-radius:999px;
-  background:#fff;
-  border:1px solid #dfe3eb;
-  color:#174ea6;
-  box-shadow:0 1px 2px rgba(60,64,67,.04);
-  font-size:14px;
-  font-weight:760;
-  white-space:nowrap;
-}
-
-dialog#dayDialog #dlgShowAddShift{
-  background:#e8f0fe;
-  border-color:#d7e3ff;
-}
-
-dialog#dayDialog .plusMark{
-  width:24px;
-  height:24px;
-  min-width:24px;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  color:#1a73e8;
-  font-size:20px;
-  line-height:1;
-  font-weight:500;
-}
-
-dialog#dayDialog .addShiftPanel{
-  display:none;
+/* Formularz pojedynczego wydarzenia dnia */
+dialog#dayDialog .dayEntryForm{
   margin:0;
   padding:0;
   background:transparent;
@@ -3888,20 +3640,13 @@ dialog#dayDialog .addShiftPanel{
   box-shadow:none;
 }
 
-dialog#dayDialog.googlePanel.is-form-open .addShiftPanel{
-  display:block;
+dialog#dayDialog .dayEntryForm[hidden],
+dialog#dayDialog .entryFormActions button[hidden]{
+  display:none;
 }
 
-dialog#dayDialog .addShiftPanel .timeGrid{
+dialog#dayDialog .dayEntryForm .timeGrid{
   margin-bottom:18px;
-}
-
-dialog#dayDialog .dayNoteField{
-  margin:18px 0 0;
-  padding:0;
-  background:transparent;
-  border:0;
-  box-shadow:none;
 }
 
 dialog#dayDialog .dayNoteField label{
@@ -3921,6 +3666,20 @@ dialog#dayDialog .dayNoteField textarea{
   box-shadow:0 1px 2px rgba(60,64,67,.035);
 }
 
+dialog#dayDialog .entryFormActions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:18px;
+  flex-wrap:wrap;
+}
+
+dialog#dayDialog .entryFormActions .error-tonal{
+  min-height:46px;
+  padding:0 22px;
+}
+
 dialog#dayDialog #dlgAddShift.addBtnCenter{
   display:flex;
   align-items:center;
@@ -3930,7 +3689,7 @@ dialog#dayDialog #dlgAddShift.addBtnCenter{
   max-width:max-content;
   height:46px;
   min-height:46px;
-  margin:18px 0 0 auto;
+  margin:0;
   padding:0 28px;
   border-radius:999px;
   background:#4285f4;
@@ -3940,8 +3699,12 @@ dialog#dayDialog #dlgAddShift.addBtnCenter{
   font-weight:800;
 }
 
-dialog#dayDialog .dayCloseRow{
-  display:none;
+dialog#dayDialog .noteAutosaveStatus{
+  min-height:20px;
+  margin-top:12px;
+  color:#5f6368;
+  font-size:13px;
+  line-height:1.35;
 }
 
 .statsPage{
@@ -4256,7 +4019,6 @@ dialog#dayDialog .dayCloseRow{
       </div>
 
       <div class="dayViewBottomActions bottomActions dayViewFooterActions">
-        <button class="tonal" id="dayViewOpenModal" type="button">Edytuj dzień</button>
         <button class="tonal" id="dayViewBackToMonth" type="button">Wróć</button>
       </div>
         </div>
@@ -4655,7 +4417,7 @@ dialog#dayDialog .dayCloseRow{
       <div class="googlePanelContent workPanelContent">
     <div class="modalHead">
       <div class="modalHeadInner">
-        <h3>Dodaj urlop</h3>
+        <h3 id="vacDialogTitle">Dodaj urlop / L4</h3>
         <div class="muted">Ustaw status w zakresie dat. Status nie usuwa wpisanych godzin pracy.</div>
       </div>
     </div>
@@ -4803,7 +4565,7 @@ dialog#dayDialog .dayCloseRow{
     </div>
   </dialog>
 
-  <!-- MODAL DNIA -->
+  <!-- FORMULARZ POJEDYNCZEGO WYDARZENIA DNIA -->
   <dialog id="dayDialog" class="googlePanel workPanel dayPanel">
     <div class="googlePanelShell workPanelShell">
       <div class="googlePanelBar workPanelBar">
@@ -4811,49 +4573,15 @@ dialog#dayDialog .dayCloseRow{
       </div>
       <div class="googlePanelContent workPanelContent">
 
-    <div class="modalHead dayPreviewHead">
+    <div class="modalHead">
       <div class="modalHeadInner">
-        <h3 id="dlgTitle">Dzień</h3>
+        <h3 id="dlgTitle">Dodaj godziny</h3>
         <div class="muted" id="dlgMeta"></div>
       </div>
     </div>
 
-    <div class="modalBody dayPreviewBody">
-      <div class="modalStats dayPreviewStats">
-        <div class="statMini">
-          <div class="statMiniValue" id="dlgSumHM">0:00</div>
-          <div class="muted">Suma godzin</div>
-        </div>
-        <div class="statMini">
-          <div class="statMiniValue" id="dlgSumPay">0,00 zł</div>
-          <div class="muted">Dniówka</div>
-        </div>
-      </div>
-
-      <div id="dlgShiftsBlock" class="daySection">
-        <strong id="dlgShiftsTitle">Godziny pracy</strong>
-        <div class="shiftList" id="dlgShifts"></div>
-      </div>
-
-      <div class="dayNotePreview" id="dlgNotePreview" hidden></div>
-
-      <div class="dayAddActions">
-        <button id="dlgShowAddShift" type="button" class="dayAddTrigger">
-          <span class="plusMark">+</span>
-          <span>Dodaj godziny</span>
-        </button>
-        <button id="dlgShowAddLeave" type="button" class="dayAddTrigger dayAddLeaveTrigger">
-          <span class="plusMark">+</span>
-          <span>Dodaj urlop / L4</span>
-        </button>
-      </div>
-
-      <div class="modalStack addShiftPanel" id="dlgWorkBlock">
-        <div class="quickTemplatesBlock" id="dayTemplatesBlock">
-          <div class="quickTemplatesTitle">Szablon stałych godzin</div>
-          <div class="quickTemplates" id="dayTemplates"></div>
-        </div>
-
+    <div class="modalBody">
+      <div class="dayEntryForm" id="dlgShiftForm">
         <div class="timeGrid">
           <div>
             <label>Wejście</label>
@@ -4865,16 +4593,19 @@ dialog#dayDialog .dayCloseRow{
           </div>
         </div>
 
-        <div class="dayNoteField">
-          <label>Notatka do dnia</label>
-          <textarea id="dlgNote" placeholder="Zapisuje się automatycznie..."></textarea>
+        <div class="entryFormActions">
+          <button id="dlgDeleteShift" type="button" class="error-tonal" hidden>Usuń wpis</button>
+          <button id="dlgAddShift" type="button" class="filled addBtnCenter">Dodaj godziny</button>
         </div>
-
-        <button id="dlgAddShift" type="button" class="filled addBtnCenter">Dodaj godziny</button>
       </div>
 
-      <div class="actionRow dayCloseRow">
-        <button class="tonal" id="dlgBack" aria-label="Zamknij" type="button"></button>
+      <div class="dayEntryForm dayNoteField" id="dlgNoteForm" hidden>
+        <label for="dlgNote">Notatka dnia</label>
+        <textarea id="dlgNote" placeholder="Zapisuje się automatycznie..."></textarea>
+        <div class="entryFormActions">
+          <button id="dlgDeleteNote" type="button" class="error-tonal" hidden>Usuń notatkę</button>
+        </div>
+        <div class="noteAutosaveStatus" id="dlgNoteAutosave" aria-live="polite">Zmiany zapisują się automatycznie.</div>
       </div>
     </div>
       </div>
@@ -5576,7 +5307,6 @@ dialog#dayDialog .dayCloseRow{
       `).join("");
     };
 
-    renderButtons("dayTemplates", "day");
     renderButtons("dayViewTemplates", "active-day");
     renderButtons("bulkTemplates", "bulk");
   }
@@ -5605,11 +5335,6 @@ dialog#dayDialog .dayCloseRow{
         const t = getShiftTemplates()[Number(btn.dataset.templateIndex)];
         if (!t) return;
 
-        if (mode === "day") {
-          addShiftFromTemplate(t.start, t.end);
-          return;
-        }
-
         if (mode === "active-day") {
           addShiftTemplateToDate(activeDayISO, t.start, t.end);
           return;
@@ -5623,7 +5348,6 @@ dialog#dayDialog .dayCloseRow{
       box.dataset.delegated = "1";
     };
 
-    setupQuickBox("dayTemplates", "day");
     setupQuickBox("dayViewTemplates", "active-day");
     setupQuickBox("bulkTemplates", "bulk");
   }
@@ -5649,21 +5373,9 @@ dialog#dayDialog .dayCloseRow{
     db.settings.lastShift = { start, end };
     save();
     renderAll();
-    if (dlgDate === dateISO) renderDayDialog();
-
-    if (dlg) {
-      dlg.classList.add("is-preview-only");
-      dlg.classList.remove("is-form-open", "is-empty-day");
-    }
-
     setStatus(`Dodano zakres: ${start}–${end}.`);
     haptic.success();
     return true;
-  }
-
-  function addShiftFromTemplate(start, end) {
-    if (!dlgDate) return;
-    return addShiftTemplateToDate(dlgDate, start, end);
   }
 
   function fmtHM(mins) {
@@ -5808,7 +5520,6 @@ dialog#dayDialog .dayCloseRow{
 
     save();
     renderAll();
-    if (dlgDate) renderDayDialog();
 
     const skippedText = skippedDays ? ` Pominięto ${skippedDays} dni wolnych.` : "";
     setStatus(`Ustawiono status: ${leaveLabel(leaveType)} (${count} dni).${skippedText}`);
@@ -5845,7 +5556,6 @@ dialog#dayDialog .dayCloseRow{
 
     save();
     renderAll();
-    if (dlgDate) renderDayDialog();
 
     const skippedText = skippedDays ? ` Pominięto ${skippedDays} dni wolnych.` : "";
     setStatus(`Usunięto status w ${count} dniach.${skippedText}`);
@@ -5921,7 +5631,6 @@ dialog#dayDialog .dayCloseRow{
 
     save();
     renderAll();
-    if (dlgDate) renderDayDialog();
 
     const skippedText = skippedDays ? ` Pominięto ${skippedDays} dni wolnych.` : "";
     const conflictText = conflictDays ? ` Pominięto ${conflictDays} dni z konfliktem godzin.` : "";
@@ -6347,259 +6056,218 @@ dialog#dayDialog .dayCloseRow{
     grid.dataset.dayDelegated = "1";
   }
 
-  // ===== MODAL DNIA =====
+  // ===== FORMULARZ POJEDYNCZEGO WYDARZENIA DNIA =====
   const dlg = $("dayDialog");
   let dlgDate = null;
+  let dlgMode = "";
+  let dlgShiftIndex = -1;
+  let noteTimer = null;
+  let pendingNoteSave = null;
 
-  function openDay(dateISO) {
+  function setDayDialogMeta(dateISO) {
+    if (!$("dlgMeta")) return;
+    const [year] = dateISO.split("-").map(Number);
+    const holidayName = getHolidayMap(year).get(dateISO) || "";
+    const weekday = capFirst(fmtWeekdayLongPL(dateISO));
+    $("dlgMeta").textContent = holidayName
+      ? `${fmtDateLongPL(dateISO)} · ${weekday} · ${holidayName}`
+      : `${fmtDateLongPL(dateISO)} · ${weekday}`;
+  }
+
+  function saveNoteForDate(dateISO, value, { showStatus = true } = {}) {
+    if (!isValidDateISO(dateISO)) return false;
+    const note = String(value || "").trim();
+    const existing = getDay(dateISO);
+    if (!existing && !note) return false;
+    if ((existing?.note || "").trim() === note) return false;
+
+    const day = existing || { date: dateISO, note: "", shifts: [], vacation: false, leaveType:"" };
+    day.note = note;
+    upsertDay(dateISO, day);
+    save();
+    renderAll();
+    if (showStatus) setStatus("Zapisano notatkę.");
+    return true;
+  }
+
+  function commitPendingNoteSave({ showStatus = true } = {}) {
+    if (!pendingNoteSave) return false;
+    clearTimeout(noteTimer);
+    noteTimer = null;
+    const pending = pendingNoteSave;
+    pendingNoteSave = null;
+    const changed = saveNoteForDate(pending.dateISO, pending.value, { showStatus });
+    if ($("dlgNoteAutosave") && dlgMode === "note" && dlgDate === pending.dateISO) {
+      $("dlgNoteAutosave").textContent = changed ? "Zapisano automatycznie." : "Zmiany zapisują się automatycznie.";
+      $("dlgDeleteNote").hidden = !((getDay(pending.dateISO)?.note || "").trim());
+    }
+    return changed;
+  }
+
+  function cancelPendingNoteSave() {
+    clearTimeout(noteTimer);
+    noteTimer = null;
+    pendingNoteSave = null;
+  }
+
+  function openDayForm(dateISO, mode, shiftIndex = -1) {
+    const targetDate = isValidDateISO(dateISO) ? dateISO : activeDayISO;
+    const day = getDay(targetDate) || { date: targetDate, note: "", shifts: [], vacation: false, leaveType:"" };
+    const isNote = mode === "note";
+    const isEdit = mode === "shift-edit";
+    const shift = isEdit ? day.shifts?.[shiftIndex] : null;
+
+    if (isEdit && !shift) {
+      notify("Nie znaleziono wybranego zakresu godzin.");
+      return;
+    }
+
+    commitPendingNoteSave({ showStatus:false });
     haptic.open();
-    dlgDate = dateISO;
+    dlgDate = targetDate;
+    dlgMode = isNote ? "note" : (isEdit ? "shift-edit" : "shift-add");
+    dlgShiftIndex = isEdit ? shiftIndex : -1;
 
-    const day = getDay(dateISO) || { date: dateISO, note: "", shifts: [], vacation: false, leaveType:"" };
-    const hasShifts = (day.shifts || []).length > 0;
-    const hasLeaveEvent = !!(day.leaveType || day.vacation);
-    const hasNote = !!(day.note && day.note.trim());
-    const [holidayYear] = dateISO.split("-").map(Number);
-    const hasHoliday = getHolidayMap(holidayYear).has(dateISO);
-    const hasAnyEvent = hasShifts || hasLeaveEvent || hasNote || hasHoliday;
+    $("dlgShiftForm")?.toggleAttribute("hidden", isNote);
+    $("dlgNoteForm")?.toggleAttribute("hidden", !isNote);
+    if ($("dlgTitle")) {
+      $("dlgTitle").textContent = isNote ? "Notatka dnia" : (isEdit ? "Edytuj godziny" : "Dodaj godziny");
+    }
+    setDayDialogMeta(targetDate);
 
-    if ($("dlgTitle")) $("dlgTitle").textContent = fmtDateLongPL(dateISO);
-    if ($("dlgMeta")) {
-      const [hy] = dateISO.split("-").map(Number);
-      const holidayName = getHolidayMap(hy).get(dateISO) || "";
-      $("dlgMeta").textContent = holidayName
-        ? `${capFirst(fmtWeekdayLongPL(dateISO))} · ${holidayName}`
-        : capFirst(fmtWeekdayLongPL(dateISO));
+    if (isNote) {
+      if ($("dlgNote")) $("dlgNote").value = day.note || "";
+      if ($("dlgDeleteNote")) $("dlgDeleteNote").hidden = !((day.note || "").trim());
+      if ($("dlgNoteAutosave")) $("dlgNoteAutosave").textContent = "Zmiany zapisują się automatycznie.";
+    } else {
+      const last = db?.settings?.lastShift;
+      if ($("dlgStart")) $("dlgStart").value = shift?.start || last?.start || "";
+      if ($("dlgEnd")) $("dlgEnd").value = shift?.end || last?.end || "";
+      if ($("dlgAddShift")) $("dlgAddShift").textContent = isEdit ? "Zapisz zmiany" : "Dodaj godziny";
+      if ($("dlgDeleteShift")) $("dlgDeleteShift").hidden = !isEdit;
     }
 
-    if ($("dlgStart")) $("dlgStart").value = "";
-    if ($("dlgEnd")) $("dlgEnd").value = "";
-    if ($("dlgNote")) $("dlgNote").value = day.note || "";
-
-    if (dlg) {
-      dlg.classList.toggle("is-form-open", !hasAnyEvent);
-      dlg.classList.toggle("is-preview-only", hasAnyEvent);
-      dlg.classList.toggle("is-empty-day", !hasAnyEvent);
-
-    }
-
-    renderDayDialog();
-
+    const content = dlg?.querySelector(".googlePanelContent");
+    if (content) content.scrollTop = 0;
     window.CPApp?.setSystemBars?.("#eef1f6");
     if (dlg && typeof dlg.showModal === "function") dlg.showModal();
     else if (dlg) dlg.setAttribute("open", "");
     if (window.lockPageScroll) window.lockPageScroll("modal"); else document.body.classList.add("modal-open");
     openOverlay("dayDialog");
+    setTimeout(() => (isNote ? $("dlgNote") : $("dlgStart"))?.focus(), 80);
   }
 
-  Object.assign(window.CPApp, {
-    openWorkDay: openDay,
-    workTodayISO: todayISO
-  });
+  function openDayAddForm(dateISO = activeDayISO) {
+    openDayForm(dateISO, "shift-add");
+  }
+
+  function openDayShiftEditForm(dateISO, shiftIndex) {
+    openDayForm(dateISO, "shift-edit", shiftIndex);
+  }
+
+  function openDayNoteForm(dateISO = activeDayISO) {
+    openDayForm(dateISO, "note");
+  }
 
   function closeDay(options = {}) {
     if (!options || options instanceof Event) options = {};
+    commitPendingNoteSave({ showStatus:false });
     if (options.haptic !== false) haptic.close();
     if (closeOverlay("dayDialog", options)) return;
     dlgDate = null;
+    dlgMode = "";
+    dlgShiftIndex = -1;
     if (dlg && typeof dlg.close === "function" && dlg.open) dlg.close();
     else if (dlg) dlg.removeAttribute("open");
     if (window.unlockPageScroll) window.unlockPageScroll("modal"); else document.body.classList.remove("modal-open");
     window.CPApp?.setSystemBars?.("#eef1f6");
   }
 
+  Object.assign(window.CPApp, {
+    openDayAddForm,
+    openDayShiftEditForm,
+    openDayNoteForm,
+    closeDayForm:closeDay,
+    workTodayISO:todayISO
+  });
+
   if (dlg) {
-    dlg.addEventListener("close", () => { document.body.classList.remove("modal-open"); window.CPApp?.setSystemBars?.("#eef1f6"); });
+    dlg.addEventListener("close", () => {
+      commitPendingNoteSave({ showStatus:false });
+      document.body.classList.remove("modal-open");
+      window.CPApp?.setSystemBars?.("#eef1f6");
+    });
     dlg.addEventListener("cancel", (e) => { e.preventDefault(); closeDay(); });
   }
 
-  function expandDayPanel({ form = false, focus = "start" } = {}) {
-    if (!dlg) return;
-    if (form) {
-      dlg.classList.add("is-form-open");
-      dlg.classList.remove("is-preview-only");
-      renderQuickTemplatesUI();
-      const last = db?.settings?.lastShift;
-      if (last?.start && last?.end) {
-        if ($("dlgStart") && !$("dlgStart").value) $("dlgStart").value = last.start;
-        if ($("dlgEnd") && !$("dlgEnd").value) $("dlgEnd").value = last.end;
-      }
-      const focusEl = focus === "note" ? $("dlgNote") : $("dlgStart");
-      setTimeout(() => focusEl?.focus(), 80);
-    } else {
-      dlg.classList.add("is-preview-only");
-      dlg.classList.remove("is-form-open");
+  $("dlgAddShift")?.addEventListener("click", () => {
+    if (!dlgDate || (dlgMode !== "shift-add" && dlgMode !== "shift-edit")) return;
+    const start = normalizeTimeHHMM($("dlgStart")?.value);
+    const end = normalizeTimeHHMM($("dlgEnd")?.value);
+    if (!start || !end) return notify("Uzupełnij godzinę wejścia i wyjścia.");
+
+    const isEdit = dlgMode === "shift-edit";
+    const validation = validateShiftNoOverlap(dlgDate, start, end, isEdit
+      ? { skipDate:dlgDate, skipIndex:dlgShiftIndex }
+      : {});
+    if (!validation.ok) {
+      haptic.warning();
+      notify(validation.message);
+      return;
     }
 
-    const content = dlg.querySelector(".googlePanelContent");
-    if (content) content.scrollTop = 0;
-  }
-
-  function openDayAddForm(dateISO = activeDayISO) {
-    openDay(dateISO);
-    setTimeout(() => expandDayPanel({ form:true }), 90);
-  }
-
-  function openDayNoteForm(dateISO = activeDayISO) {
-    openDay(dateISO);
-    setTimeout(() => expandDayPanel({ form:true, focus:"note" }), 90);
-  }
-
-  Object.assign(window.CPApp, {
-    openDayAddForm,
-    openDayNoteForm
+    const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
+    day.shifts = Array.isArray(day.shifts) ? day.shifts : [];
+    if (isEdit) {
+      if (!day.shifts[dlgShiftIndex]) return notify("Nie znaleziono wybranego zakresu godzin.");
+      day.shifts[dlgShiftIndex] = { start, end };
+    } else {
+      day.shifts.push({ start, end });
+      db.settings.lastShift = { start, end };
+    }
+    day.shifts.sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+    upsertDay(dlgDate, day);
+    save();
+    renderAll();
+    setStatus(isEdit ? "Zapisano zmiany zakresu." : "Dodano zakres.");
+    haptic.success();
+    closeDay({ haptic:false });
   });
 
-  const dlgShowAddShiftBtn = $("dlgShowAddShift");
-  if (dlgShowAddShiftBtn) {
-    dlgShowAddShiftBtn.onclick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      expandDayPanel({ form:true });
-      haptic.tap();
-    };
-  }
+  $("dlgDeleteShift")?.addEventListener("click", async () => {
+    if (!dlgDate || dlgMode !== "shift-edit" || dlgShiftIndex < 0) return;
+    if (!(await askConfirm("Usunąć ten zakres?", "Usuń zakres"))) return;
+    const day = getDay(dlgDate);
+    if (!day?.shifts?.[dlgShiftIndex]) return;
+    day.shifts.splice(dlgShiftIndex, 1);
+    save();
+    renderAll();
+    setStatus("Usunięto zakres.");
+    haptic.danger();
+    closeDay({ haptic:false });
+  });
 
-  const dlgShowAddLeaveBtn = $("dlgShowAddLeave");
-  if (dlgShowAddLeaveBtn) {
-    dlgShowAddLeaveBtn.onclick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (dlgDate) openVacationForDate(dlgDate);
-    };
-  }
+  $("dlgNote")?.addEventListener("input", () => {
+    if (!dlgDate || dlgMode !== "note") return;
+    pendingNoteSave = { dateISO:dlgDate, value:$("dlgNote").value || "" };
+    clearTimeout(noteTimer);
+    if ($("dlgNoteAutosave")) $("dlgNoteAutosave").textContent = "Zapisywanie…";
+    noteTimer = setTimeout(() => commitPendingNoteSave(), 250);
+  });
 
-  function renderDayDialog() {
-    if (!dlgDate) return;
-    const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
-
-    const mins = computeDayMinutes(day);
-    const pay = round2((mins / 60) * (db.settings.rate || 0));
-
-    if ($("dlgSumHM")) $("dlgSumHM").textContent = fmtHM(mins);
-    if ($("dlgSumPay")) $("dlgSumPay").textContent = pln(pay);
-
-    const notePreview = $("dlgNotePreview");
-    const note = (day.note || "").trim();
-    if (notePreview) {
-      notePreview.hidden = true;
-      notePreview.innerHTML = "";
-    }
-
-    const shiftsTitle = $("dlgShiftsTitle");
-    const shiftsBox = $("dlgShifts");
-
-    day.shifts.sort((a, b) => (a.start || "").localeCompare(b.start || ""));
-
-    const leaveType = day.leaveType || (day.vacation ? "paid" : "");
-    const leaveEvent = leaveType ? `
-      <div class="shiftItem googleEvent leaveEvent ${leavePillClass(leaveType)}">
-        <div class="eventStripe" aria-hidden="true"></div>
-        <div class="eventContent">
-          <div class="times">${leaveLabel(leaveType)}</div>
-          <div class="mins">Cały dzień</div>
-        </div>
-        <button class="delIcon" data-clearleave="1" aria-label="Usuń status dnia" type="button"></button>
-      </div>
-    ` : "";
-
-    const shiftEvents = (day.shifts || []).map((s, idx) => {
-      const a = s.start || "—";
-      const b = s.end || "—";
-      const m = (s.start && s.end) ? Math.max(0, minutesBetween(day.date, s.start, s.end)) : 0;
-
-      return `
-        <div class="shiftItem googleEvent workEvent">
-          <div class="eventStripe" aria-hidden="true"></div>
-          <div class="eventContent">
-            <div class="times">${a} – ${b}</div>
-            <div class="mins">${m ? (fmtHM(m) + " godz.") : "-"}</div>
-          </div>
-          <button class="delIcon" data-delshift="${idx}" aria-label="Usuń zakres" type="button"></button>
-        </div>
-      `;
-    }).join("");
-
-    const [holidayYear] = dlgDate.split("-").map(Number);
-    const holidayName = getHolidayMap(holidayYear).get(dlgDate) || "";
-    const holidayEvent = holidayName ? `
-      <div class="shiftItem googleEvent holidayEvent">
-        <div class="eventStripe" aria-hidden="true"></div>
-        <div class="eventContent">
-          <div class="times">${holidayName}</div>
-          <div class="mins">Święto · cały dzień</div>
-        </div>
-      </div>
-    ` : "";
-
-    const noteEvent = note ? `
-      <div class="shiftItem googleEvent noteEvent">
-        <div class="eventStripe" aria-hidden="true"></div>
-        <div class="eventContent">
-          <div class="times">Notatka</div>
-          <div class="mins">${escapeHtml(note)}</div>
-        </div>
-        <button class="delIcon" data-clearnote="1" aria-label="Usuń notatkę" type="button"></button>
-      </div>
-    ` : "";
-
-    const items = holidayEvent + leaveEvent + shiftEvents + noteEvent;
-
-    if (shiftsTitle) shiftsTitle.textContent = items ? "Wydarzenia dnia" : "Godziny pracy";
-    if (shiftsBox) shiftsBox.innerHTML = items || `<div class="emptyDayHint">Brak godzin w tym dniu. Dodaj pierwszy zakres poniżej.</div>`;
-
-    function maybeOpenFormWhenEmpty(dayObj) {
-      const d = dayObj || getDay(dlgDate);
-      const hasUserData = !!(d && ((d.shifts || []).length || d.leaveType || d.vacation || (d.note && d.note.trim())));
-      const [holidayYearCheck] = dlgDate.split("-").map(Number);
-      const hasHolidayOnly = !!getHolidayMap(holidayYearCheck).get(dlgDate);
-      if (dlg && !hasUserData && !hasHolidayOnly) {
-        dlg.classList.add("is-form-open", "is-empty-day");
-        dlg.classList.remove("is-preview-only");
-      }
-    }
-
-    shiftsBox?.querySelectorAll("[data-delshift]").forEach(btn => {
-      btn.onclick = async () => {
-        const idx = Number(btn.getAttribute("data-delshift"));
-        if (!(await askConfirm("Usunąć ten zakres?", "Usuń zakres"))) return;
-        const d = getDay(dlgDate);
-        if (!d) return;
-        d.shifts.splice(idx, 1);
-        save();
-        renderAll();
-        renderDayDialog();
-        maybeOpenFormWhenEmpty(d);
-        haptic.danger();
-      };
-    });
-
-    shiftsBox?.querySelector("[data-clearleave]")?.addEventListener("click", async () => {
-      if (!(await askConfirm("Usunąć status urlopu/L4 z tego dnia?", "Usuń status"))) return;
-      const d = getDay(dlgDate);
-      if (!d) return;
-      d.leaveType = "";
-      d.vacation = false;
-      save();
-      renderAll();
-      renderDayDialog();
-      maybeOpenFormWhenEmpty(d);
-      haptic.warning();
-    });
-
-    shiftsBox?.querySelector("[data-clearnote]")?.addEventListener("click", async () => {
-      if (!(await askConfirm("Usunąć notatkę z tego dnia?", "Usuń notatkę"))) return;
-      const d = getDay(dlgDate);
-      if (!d) return;
-      d.note = "";
-      if ($("dlgNote")) $("dlgNote").value = "";
-      save();
-      renderAll();
-      renderDayDialog();
-      maybeOpenFormWhenEmpty(d);
-      haptic.warning();
-    });
-  }
+  $("dlgDeleteNote")?.addEventListener("click", async () => {
+    if (!dlgDate || dlgMode !== "note") return;
+    if (!(await askConfirm("Usunąć notatkę z tego dnia?", "Usuń notatkę"))) return;
+    cancelPendingNoteSave();
+    const day = getDay(dlgDate);
+    if (!day) return;
+    day.note = "";
+    save();
+    renderAll();
+    setStatus("Usunięto notatkę.");
+    haptic.warning();
+    closeDay({ haptic:false });
+  });
 
 
   // ===== WIDOK DNIA =====
@@ -6625,38 +6293,44 @@ dialog#dayDialog .dayCloseRow{
 
     if (leaveType) {
       events.push(`
-        <div class="shiftItem googleEvent leaveEvent ${leavePillClass(leaveType)}">
+        <button class="shiftItem googleEvent leaveEvent ${leavePillClass(leaveType)}" type="button"
+          data-day-event="leave" aria-label="Edytuj status: ${escapeHtml(leaveLabel(leaveType))}">
           <div class="eventStripe" aria-hidden="true"></div>
           <div class="eventContent">
             <div class="times">${escapeHtml(leaveLabel(leaveType))}</div>
             <div class="mins">Cały dzień</div>
           </div>
-        </div>
+        </button>
       `);
     }
 
-    (day.shifts || []).slice().sort((a, b) => (a.start || "").localeCompare(b.start || "")).forEach(s => {
+    (day.shifts || [])
+      .map((shift, index) => ({ shift, index }))
+      .sort((a, b) => (a.shift.start || "").localeCompare(b.shift.start || ""))
+      .forEach(({ shift:s, index }) => {
       const m = (s.start && s.end) ? Math.max(0, minutesBetween(day.date, s.start, s.end)) : 0;
       events.push(`
-        <div class="shiftItem googleEvent workEvent">
+        <button class="shiftItem googleEvent workEvent" type="button" data-day-event="shift"
+          data-shift-index="${index}" aria-label="Edytuj godziny ${escapeHtml(s.start || "—")}–${escapeHtml(s.end || "—")}">
           <div class="eventStripe" aria-hidden="true"></div>
           <div class="eventContent">
             <div class="times">${escapeHtml(s.start || "—")} – ${escapeHtml(s.end || "—")}</div>
             <div class="mins">${m ? (fmtHM(m) + " godz.") : "-"}</div>
           </div>
-        </div>
+        </button>
       `);
     });
 
     if (note) {
       events.push(`
-        <div class="shiftItem googleEvent noteEvent">
+        <button class="shiftItem googleEvent noteEvent" type="button" data-day-event="note"
+          aria-label="Edytuj notatkę dnia">
           <div class="eventStripe" aria-hidden="true"></div>
           <div class="eventContent">
             <div class="times">Notatka</div>
             <div class="mins">${escapeHtml(note)}</div>
           </div>
-        </div>
+        </button>
       `);
     }
 
@@ -7108,6 +6782,10 @@ dialog#dayDialog .dayCloseRow{
     haptic.open();
     if (!vacDlg) return;
     const t = isValidDateISO(dateISO) ? dateISO : todayISO();
+    const day = getDay(t);
+    const currentLeaveType = day?.leaveType || (day?.vacation ? "paid" : "");
+    if ($("vacDialogTitle")) $("vacDialogTitle").textContent = currentLeaveType ? "Edytuj urlop / L4" : "Dodaj urlop / L4";
+    if ($("vacType")) $("vacType").value = ["paid", "unpaid", "sick"].includes(currentLeaveType) ? currentLeaveType : "paid";
     if ($("vacFrom")) $("vacFrom").value = t;
     if ($("vacTo")) $("vacTo").value = t;
     if ($("vacIncludeSat")) $("vacIncludeSat").checked = !!db.settings.defaultIncludeSat;
@@ -8110,6 +7788,19 @@ dialog#dayDialog .dayCloseRow{
 
   // ===== DAY EVENTS =====
   function handleDayViewClick(e) {
+    const eventButton = e.target.closest?.("[data-day-event]");
+    if (eventButton && $("dayViewEvents")?.contains(eventButton)) {
+      const eventType = eventButton.getAttribute("data-day-event");
+      if (eventType === "shift") {
+        openDayShiftEditForm(activeDayISO, Number(eventButton.getAttribute("data-shift-index")));
+      } else if (eventType === "note") {
+        openDayNoteForm(activeDayISO);
+      } else if (eventType === "leave") {
+        openVacationForDate(activeDayISO);
+      }
+      return;
+    }
+
     const btn = e.target.closest?.("button");
     if (!btn || !$("dayViewPage")?.contains(btn)) return;
 
@@ -8123,9 +7814,6 @@ dialog#dayDialog .dayCloseRow{
         break;
       case "dayViewNext":
         animateDayChange(1);
-        break;
-      case "dayViewOpenModal":
-        openDay(activeDayISO);
         break;
     }
   }
@@ -8717,75 +8405,11 @@ dialog#dayDialog .dayCloseRow{
     page.dataset.swipeReady = "1";
   })();
 
-  const dlgBackBtn = $("dlgBack");
-  if (dlgBackBtn) dlgBackBtn.onclick = () => { closeDay(); };
-
-
   const vacBackBtn = $("vacBack");
   if (vacBackBtn) vacBackBtn.onclick = closeVac;
 
   const bulkBackBtn = $("bulkBack");
   if (bulkBackBtn) bulkBackBtn.onclick = closeBulk;
-
-  const dlgAddShiftBtn = $("dlgAddShift");
-  if (dlgAddShiftBtn) {
-    dlgAddShiftBtn.onclick = () => {
-      if (!dlgDate) return;
-
-      const start = normalizeTimeHHMM($("dlgStart")?.value);
-      const end = normalizeTimeHHMM($("dlgEnd")?.value);
-      if (!start || !end) return notify("Uzupełnij godzinę wejścia i wyjścia.");
-
-      const validation = validateShiftNoOverlap(dlgDate, start, end);
-      if (!validation.ok) {
-        haptic.warning();
-        notify(validation.message);
-        return;
-      }
-
-      const day = getDay(dlgDate) || { date: dlgDate, note: "", shifts: [], vacation: false, leaveType:"" };
-      day.shifts.push({ start, end });
-      day.shifts.sort((a, b) => (a.start || "").localeCompare(b.start || ""));
-
-      upsertDay(dlgDate, day);
-      db.settings.lastShift = { start, end };
-      if ($("dlgStart")) $("dlgStart").value = "";
-      if ($("dlgEnd")) $("dlgEnd").value = "";
-      save();
-      renderAll();
-      renderDayDialog();
-      if (dlg) {
-        dlg.classList.add("is-preview-only");
-        dlg.classList.remove("is-form-open", "is-empty-day");
-      }
-      setStatus("Dodano zakres.");
-      haptic.success();
-    };
-  }
-
-  const dlgNoteEl = $("dlgNote");
-  let noteTimer = null;
-  if (dlgNoteEl) {
-    dlgNoteEl.addEventListener("input", () => {
-      if (!dlgDate) return;
-
-      const noteDate = dlgDate;
-      const noteValue = dlgNoteEl.value || "";
-
-      clearTimeout(noteTimer);
-      noteTimer = setTimeout(() => {
-        const note = noteValue.trim();
-        const day = getDay(noteDate) || { date: noteDate, note: "", shifts: [], vacation: false, leaveType:"" };
-        day.note = note;
-        upsertDay(noteDate, day);
-        save();
-        renderAll();
-        if (dlgDate === noteDate) renderDayDialog();
-        setStatus("Zapisano notatkę.");
-        // bez haptics, żeby nie wibrowało podczas pisania
-      }, 250);
-    });
-  }
 
   // ===== MONTH EVENTS =====
   const monthToggle = $("monthNavToggle");
@@ -9159,7 +8783,6 @@ dialog#dayDialog .dayCloseRow{
           const res = mergeImportedDb(importDb);
           hydrateSettingsUI();
           renderAll();
-          if (dlgDate) renderDayDialog();
           setStatus(`Scalono import: ${res.addedDays} dni, ${res.addedShifts} zakresów.`);
           haptic.success();
           restoreInput.value = "";
@@ -9177,7 +8800,6 @@ dialog#dayDialog .dayCloseRow{
         save();
         hydrateSettingsUI();
         renderAll();
-        if (dlgDate) renderDayDialog();
         setStatus("Przywrócono dane z pliku JSON.");
         haptic.success();
         restoreInput.value = "";
@@ -9708,7 +9330,7 @@ dialog#dayDialog .dayCloseRow{
 
     const handlers = {
       fabBulkAction: () => window.CPApp?.openBulkDialog?.(),
-      fabTodayAction: () => window.CPApp?.openWorkDay?.(window.CPApp?.workTodayISO?.()),
+      fabTodayAction: () => window.CPApp?.setActiveView?.("day", window.CPApp?.workTodayISO?.()),
       fabDayHoursAction: () => window.CPApp?.openDayAddForm?.(),
       fabDayLeaveAction: () => window.CPApp?.openVacationForDate?.(),
       fabDayNoteAction: () => window.CPApp?.openDayNoteForm?.()
@@ -9723,7 +9345,7 @@ dialog#dayDialog .dayCloseRow{
   onClick("vacPanelSave", () => { $("setVacationRange")?.click(); });
   onClick("bulkPanelClose", () => { $("bulkBack")?.click(); });
   onClick("bulkPanelSave", () => { $("bulkApply")?.click(); });
-  onClick("dayPanelClose", () => { $("dlgBack")?.click(); });
+  onClick("dayPanelClose", () => { window.CPApp?.closeDayForm?.(); });
 
 
   const drawer = $("mainMenuDialog");
