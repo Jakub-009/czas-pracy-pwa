@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.5.18</title>
+  <title>Czas pracy 4.5.19</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -291,7 +291,6 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{
     }
 
 .surfaceCard,
-.listCard,
 .statSoftBox{
       background:#fff;
       border:1px solid #e4e8f1;
@@ -309,8 +308,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{
     }
 
 .surfaceCard:active,
-.heroCard:active,
-.listCard:active{
+.heroCard:active{
       transform:scale(.997);
     }
 
@@ -1304,12 +1302,6 @@ dialog#mainMenuDialog.drawerDialog::backdrop{
   display:flex;
   flex-direction:column;
   padding:2px 12px;
-}
-
-.drawerDivider{
-  height:1px;
-  background:#e2e6ed;
-  margin:10px 0;
 }
 
 .drawerItem{
@@ -2526,106 +2518,8 @@ button.shiftItem.googleEvent:focus-visible{
 
 .viewSwipeGhost button:active,
 .viewSwipeGhost .surfaceCard:active,
-.viewSwipeGhost .heroCard:active,
-.viewSwipeGhost .listCard:active{
+.viewSwipeGhost .heroCard:active{
   transform:none;
-}
-
-.weekViewPage{
-  width:calc(100% - 20px);
-  margin:10px 10px 0;
-  padding:0 0 18px;
-  animation:dayViewIn .18s cubic-bezier(.2,0,0,1);
-  touch-action:pan-y;
-}
-
-.weekViewList{
-  display:grid;
-  gap:8px;
-  margin:0 0 12px;
-}
-
-.weekDayCard{
-  width:100%;
-  min-height:72px;
-  padding:12px 13px;
-  color:#202124;
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  align-items:center;
-  gap:12px;
-  text-align:left;
-  cursor:pointer;
-}
-
-.weekDayCard.today{
-  border-color:rgba(66,133,244,.28);
-  background:#f8fbff;
-}
-
-.weekDayCard:active{
-  transform:scale(.992);
-}
-
-.weekDayMain{
-  min-width:0;
-}
-
-.weekDayTitle{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  min-width:0;
-  margin-bottom:5px;
-}
-
-.weekDayTitle strong{
-  font-size:15.5px;
-  line-height:1.15;
-  font-weight:700;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.weekDayTitle span{
-  font-size:12px;
-  line-height:1;
-  font-weight:700;
-  color:#174ea6;
-  background:#e8f0fe;
-  border-radius:999px;
-  padding:4px 7px;
-}
-
-.weekDaySub{
-  font-size:12.5px;
-  line-height:1.25;
-  color:#5f6368;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.weekDayHours{
-  text-align:right;
-  white-space:nowrap;
-}
-
-.weekDayHours strong{
-  display:block;
-  font-size:18px;
-  line-height:1;
-  color:#202124;
-}
-
-.weekDayHours span{
-  display:block;
-  margin-top:5px;
-  font-size:12px;
-  line-height:1;
-  color:#174ea6;
-  font-weight:650;
 }
 
 html,
@@ -2649,8 +2543,6 @@ body,
 
 #dayViewPrev,
 #dayViewNext,
-#weekViewPrev,
-#weekViewNext,
 #monthStatsPrev,
 #monthStatsNext,
 #yearStatsPrev,
@@ -2662,8 +2554,6 @@ body,
 
 #dayViewPrev::before,
 #dayViewNext::before,
-#weekViewPrev::before,
-#weekViewNext::before,
 #monthStatsPrev::before,
 #monthStatsNext::before,
 #yearStatsPrev::before,
@@ -2679,7 +2569,6 @@ body,
 }
 
 #dayViewPrev::before,
-#weekViewPrev::before,
 #monthStatsPrev::before,
 #yearStatsPrev::before{
   border-left:2.4px solid currentColor;
@@ -2687,7 +2576,6 @@ body,
 }
 
 #dayViewNext::before,
-#weekViewNext::before,
 #monthStatsNext::before,
 #yearStatsNext::before{
   border-right:2.4px solid currentColor;
@@ -2829,11 +2717,6 @@ dialog#mainMenuDialog.drawerDialog .drawerItem{
     margin-left:8px;
     margin-right:8px;
   }
-.weekViewPage{
-    width:calc(100% - 16px);
-    margin-left:8px;
-    margin-right:8px;
-  }
 .dayViewTop{
     align-items:flex-start;
   }
@@ -2850,7 +2733,7 @@ dialog#mainMenuDialog.drawerDialog .drawerItem{
 
 html,body,.appHeader,.appHeader.navTopBar,.monthStrip{background:#eef1f6;}
 
-.monthViewHidden,.calCard.monthViewHidden,.monthSummaryCard.monthViewHidden,.dayViewPage.monthViewHidden,.weekViewPage.monthViewHidden{display:none;}
+.monthViewHidden,.calCard.monthViewHidden,.monthSummaryCard.monthViewHidden,.dayViewPage.monthViewHidden{display:none;}
 
 .calCard{background:transparent;border:none;box-shadow:none;padding-left:6px;padding-right:6px;}
 
@@ -3127,7 +3010,6 @@ body,
 .wrap,
 body.view-month,
 body.view-day,
-body.view-week,
 body.view-stats{
   background:#eef1f6;
 }
@@ -3876,39 +3758,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       </div>
     </section>
 
-    <section class="weekViewPage monthViewHidden" id="weekViewPage" aria-label="Widok tygodnia">
-      <div class="dayViewTop weekViewTop">
-        <div class="dayViewNav weekViewNav">
-          <button class="tonal" id="weekViewPrev" type="button" aria-label="Poprzedni tydzień">‹</button>
-          <div class="dayViewDateBlock">
-            <strong id="weekViewRange">—</strong>
-            <span id="weekViewMeta">—</span>
-          </div>
-          <button class="tonal" id="weekViewNext" type="button" aria-label="Następny tydzień">›</button>
-        </div>
-      </div>
-
-      <div class="viewSwipeViewport" id="weekViewSwipeViewport">
-        <div class="viewSwipeGhost" id="weekViewSwipeGhost" aria-hidden="true"></div>
-        <div class="viewSwipeSurface" id="weekViewSwipeSurface">
-      <div class="dayViewHero weekViewHero heroCard">
-        <div>
-          <span>Podsumowanie tygodnia</span>
-          <strong id="weekViewHours">0:00</strong>
-          <small id="weekViewPay">0,00 zł</small>
-        </div>
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M7 2v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-2V2h-2v2H9V2H7Zm12 18H5V9h14v11Z"/>
-        </svg>
-      </div>
-
-      <div class="weekViewList" id="weekViewList"></div>
-
-        </div>
-      </div>
-    </section>
-
-
         <section id="statsPage" class="statsPage monthViewHidden" aria-label="Statystyki">
       <div class="statsPageShell">
         <article class="statsFullCard">
@@ -4065,11 +3914,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
   <div class="fab-container fabGoogle" id="fabContainer" hidden>
     <div class="fabActions" id="fabActions" hidden>
-<button class="fabActionPill" id="fabTodayAction" type="button" data-fab-view="month" data-fab-order="2">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V9h14v10ZM5 7V5h14v2H5Zm7 3.5c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5Z"/></svg>
-        <span>Dzisiejszy wpis</span>
-      </button>
-
       <button class="fabActionPill" id="fabDayHoursAction" type="button" data-fab-view="day" data-fab-order="1" hidden>
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2Zm1 5h-2v6l5 3 .9-1.45-3.9-2.32V7Zm6 2v3h3v2h-3v3h-2v-3h-3v-2h3V9h2Z"/></svg>
         <span>Dodaj godziny</span>
@@ -4127,13 +3971,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
             <button class="drawerItem" id="openAppInfo" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11 17h2v-6h-2v6Zm1-14a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 16a7 7 0 1 1 0-14 7 7 0 0 1 0 14ZM11 9h2V7h-2v2Z"/></svg>
               <span>Informacje</span>
-            </button>
-          </div>
-          <div class="drawerDivider"></div>
-          <div class="drawerSection">
-            <button class="drawerItem" id="drawerWeekView" type="button">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 2v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-2V2h-2v2H9V2H7Zm12 18H5V9h14v11Z"/></svg>
-              <span>Widok tygodnia</span>
             </button>
           </div>
         </div>
@@ -4813,13 +4650,11 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   let db = load() || createEmptyDB();
   let dataRevision = 0;
   const viewSwipePreviewCache = {
-    day:null,
-    week:null
+    day:null
   };
 
   function clearViewSwipePreviewCache() {
     viewSwipePreviewCache.day = null;
-    viewSwipePreviewCache.week = null;
   }
 
   const calendarHtmlCache = new Map();
@@ -5548,7 +5383,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     if (!mp) return;
     mp.value = newYM;
     shouldScrollToToday = false;
-    if ((activeView === "day" || activeView === "week") && activeDayISO && ym(activeDayISO) !== newYM) {
+    if (activeView === "day" && activeDayISO && ym(activeDayISO) !== newYM) {
       const today = todayISO();
       activeDayISO = ym(today) === newYM ? today : `${newYM}-01`;
     }
@@ -6202,98 +6037,12 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     scheduleViewSwipePreviewCache("day", activeDayISO);
   }
 
-  function startOfWeekISO(dateISO) {
-    const dt = parseISODate(dateISO) || new Date();
-    return isoFromDate(addDays(dt, -mondayIndex(dt.getDay())));
-  }
-
-  function formatWeekRange(startISO) {
-    const start = parseISODate(startISO) || new Date();
-    const end = addDays(start, 6);
-    const startText = new Intl.DateTimeFormat("pl-PL", { day:"numeric", month:"short" }).format(start).replace(".", "");
-    const endText = new Intl.DateTimeFormat("pl-PL", { day:"numeric", month:"short", year:"numeric" }).format(end).replace(".", "");
-    return `${startText} – ${endText}`;
-  }
-
-  function summarizeWeekDay(dateISO) {
-    const day = getDay(dateISO) || { date: dateISO, note: "", shifts: [], vacation: false, leaveType:"" };
-    const [Y] = dateISO.split("-").map(Number);
-    const holidayName = getHolidayMap(Y).get(dateISO) || "";
-    const leaveType = day.leaveType || (day.vacation ? "paid" : "");
-    const shifts = (day.shifts || []).slice().sort((a, b) => (a.start || "").localeCompare(b.start || ""));
-    const note = (day.note || "").trim();
-    const parts = [];
-
-    if (holidayName) parts.push(holidayName);
-    if (leaveType) parts.push(leaveLabel(leaveType));
-    if (shifts.length) parts.push(shifts.map(s => `${s.start || "—"}–${s.end || "—"}`).join(", "));
-    if (note) parts.push("Notatka");
-    if (!parts.length && isMissingWorkday(dateISO, day)) parts.push("Brak wpisu w dniu roboczym");
-
-    return {
-      day,
-      minutes:computeDayMinutes(day),
-      details:parts.join(" · ") || "Brak wpisów"
-    };
-  }
-
-  function renderWeekView(dateISO = activeDayISO) {
-    activeDayISO = dateISO || todayISO();
-    const startISO = startOfWeekISO(activeDayISO);
-    const startDate = parseISODate(startISO) || new Date();
-    const days = Array.from({ length:7 }, (_, i) => isoFromDate(addDays(startDate, i)));
-    const today = todayISO();
-    let totalMinutes = 0;
-    let workDays = 0;
-    let absences = 0;
-
-    const listHTML = days.map(date => {
-      const summary = summarizeWeekDay(date);
-      totalMinutes += summary.minutes;
-      if (summary.minutes > 0) workDays++;
-      if (summary.day.leaveType || summary.day.vacation) absences++;
-
-      const isToday = date === today;
-      const title = capFirst(fmtWeekdayLongPL(date));
-      const dayText = fmtDMYText(date);
-      const pay = round2((summary.minutes / 60) * (db.settings.rate || 0));
-
-      return `
-        <div class="weekDayCard listCard ${isToday ? "today" : ""}" role="button" tabindex="0" data-week-date="${date}">
-          <div class="weekDayMain">
-            <div class="weekDayTitle">
-              <strong>${escapeHtml(title)}</strong>
-              ${isToday ? "<span>Dzi\u015b</span>" : ""}
-            </div>
-            <div class="weekDaySub">${escapeHtml(dayText)} \u00b7 ${escapeHtml(summary.details)}</div>
-          </div>
-          <div class="weekDayHours">
-            <strong>${fmtHM(summary.minutes)}</strong>
-            <span>${pln(pay)}</span>
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    const totalPay = round2((totalMinutes / 60) * (db.settings.rate || 0));
-
-    if ($("weekViewRange")) $("weekViewRange").textContent = formatWeekRange(startISO);
-    if ($("weekViewMeta")) $("weekViewMeta").textContent =
-      `${workDays} ${pluralPL(workDays, "dzień pracy", "dni pracy", "dni pracy")} · ${absences} ${pluralPL(absences, "nieobecność", "nieobecności", "nieobecności")}`;
-    if ($("weekViewHours")) $("weekViewHours").textContent = fmtHM(totalMinutes);
-    if ($("weekViewPay")) $("weekViewPay").textContent = pln(totalPay);
-    if ($("weekViewList")) $("weekViewList").innerHTML = listHTML;
-    scheduleViewSwipePreviewCache("week", activeDayISO);
-  }
-
   function applyActiveView() {
     const isDay = activeView === "day";
-    const isWeek = activeView === "week";
     const isStats = activeView === "stats";
-    const isMonth = !isDay && !isWeek && !isStats;
+    const isMonth = !isDay && !isStats;
 
     document.body.classList.toggle("view-day", isDay);
-    document.body.classList.toggle("view-week", isWeek);
     document.body.classList.toggle("view-stats", isStats);
     document.body.classList.toggle("view-month", isMonth);
     window.CPApp?.syncFabActions?.();
@@ -6301,19 +6050,16 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     $("monthNavToggle").hidden = !isMonth;
     $("monthPick").disabled = !isMonth;
     $("appViewTitle").hidden = isMonth;
-    $("appViewTitle").textContent = isDay ? "Dzień" : isWeek ? "Tydzień" : isStats ? "Statystyki" : "";
+    $("appViewTitle").textContent = isDay ? "Dzień" : isStats ? "Statystyki" : "";
     document.querySelector(".topActions").hidden = !isMonth;
 
     document.querySelector(".calCard")?.classList.toggle("monthViewHidden", !isMonth);
     $("monthSummaryCard")?.classList.toggle("monthViewHidden", !isMonth);
     $("dayViewPage")?.classList.toggle("monthViewHidden", !isDay);
-    $("weekViewPage")?.classList.toggle("monthViewHidden", !isWeek);
     $("statsPage")?.classList.toggle("monthViewHidden", !isStats);
     $("monthStrip")?.toggleAttribute("hidden", !isMonth || !document.body.classList.contains("month-strip-open"));
 
-
     if (isDay) renderDayView(activeDayISO);
-    if (isWeek) renderWeekView(activeDayISO);
     if (isStats) renderStatsPanel();
   }
 
@@ -6401,7 +6147,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     const state = window.history?.state;
     if (!overlay || !state?.cpApp || state.overlay !== overlay || typeof window.history?.back !== "function") return false;
     const previous = appHistoryStates.get(state.cpIndex + delta);
-    if (!previous?.cpApp || !["month", "day", "week", "stats"].includes(previous.view)) return false;
+    if (!previous?.cpApp || !["month", "day", "stats"].includes(previous.view)) return false;
     if (!historyBackPending) {
       historyBackPending = true;
       window.history.go(delta);
@@ -6451,7 +6197,15 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   }
 
   function applyAppHistoryState(state) {
-    if (!state?.cpApp || !["month", "day", "week", "stats"].includes(state.view)) return false;
+    // Starszy wpis tygodnia zastępujemy miesiącem w tym samym miejscu historii.
+    // Nie cofamy ponownie: zachowujemy cpIndex i datę, również na granicy miesięcy.
+    const legacyWeek = state?.cpApp && state.view === "week";
+    if (legacyWeek) {
+      const date = isValidDateISO(state.date) ? state.date
+        : /^\d{4}-(0[1-9]|1[0-2])$/.test(String(state.month || "")) ? state.month + "-01" : todayISO();
+      state = { ...state, view:"month", date, month:ym(date), overlay:"", drawerView:"" };
+    }
+    if (!state?.cpApp || !["month", "day", "stats"].includes(state.view)) return false;
 
     // A forward entry can refer to a form already closed and no longer holding a draft.
     // Normalize it instead of retaining an invisible overlay in the history state.
@@ -6461,7 +6215,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       : state.overlay === "monthStrip"
         ? document.body.classList.contains("month-strip-open")
         : !!$(overlayElements[state.overlay])?.open;
-    if (state.overlay && !overlayVisible) {
+    if (legacyWeek || (state.overlay && !overlayVisible)) {
       state = { ...state, overlay:"", drawerView:"" };
       window.history.replaceState(state, document.title);
       currentAppHistoryState = state;
@@ -6470,7 +6224,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
     applyingAppHistory = true;
     try {
-      activeView = ["month", "day", "week", "stats"].includes(state.view) ? state.view : "month";
+      activeView = state.view;
       if (isValidDateISO(state.date)) activeDayISO = state.date;
 
       const monthPick = $("monthPick");
@@ -6525,7 +6279,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     // Capture the selected month/period before leaving it.
     if (options.historyMode !== "none" && !window.history?.state?.overlay) writeAppHistory("replace");
     const mp = $("monthPick");
-    activeView = view === "day" ? "day" : (view === "week" ? "week" : (view === "stats" ? "stats" : "month"));
+    activeView = view === "day" ? "day" : (view === "stats" ? "stats" : "month");
     window.CPApp?.closeFabMenu?.({ history:false, haptic:false });
     if (activeView !== "month") setMonthStripOpen(false, { history:false });
     if (activeView === "stats") {
@@ -6535,7 +6289,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     }
     if (dateISO) activeDayISO = dateISO;
 
-    if ((activeView === "day" || activeView === "week") && mp && activeDayISO) {
+    if (activeView === "day" && mp && activeDayISO) {
       const nextYM = ym(activeDayISO);
       if (mp.value !== nextYM) mp.value = nextYM;
     }
@@ -6551,11 +6305,11 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
   function goBackOrSetActiveView(view = "month", dateISO = "") {
     const state = window.history?.state;
-    const targetView = view === "day" ? "day" : (view === "week" ? "week" : (view === "stats" ? "stats" : "month"));
+    const targetView = view === "day" ? "day" : (view === "stats" ? "stats" : "month");
 
     const previous = appHistoryStates.get((state?.cpIndex || 0) - 1);
     if (historyBackPending || restoreNoteHistory) return;
-    if (state?.cpApp && previous?.cpApp && !previous.overlay && ["month", "day", "week", "stats"].includes(previous.view) && typeof window.history?.back === "function") {
+    if (state?.cpApp && previous?.cpApp && !previous.overlay && ["month", "day", "stats"].includes(previous.view) && typeof window.history?.back === "function") {
       historyBackPending = true;
       window.history.back();
       return;
@@ -6582,24 +6336,8 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     haptic.tap();
   }
 
-  function changeWeek(delta) {
-    const base = parseISODate(activeDayISO) || new Date();
-    activeDayISO = isoFromDate(addDays(base, delta * 7));
-
-    const mp = $("monthPick");
-    if (mp && activeDayISO) {
-      const nextYM = ym(activeDayISO);
-      if (mp.value !== nextYM) mp.value = nextYM;
-    }
-
-    renderWeekView(activeDayISO);
-    writeAppHistory("replace");
-    haptic.tap();
-  }
-
   Object.assign(window.CPApp, {
-    changeDay,
-    changeWeek
+    changeDay
   });
 
   Object.assign(window.CPApp, {
@@ -6615,8 +6353,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     pushDrawerViewHistory: () => writeAppHistory("push", { overlay:"drawer" }),
     setActiveView,
     goBackOrSetActiveView,
-    renderDayView,
-    renderWeekView
+    renderDayView
   });
 
 
@@ -6655,7 +6392,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     if (monthStrip && !monthStrip.hidden) renderMonthStrip(monthYM);
     renderStatsPanel();
     if (activeView === "day") renderDayView(activeDayISO);
-    if (activeView === "week") renderWeekView(activeDayISO);
     applyActiveView();
 
     const todayNum = $("todayIconNum");
@@ -7712,30 +7448,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
   $("dayViewPage")?.addEventListener("click", handleDayViewClick);
 
-  // ===== WEEK EVENTS =====
-  function handleWeekViewClick(e) {
-    const dateCard = e.target.closest?.("[data-week-date]");
-    if (dateCard && $("weekViewPage")?.contains(dateCard)) {
-      const date = dateCard.getAttribute("data-week-date");
-      if (date) setActiveView("day", date);
-      return;
-    }
-
-    const btn = e.target.closest?.("button");
-    if (!btn || !$("weekViewPage")?.contains(btn)) return;
-
-    switch (btn.id) {
-      case "weekViewPrev":
-        animateWeekChange(-1);
-        break;
-      case "weekViewNext":
-        animateWeekChange(1);
-        break;
-    }
-  }
-
-  $("weekViewPage")?.addEventListener("click", handleWeekViewClick);
-
   function getSwipeWidth(page) {
     return Math.max(page?.getBoundingClientRect?.().width || 0, window.innerWidth || 320);
   }
@@ -7804,54 +7516,8 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     return root.innerHTML;
   }
 
-  function buildWeekSwipeSnapshotHTML(surface, dateISO) {
-    if (!surface) return "";
-    const root = document.createElement("div");
-    root.innerHTML = surface.innerHTML;
-
-    const startISO = startOfWeekISO(dateISO || todayISO());
-    const startDate = parseISODate(startISO) || new Date();
-    const days = Array.from({ length:7 }, (_, i) => isoFromDate(addDays(startDate, i)));
-    const today = todayISO();
-    let totalMinutes = 0;
-
-    const listHTML = days.map(date => {
-      const summary = summarizeWeekDay(date);
-      totalMinutes += summary.minutes;
-      const isToday = date === today;
-      const title = capFirst(fmtWeekdayLongPL(date));
-      const dayText = fmtDMYText(date);
-      const pay = round2((summary.minutes / 60) * (db.settings.rate || 0));
-
-      return `
-        <div class="weekDayCard listCard ${isToday ? "today" : ""}" role="button" tabindex="0" data-week-date="${date}">
-          <div class="weekDayMain">
-            <div class="weekDayTitle">
-              <strong>${escapeHtml(title)}</strong>
-              ${isToday ? "<span>Dzi\u015b</span>" : ""}
-            </div>
-            <div class="weekDaySub">${escapeHtml(dayText)} \u00b7 ${escapeHtml(summary.details)}</div>
-          </div>
-          <div class="weekDayHours">
-            <strong>${fmtHM(summary.minutes)}</strong>
-            <span>${pln(pay)}</span>
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    const totalPay = round2((totalMinutes / 60) * (db.settings.rate || 0));
-
-    setSnapshotText(root, "#weekViewHours", fmtHM(totalMinutes));
-    setSnapshotText(root, "#weekViewPay", pln(totalPay));
-    setSnapshotHTML(root, "#weekViewList", listHTML);
-
-    return root.innerHTML;
-  }
-
   const viewSwipePreviewTimers = {
-    day:0,
-    week:0
+    day:0
   };
 
   function clearViewSwipePreviewTimer(type) {
@@ -7870,35 +7536,25 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   }
 
   function scheduleViewSwipePreviewCache(type, dateISO) {
-    if (type !== "day" && type !== "week") return;
+    if (type !== "day") return;
     clearViewSwipePreviewTimer(type);
 
     const revision = dataRevision;
     viewSwipePreviewTimers[type] = scheduleIdleWork(() => {
       viewSwipePreviewTimers[type] = 0;
       if (revision !== dataRevision) return;
-      if (type === "day" && (activeView !== "day" || activeDayISO !== dateISO)) return;
-      if (type === "week" && (activeView !== "week" || activeDayISO !== dateISO)) return;
+      if (activeView !== "day" || activeDayISO !== dateISO) return;
 
-      const surface = type === "day" ? $("dayViewSwipeSurface") : $("weekViewSwipeSurface");
+      const surface = $("dayViewSwipeSurface");
       if (!surface || surface.classList.contains("is-swipe-animating") || surface.classList.contains("is-horizontal-swipe")) return;
 
       const base = parseISODate(dateISO) || new Date();
-      if (type === "day") {
-        viewSwipePreviewCache.day = {
-          dateISO,
-          revision,
-          prev:buildDaySwipeSnapshotHTML(surface, isoFromDate(addDays(base, -1))),
-          next:buildDaySwipeSnapshotHTML(surface, isoFromDate(addDays(base, 1)))
-        };
-      } else {
-        viewSwipePreviewCache.week = {
-          dateISO,
-          revision,
-          prev:buildWeekSwipeSnapshotHTML(surface, isoFromDate(addDays(base, -7))),
-          next:buildWeekSwipeSnapshotHTML(surface, isoFromDate(addDays(base, 7)))
-        };
-      }
+      viewSwipePreviewCache.day = {
+        dateISO,
+        revision,
+        prev:buildDaySwipeSnapshotHTML(surface, isoFromDate(addDays(base, -1))),
+        next:buildDaySwipeSnapshotHTML(surface, isoFromDate(addDays(base, 1)))
+      };
     });
   }
 
@@ -8036,24 +7692,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     });
   }
 
-  function animateWeekChange(delta) {
-    const current = activeDayISO || todayISO();
-    const base = parseISODate(current) || new Date();
-    const target = isoFromDate(addDays(base, delta * 7));
-    const surface = $("weekViewSwipeSurface") || $("weekViewPage");
-    const ghost = $("weekViewSwipeGhost");
-    const viewport = $("weekViewSwipeViewport");
-    const direction = delta > 0 ? -1 : 1;
-
-    runSwipeChange(surface, direction, () => changeWeek(delta), {
-      ghost,
-      viewport,
-      previewHTML:() => getViewSwipePreviewHTML("week", current, direction, () => buildWeekSwipeSnapshotHTML(surface, target)),
-      renderPreview:() => renderWeekView(target),
-      renderCurrent:() => renderWeekView(current)
-    });
-  }
-
   function prepareDaySwipePreview(surface, direction) {
     const current = activeDayISO || todayISO();
     const base = parseISODate(current) || new Date();
@@ -8065,20 +7703,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       previewHTML:() => getViewSwipePreviewHTML("day", current, direction, () => buildDaySwipeSnapshotHTML(surface, target)),
       renderPreview:() => renderDayView(target),
       renderCurrent:() => renderDayView(current)
-    });
-  }
-
-  function prepareWeekSwipePreview(surface, direction) {
-    const current = activeDayISO || todayISO();
-    const base = parseISODate(current) || new Date();
-    const target = isoFromDate(addDays(base, direction < 0 ? 7 : -7));
-    prepareSwipeGhost(surface, direction, {
-      ghost:$("weekViewSwipeGhost"),
-      viewport:$("weekViewSwipeViewport"),
-      mode:"drag",
-      previewHTML:() => getViewSwipePreviewHTML("week", current, direction, () => buildWeekSwipeSnapshotHTML(surface, target)),
-      renderPreview:() => renderWeekView(target),
-      renderCurrent:() => renderWeekView(current)
     });
   }
 
@@ -8182,112 +7806,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       locked = null;
       previewDirection = 0;
       cancelDaySwipeFrame();
-      cancelSwipePreview(surface, swipeOptions);
-    }, { passive:true });
-
-    page.dataset.swipeReady = "1";
-  })();
-
-  (function enableWeekViewSwipe() {
-    const page = $("weekViewPage");
-    const surface = $("weekViewSwipeSurface") || page;
-    if (!page || page.dataset.swipeReady) return;
-
-    let sx = 0, sy = 0, tracking = false, locked = null, previewDirection = 0;
-    let swipeFrame = 0, queuedDx = 0, suppressClickUntil = 0;
-    const LOCK_START = 10;
-    const THRESH_X = 56;
-    const swipeOptions = {
-      ghost:$("weekViewSwipeGhost"),
-      viewport:$("weekViewSwipeViewport")
-    };
-
-    function queueWeekSwipeVisual(dx) {
-      queuedDx = dx;
-      if (swipeFrame) return;
-      swipeFrame = requestAnimationFrame(() => {
-        swipeFrame = 0;
-        setSwipeVisual(surface, queuedDx, false, swipeOptions);
-      });
-    }
-
-    function cancelWeekSwipeFrame() {
-      if (swipeFrame) cancelAnimationFrame(swipeFrame);
-      swipeFrame = 0;
-    }
-
-    page.addEventListener("click", (e) => {
-      if (Date.now() < suppressClickUntil) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }, true);
-
-    page.addEventListener("touchstart", (e) => {
-      if (e.touches.length !== 1) return;
-      if (e.target.closest?.("input,textarea,select,a")) return;
-      if (surface?.classList.contains("is-swipe-animating")) return;
-      const t = e.touches[0];
-      sx = t.clientX;
-      sy = t.clientY;
-      tracking = true;
-      locked = null;
-      previewDirection = 0;
-    }, { passive:true });
-
-    page.addEventListener("touchmove", (e) => {
-      if (!tracking || e.touches.length !== 1) return;
-      const t = e.touches[0];
-      const dx = t.clientX - sx;
-      const dy = t.clientY - sy;
-
-      if (!locked && (Math.abs(dx) > LOCK_START || Math.abs(dy) > LOCK_START)) {
-        locked = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
-        if (locked === "h") {
-          suppressClickUntil = Date.now() + 480;
-          surface.classList.add("is-horizontal-swipe");
-        }
-      }
-
-      if (locked === "h") {
-        e.preventDefault();
-        const direction = dx < 0 ? -1 : 1;
-        if (previewDirection !== direction) {
-          previewDirection = direction;
-          prepareWeekSwipePreview(surface, direction);
-        }
-        queueWeekSwipeVisual(dx);
-      }
-    }, { passive:false });
-
-    page.addEventListener("touchend", (e) => {
-      if (!tracking) return;
-      tracking = false;
-      cancelWeekSwipeFrame();
-      if (locked !== "h") {
-        previewDirection = 0;
-        cancelSwipePreview(surface, swipeOptions);
-        return;
-      }
-
-      const t = e.changedTouches[0];
-      const dx = t.clientX - sx;
-      if (Math.abs(dx) < THRESH_X) {
-        previewDirection = 0;
-        cancelSwipePreview(surface, swipeOptions);
-        return;
-      }
-
-      previewDirection = 0;
-      suppressClickUntil = Date.now() + 480;
-      animateWeekChange(dx < 0 ? 1 : -1);
-    }, { passive:true });
-
-    page.addEventListener("touchcancel", () => {
-      tracking = false;
-      locked = null;
-      previewDirection = 0;
-      cancelWeekSwipeFrame();
       cancelSwipePreview(surface, swipeOptions);
     }, { passive:true });
 
@@ -9331,7 +8849,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
   onClick("drawerBulkEntry", () => goFromDrawer(() => window.CPApp?.openBulkDialog?.()));
   onClick("openBackupTools", () => { showDrawerView("backup"); haptic.tap(); });
-  onClick("drawerWeekView", () => goFromDrawer(() => window.CPApp?.setActiveView?.("week")));
   onClick("openEmployerSettings", () => { showDrawerView("settings"); haptic.tap(); });
   onClick("openSystemTools", () => { showDrawerView("tools"); haptic.tap(); });
   onClick("openAppInfo", () => { showDrawerView("info"); haptic.tap(); });
