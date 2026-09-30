@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.5.12</title>
+  <title>Czas pracy 4.5.13</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2560,17 +2560,6 @@ dialog.googlePanel[open],
   fill:#1a73e8;
 }
 
-.dayViewActions{
-  display:flex;
-  gap:10px;
-  margin:0 0 10px;
-}
-
-.dayViewActions button{
-  min-height:44px;
-  padding:0 16px;
-}
-
 .dayViewCard{
   padding:14px 13px 13px;
 }
@@ -2729,21 +2718,11 @@ dialog.googlePanel[open],
   transform:none;
 }
 
-.viewSwipeGhost [data-ghost-id="dayViewAddHours"]{
-  background:#1a73e8;
-  color:#fff;
-}
-
-.viewSwipeGhost [data-ghost-id="dayViewAddLeave"],
 .viewSwipeGhost [data-ghost-id="dayViewOpenModal"]{
   background:#fff;
   border:1px solid #dfe3eb;
   color:#174ea6;
   box-shadow:0 1px 2px rgba(60,64,67,.04);
-}
-
-.viewSwipeGhost [data-ghost-id="dayViewAddLeave"]{
-  border-color:#cddaf3;
 }
 
 .weekViewPage{
@@ -2905,24 +2884,6 @@ body,
   transform:translate(-58%,-50%) rotate(-45deg);
 }
 
-.dayViewActions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.dayViewActions #dayViewOpenModal{
-  grid-column:1 / -1;
-  background:#fff;
-  border:1px solid #e4e8f1;
-  color:#174ea6;
-}
-
-.dayViewActions #dayViewAddLeave{
-  background:#e8f0fe;
-  color:#174ea6;
-}
-
 .rangeModeTab{
   cursor:pointer;
 }
@@ -3082,15 +3043,6 @@ dialog#mainMenuDialog.drawerDialog .drawerItem{
   }
 .dayViewHero strong{
     font-size:31px;
-  }
-.dayViewActions{
-    flex-wrap:wrap;
-  }
-.dayViewActions{
-    grid-template-columns:1fr;
-  }
-.dayViewActions #dayViewOpenModal{
-    grid-column:auto;
   }
 }
 
@@ -3259,6 +3211,14 @@ html,body,.appHeader,.appHeader.navTopBar,.monthStrip{background:#eef1f6;}
 .fabActionPill:nth-child(2){animation-delay:.015s}
 .fabActionPill:nth-child(3){animation-delay:0s}
 
+.fabActionPill[hidden]{
+  display:none;
+}
+
+.fabActionPill[data-fab-order="1"]{animation-delay:.03s}
+.fabActionPill[data-fab-order="2"]{animation-delay:.015s}
+.fabActionPill[data-fab-order="3"]{animation-delay:0s}
+
 @keyframes fabActionIn{
   from{opacity:0;transform:translateY(10px) scale(.96)}
   to{opacity:1;transform:translateY(0) scale(1)}
@@ -3328,6 +3288,7 @@ body.fab-open .appHeader{
   pointer-events:none;
 }
 
+body.view-week .fab-container,
 body.view-stats .fab-container{
   display:none;
 }
@@ -3369,6 +3330,7 @@ body,
 .wrap,
 body.view-month,
 body.view-day,
+body.view-week,
 body.view-stats{
   background:#eef1f6;
 }
@@ -3392,42 +3354,6 @@ body.view-stats{
   gap:8px;
 }
 
-.dayViewActions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin:12px 0 16px;
-}
-
-.dayViewActions button{
-  width:auto;
-  min-width:0;
-  min-height:42px;
-  height:42px;
-  padding:0 17px;
-  border-radius:999px;
-  font-size:14px;
-  font-weight:760;
-  flex:0 0 auto;
-}
-
-.dayViewActions #dayViewAddHours{
-  background:#1a73e8;
-  color:#fff;
-}
-
-.dayViewActions #dayViewAddLeave,
-.dayViewActions #dayViewOpenModal{
-  background:#fff;
-  border:1px solid #dfe3eb;
-  color:#174ea6;
-  box-shadow:0 1px 2px rgba(60,64,67,.04);
-}
-
-.dayViewActions #dayViewAddLeave{
-  border-color:#cddaf3;
-}
-
 .dayViewBottomActions,
 .statsBottomActions{
   padding:16px 0 0;
@@ -3448,6 +3374,24 @@ body.view-stats{
   font-size:15px;
   font-weight:800;
   flex:0 0 auto;
+}
+
+.dayViewFooterActions{
+  justify-content:space-between;
+  gap:10px;
+}
+
+.dayViewFooterActions button{
+  flex:0 1 calc(50% - 5px);
+  min-width:0;
+  max-width:220px;
+}
+
+.dayViewFooterActions #dayViewOpenModal{
+  background:#fff;
+  border:1px solid #dfe3eb;
+  color:#174ea6;
+  box-shadow:0 1px 2px rgba(60,64,67,.04);
 }
 
 /* Wspólny szkielet paneli roboczych: Zbiorczy wpis, Dzisiejszy wpis / Edytuj dzień, Urlop/L4 */
@@ -4149,17 +4093,6 @@ dialog#dayDialog .dayCloseRow{
     padding:0 22px;
   }
 
-  .dayViewActions{
-    gap:8px;
-  }
-
-  .dayViewActions button{
-    height:40px;
-    min-height:40px;
-    padding:0 14px;
-    font-size:13.5px;
-  }
-
   .dayViewBottomActions button,
   .statsCloseBottom{
     min-width:132px;
@@ -4197,7 +4130,6 @@ dialog#dayDialog .dayCloseRow{
     font-size:26px;
   }
 
-  .dayViewActions button,
   .dayViewBottomActions button,
   .statsCloseBottom{
     padding:0 12px;
@@ -4310,12 +4242,6 @@ dialog#dayDialog .dayCloseRow{
         </svg>
       </div>
 
-      <div class="dayViewActions">
-        <button class="filled" id="dayViewAddHours" type="button">Dodaj godziny</button>
-        <button class="tonal" id="dayViewAddLeave" type="button">Dodaj urlop / L4</button>
-        <button class="tonal" id="dayViewOpenModal" type="button">Edytuj dzień</button>
-      </div>
-
       <div class="quickTemplatesBlock dayViewTemplatesBlock">
         <div class="quickTemplatesTitle">Szybkie szablony</div>
         <div class="quickTemplates" id="dayViewTemplates"></div>
@@ -4329,7 +4255,8 @@ dialog#dayDialog .dayCloseRow{
         <div class="shiftList dayViewEvents" id="dayViewEvents"></div>
       </div>
 
-      <div class="dayViewBottomActions bottomActions">
+      <div class="dayViewBottomActions bottomActions dayViewFooterActions">
+        <button class="tonal" id="dayViewOpenModal" type="button">Edytuj dzień</button>
         <button class="tonal" id="dayViewBackToMonth" type="button">Wróć</button>
       </div>
         </div>
@@ -4539,14 +4466,29 @@ dialog#dayDialog .dayCloseRow{
 
   <div class="fab-container fabGoogle" id="fabContainer">
     <div class="fabActions" id="fabActions" hidden>
-      <button class="fabActionPill" id="fabBulkAction" type="button">
+      <button class="fabActionPill" id="fabBulkAction" type="button" data-fab-view="month" data-fab-order="1">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V8h14v11ZM7 10h5v5H7v-5Zm7 0h3v2h-3v-2Zm0 4h3v2h-3v-2Z"/></svg>
         <span>Zbiorczy wpis</span>
       </button>
 
-      <button class="fabActionPill" id="fabTodayAction" type="button">
+      <button class="fabActionPill" id="fabTodayAction" type="button" data-fab-view="month" data-fab-order="2">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V9h14v10ZM5 7V5h14v2H5Zm7 3.5c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5Z"/></svg>
         <span>Dzisiejszy wpis</span>
+      </button>
+
+      <button class="fabActionPill" id="fabDayHoursAction" type="button" data-fab-view="day" data-fab-order="1" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2Zm1 5h-2v6l5 3 .9-1.45-3.9-2.32V7Zm6 2v3h3v2h-3v3h-2v-3h-3v-2h3V9h2Z"/></svg>
+        <span>Dodaj godziny</span>
+      </button>
+
+      <button class="fabActionPill" id="fabDayLeaveAction" type="button" data-fab-view="day" data-fab-order="2" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V9h14v10ZM5 7V5h14v2H5Zm4 5h6v2H9v-2Zm0 4h4v2H9v-2Z"/></svg>
+        <span>Dodaj urlop / L4</span>
+      </button>
+
+      <button class="fabActionPill" id="fabDayNoteAction" type="button" data-fab-view="day" data-fab-order="3" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 2h9l5 5v15H6c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2Zm8 1.5V8h4.5L14 3.5ZM8 12h8v2H8v-2Zm0 4h8v2H8v-2Zm0-8h4v2H8V8Z"/></svg>
+        <span>Dodaj notatkę</span>
       </button>
     </div>
 
@@ -6471,7 +6413,7 @@ dialog#dayDialog .dayCloseRow{
     dlg.addEventListener("cancel", (e) => { e.preventDefault(); closeDay(); });
   }
 
-  function expandDayPanel({ form = false } = {}) {
+  function expandDayPanel({ form = false, focus = "start" } = {}) {
     if (!dlg) return;
     if (form) {
       dlg.classList.add("is-form-open");
@@ -6482,7 +6424,8 @@ dialog#dayDialog .dayCloseRow{
         if ($("dlgStart") && !$("dlgStart").value) $("dlgStart").value = last.start;
         if ($("dlgEnd") && !$("dlgEnd").value) $("dlgEnd").value = last.end;
       }
-      setTimeout(() => $("dlgStart")?.focus(), 80);
+      const focusEl = focus === "note" ? $("dlgNote") : $("dlgStart");
+      setTimeout(() => focusEl?.focus(), 80);
     } else {
       dlg.classList.add("is-preview-only");
       dlg.classList.remove("is-form-open");
@@ -6497,8 +6440,14 @@ dialog#dayDialog .dayCloseRow{
     setTimeout(() => expandDayPanel({ form:true }), 90);
   }
 
+  function openDayNoteForm(dateISO = activeDayISO) {
+    openDay(dateISO);
+    setTimeout(() => expandDayPanel({ form:true, focus:"note" }), 90);
+  }
+
   Object.assign(window.CPApp, {
-    openDayAddForm
+    openDayAddForm,
+    openDayNoteForm
   });
 
   const dlgShowAddShiftBtn = $("dlgShowAddShift");
@@ -7002,9 +6951,7 @@ dialog#dayDialog .dayCloseRow{
     if (!options || options instanceof Event) options = {};
     const mp = $("monthPick");
     activeView = view === "day" ? "day" : (view === "week" ? "week" : (view === "stats" ? "stats" : "month"));
-    if (activeView !== "month") {
-      window.CPApp?.closeFabMenu?.();
-    }
+    window.CPApp?.closeFabMenu?.({ history:false, haptic:false });
     if (activeView === "stats") {
       document.body.classList.remove("month-strip-open");
       $("monthStrip")?.setAttribute("hidden", "");
@@ -8176,12 +8123,6 @@ dialog#dayDialog .dayCloseRow{
         break;
       case "dayViewNext":
         animateDayChange(1);
-        break;
-      case "dayViewAddHours":
-        openDayAddForm(activeDayISO);
-        break;
-      case "dayViewAddLeave":
-        openVacationForDate(activeDayISO);
         break;
       case "dayViewOpenModal":
         openDay(activeDayISO);
@@ -9680,12 +9621,55 @@ dialog#dayDialog .dayCloseRow{
     else dlg.removeAttribute("open");
   }
 
+  function getFabMode() {
+    if (document.body.classList.contains("view-week") || document.body.classList.contains("view-stats")) return "hidden";
+    if (document.body.classList.contains("view-day")) return "day";
+    return "month";
+  }
+
+  function syncFabActions(options = {}) {
+    const mainFab = $("mainFab");
+    const fabActions = $("fabActions");
+    const fabScrim = $("fabScrim");
+    const fabContainer = $("fabContainer");
+    if (!mainFab || !fabActions || !fabScrim || !fabContainer) return "month";
+
+    const mode = getFabMode();
+    const prevMode = fabContainer.dataset.fabMode || "";
+    const isHiddenMode = mode === "hidden";
+    const modeChanged = !!prevMode && prevMode !== mode;
+
+    fabContainer.dataset.fabMode = mode;
+    fabContainer.hidden = isHiddenMode;
+    mainFab.disabled = isHiddenMode;
+    mainFab.setAttribute("aria-hidden", isHiddenMode ? "true" : "false");
+
+    fabActions.querySelectorAll(".fabActionPill").forEach((btn) => {
+      btn.hidden = btn.dataset.fabView !== mode;
+    });
+
+    if (isHiddenMode || modeChanged || options.close) {
+      fabContainer.classList.remove("is-open");
+      mainFab.setAttribute("aria-expanded", "false");
+      fabActions.hidden = true;
+      fabScrim.hidden = true;
+      document.body.classList.remove("fab-open");
+      unlockPageScroll("fab");
+      window.CPApp?.closeOverlay?.("fab", { history:false });
+    }
+
+    return mode;
+  }
+
   function setFabOpen(open, options = {}) {
     const mainFab = $("mainFab");
     const fabActions = $("fabActions");
     const fabScrim = $("fabScrim");
     const fabContainer = $("fabContainer");
     if (!mainFab || !fabActions || !fabScrim || !fabContainer) return;
+
+    const mode = syncFabActions();
+    if (open && mode === "hidden") return;
 
     fabContainer.classList.toggle("is-open", open);
     mainFab.setAttribute("aria-expanded", open ? "true" : "false");
@@ -9700,16 +9684,23 @@ dialog#dayDialog .dayCloseRow{
 
   function closeFabMenu(options = {}) {
     if (!options || options instanceof Event) options = {};
+    const fabContainer = $("fabContainer");
+    if (!fabContainer?.classList.contains("is-open")) {
+      syncFabActions();
+      return;
+    }
     if (options.haptic !== false) haptic.close();
     if (window.CPApp?.closeOverlay?.("fab", options)) return;
     setFabOpen(false, options);
   }
 
   Object.assign(window.CPApp, {
-    closeFabMenu
+    closeFabMenu,
+    syncFabActions
   });
 
   $("mainFab")?.addEventListener("click", () => {
+    if (getFabMode() === "hidden") return;
     const next = !$("fabContainer")?.classList.contains("is-open");
     if (!next) haptic.close();
     if (!next && window.CPApp?.closeOverlay?.("fab")) return;
@@ -9726,14 +9717,24 @@ dialog#dayDialog .dayCloseRow{
 
     closeFabMenu({ history:false });
 
-    if (btn.id === "fabTodayAction") {
-      setTimeout(() => window.CPApp?.openWorkDay?.(window.CPApp?.workTodayISO?.()), 80);
-    }
+    const handlers = {
+      fabBulkAction: () => window.CPApp?.openBulkDialog?.(),
+      fabTodayAction: () => window.CPApp?.openWorkDay?.(window.CPApp?.workTodayISO?.()),
+      fabDayHoursAction: () => window.CPApp?.openDayAddForm?.(),
+      fabDayLeaveAction: () => window.CPApp?.openVacationForDate?.(),
+      fabDayNoteAction: () => window.CPApp?.openDayNoteForm?.()
+    };
 
-    if (btn.id === "fabBulkAction") {
-      setTimeout(() => window.CPApp?.openBulkDialog?.(), 80);
-    }
+    if (handlers[btn.id]) setTimeout(handlers[btn.id], 80);
   });
+
+  syncFabActions();
+  if ("MutationObserver" in window) {
+    new MutationObserver(() => syncFabActions()).observe(document.body, {
+      attributes:true,
+      attributeFilter:["class"]
+    });
+  }
 
   onClick("vacPanelClose", () => { $("vacBack")?.click(); });
   onClick("vacPanelSave", () => { $("setVacationRange")?.click(); });
