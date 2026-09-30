@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.5.13</title>
+  <title>Czas pracy 4.5.14</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -6785,6 +6785,7 @@ dialog#dayDialog .dayCloseRow{
     document.body.classList.toggle("view-week", isWeek);
     document.body.classList.toggle("view-stats", isStats);
     document.body.classList.toggle("view-month", isMonth);
+    window.CPApp?.syncFabActions?.();
 
     document.querySelector(".calCard")?.classList.toggle("monthViewHidden", !isMonth);
     $("monthSummaryCard")?.classList.toggle("monthViewHidden", !isMonth);
@@ -7909,7 +7910,6 @@ dialog#dayDialog .dayCloseRow{
   }
 
   function openStatsPanel(mode = "month") {
-    window.CPApp?.closeFabMenu?.();
     const statsPage = $("statsPage");
     if (!statsPage) return;
 
@@ -9559,6 +9559,7 @@ dialog#dayDialog .dayCloseRow{
   let lockY = 0;
 
   function lockPageScroll(reason = "ui") {
+    if (lockReasons.has(reason)) return;
     lockReasons.add(reason);
     if (document.body.classList.contains("scroll-locked")) return;
 
@@ -9570,15 +9571,15 @@ dialog#dayDialog .dayCloseRow{
   }
 
   function unlockPageScroll(reason = "ui") {
-    lockReasons.delete(reason);
-    if (lockReasons.size) return;
+    if (!lockReasons.delete(reason) || lockReasons.size) return;
+    if (!document.body.classList.contains("scroll-locked")) return;
 
     document.documentElement.classList.remove("scroll-locked-root");
-    document.body.classList.remove("scroll-locked", "modal-open", "drawer-open", "fab-open");
+    document.body.classList.remove("scroll-locked");
 
     const y = lockY;
     document.body.style.top = "";
-    window.scrollTo(0, y);
+    if (window.scrollY !== y) window.scrollTo(0, y);
   }
 
   window.lockPageScroll = lockPageScroll;
@@ -9627,7 +9628,7 @@ dialog#dayDialog .dayCloseRow{
     return "month";
   }
 
-  function syncFabActions(options = {}) {
+  function syncFabActions() {
     const mainFab = $("mainFab");
     const fabActions = $("fabActions");
     const fabScrim = $("fabScrim");
@@ -9635,9 +9636,10 @@ dialog#dayDialog .dayCloseRow{
     if (!mainFab || !fabActions || !fabScrim || !fabContainer) return "month";
 
     const mode = getFabMode();
-    const prevMode = fabContainer.dataset.fabMode || "";
+    if (fabContainer.dataset.fabMode === mode) return mode;
+
+    closeFabMenu({ history:false, haptic:false });
     const isHiddenMode = mode === "hidden";
-    const modeChanged = !!prevMode && prevMode !== mode;
 
     fabContainer.dataset.fabMode = mode;
     fabContainer.hidden = isHiddenMode;
@@ -9647,16 +9649,6 @@ dialog#dayDialog .dayCloseRow{
     fabActions.querySelectorAll(".fabActionPill").forEach((btn) => {
       btn.hidden = btn.dataset.fabView !== mode;
     });
-
-    if (isHiddenMode || modeChanged || options.close) {
-      fabContainer.classList.remove("is-open");
-      mainFab.setAttribute("aria-expanded", "false");
-      fabActions.hidden = true;
-      fabScrim.hidden = true;
-      document.body.classList.remove("fab-open");
-      unlockPageScroll("fab");
-      window.CPApp?.closeOverlay?.("fab", { history:false });
-    }
 
     return mode;
   }
@@ -9668,8 +9660,9 @@ dialog#dayDialog .dayCloseRow{
     const fabContainer = $("fabContainer");
     if (!mainFab || !fabActions || !fabScrim || !fabContainer) return;
 
-    const mode = syncFabActions();
-    if (open && mode === "hidden") return;
+    if (open && syncFabActions() === "hidden") return;
+    if (fabContainer.classList.contains("is-open") === open) return;
+    if (!open && window.CPApp?.closeOverlay?.("fab", options)) return;
 
     fabContainer.classList.toggle("is-open", open);
     mainFab.setAttribute("aria-expanded", open ? "true" : "false");
@@ -9679,18 +9672,13 @@ dialog#dayDialog .dayCloseRow{
     if (open) lockPageScroll("fab");
     else unlockPageScroll("fab");
     if (open) window.CPApp?.openOverlay?.("fab");
-    else window.CPApp?.closeOverlay?.("fab", options);
   }
 
   function closeFabMenu(options = {}) {
     if (!options || options instanceof Event) options = {};
     const fabContainer = $("fabContainer");
-    if (!fabContainer?.classList.contains("is-open")) {
-      syncFabActions();
-      return;
-    }
+    if (!fabContainer?.classList.contains("is-open")) return;
     if (options.haptic !== false) haptic.close();
-    if (window.CPApp?.closeOverlay?.("fab", options)) return;
     setFabOpen(false, options);
   }
 
@@ -9701,11 +9689,12 @@ dialog#dayDialog .dayCloseRow{
 
   $("mainFab")?.addEventListener("click", () => {
     if (getFabMode() === "hidden") return;
-    const next = !$("fabContainer")?.classList.contains("is-open");
-    if (!next) haptic.close();
-    if (!next && window.CPApp?.closeOverlay?.("fab")) return;
-    setFabOpen(next);
-    if (next) haptic.open();
+    if ($("fabContainer")?.classList.contains("is-open")) {
+      closeFabMenu();
+    } else {
+      setFabOpen(true);
+      haptic.open();
+    }
   });
 
   $("fabScrim")?.addEventListener("click", () => { closeFabMenu(); });
@@ -9729,12 +9718,6 @@ dialog#dayDialog .dayCloseRow{
   });
 
   syncFabActions();
-  if ("MutationObserver" in window) {
-    new MutationObserver(() => syncFabActions()).observe(document.body, {
-      attributes:true,
-      attributeFilter:["class"]
-    });
-  }
 
   onClick("vacPanelClose", () => { $("vacBack")?.click(); });
   onClick("vacPanelSave", () => { $("setVacationRange")?.click(); });
