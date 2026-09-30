@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.5.19</title>
+  <title>Czas pracy 4.5.20</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -500,7 +500,6 @@ dialog::backdrop{
 .modalHeader{margin-bottom:22px}
 
 
-
 .fieldGrid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -509,32 +508,6 @@ dialog::backdrop{
     }
 
 .fieldGrid.single{grid-template-columns:1fr}
-
-.actionRow{
-      display:flex;
-      justify-content:flex-end;
-      align-items:center;
-      gap:10px;
-      margin-top:32px;
-      flex-wrap:wrap;
-    }
-
-.actionRow > *{flex:0 0 auto}
-
-#bulkApply{
-      background:var(--primary);
-      color:#fff;
-      min-height:52px;
-      font-size:16px;
-      padding:0 24px;
-    }
-
-#bulkRemove{
-      background:transparent;
-      color:var(--red);
-      box-shadow:none;
-      font-size:16px;
-    }
 
 .menu-item{
       width:100%;
@@ -1361,20 +1334,6 @@ dialog#mainMenuDialog.drawerDialog::backdrop{
   font-weight:650;
 }
 
-#bulkApply{
-  min-height:46px;
-  padding:0 20px;
-  font-size:15px;
-  border-radius:999px;
-}
-
-#bulkRemove{
-  min-height:42px;
-  padding:0 16px;
-  font-size:15px;
-  border-radius:999px;
-}
-
 body.modal-open,
 body.drawer-open{
   overflow:hidden;
@@ -1506,10 +1465,6 @@ dialog#mainMenuDialog.drawerDialog[open]{
 .settingsSoon{margin-top:12px;padding:11px 13px;border-radius:14px;background:#f6f8fb;border:1px solid #e2e6ed;color:#5f6368;font-size:13.5px;line-height:1.35}
 
 .templateChip{min-height:29px;height:29px;padding:0 9px;font-size:12px;font-weight:650}
-
-#bulkApply{min-height:46px;padding:0 20px;font-size:15px;border-radius:999px}
-
-#bulkRemove{min-height:42px;padding:0 16px;font-size:15px;border-radius:999px}
 
 html.scroll-locked-root,
 html.scroll-locked-root body{
@@ -1758,33 +1713,6 @@ dialog#mainMenuDialog.drawerDialog .drawerBack{
   padding-top:0;
 }
 
-.statsTabs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:4px;
-  padding:4px;
-  margin:0 0 12px;
-  border-radius:999px;
-  background:#edf1f7;
-}
-
-.statsTab{
-  min-height:40px;
-  padding:0 14px;
-  border-radius:999px;
-  background:transparent;
-  color:#3c4043;
-  box-shadow:none;
-  font-size:14px;
-  font-weight:650;
-}
-
-.statsTab.active{
-  background:#fff;
-  color:#174ea6;
-  box-shadow:0 1px 2px rgba(60,64,67,.12);
-}
-
 .statsView{
   display:none;
 }
@@ -1873,7 +1801,7 @@ dialog#mainMenuDialog.drawerDialog .drawerBack{
 
 .statSoftBox{
   min-width:0;
-  padding:11px 12px;
+  padding:10px 11px;
   border-radius:20px;
   background:#fff;
   border:1px solid #e4e8f1;
@@ -1881,7 +1809,7 @@ dialog#mainMenuDialog.drawerDialog .drawerBack{
 
 .statSoftBox strong{
   display:block;
-  font-size:21px;
+  font-size:19.5px;
   line-height:1.1;
   color:#202124;
   white-space:nowrap;
@@ -1907,274 +1835,6 @@ dialog#mainMenuDialog.drawerDialog .drawerBack{
 .statsActions button{
   min-height:40px;
   padding:0 16px;
-}
-
-.statsChartCard{
-  margin:0 0 18px;
-  padding:13px 12px 10px;
-  border-radius:22px;
-  background:#fff;
-  border:1px solid #e4e8f1;
-}
-
-.statsChartHead{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:4px;
-}
-
-.statsChartHead strong{
-  font-size:15px;
-  line-height:1.2;
-  color:#202124;
-}
-
-.statsChartHead span{
-  font-size:12.5px;
-  line-height:1.2;
-  color:#5f6368;
-}
-
-.statsChart{
-  display:block;
-  width:100%;
-  height:auto;
-  min-height:164px;
-}
-
-.statsChart .axis,
-.statsChart .gridLine{
-  stroke:#dfe3eb;
-  stroke-width:1;
-}
-
-.statsChart .bar{
-  fill:#4285f4;
-}
-
-.statsChart .barSoft{
-  fill:#d2e3fc;
-}
-
-.statsChart .label{
-  fill:#5f6368;
-  font-size:9px;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-}
-
-.statsChart .value{
-  fill:#202124;
-  font-size:8.5px;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  font-weight:650;
-}
-
-.statsTableWrap{
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  background:#fff;
-  border:1px solid #e4e8f1;
-  border-radius:22px;
-}
-
-.statsTable{
-  width:100%;
-  min-width:430px;
-  border-collapse:collapse;
-  font-size:13px;
-}
-
-.statsTable th,
-.statsTable td{
-  padding:9px 10px;
-  border-bottom:1px solid #eef1f6;
-  text-align:right;
-  white-space:nowrap;
-}
-
-.statsTable tr:last-child td{
-  border-bottom:none;
-}
-
-.statsTable th:first-child,
-.statsTable td:first-child{
-  text-align:left;
-}
-
-.statsTable th{
-  color:#5f6368;
-  font-weight:650;
-  background:#f8fafd;
-}
-
-.statsTable td{
-  color:#202124;
-  font-weight:520;
-}
-
-.statsPanel .modalHead{
-  padding-bottom:12px;
-}
-
-.statsPanel .modalBody{
-  padding-bottom:12px;
-}
-
-.statsChartHead{
-  align-items:center;
-}
-
-.statsChartHead span{
-  display:none;
-}
-
-.statsChartCard{
-  overflow:hidden;
-}
-
-.statsChartHead{
-  position:sticky;
-  left:0;
-  z-index:2;
-  background:#fff;
-  padding:0 2px 8px;
-}
-
-.statsChartScroll{
-  overflow-x:auto;
-  overflow-y:hidden;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior-x:contain;
-  scrollbar-width:none;
-  margin:0 -6px;
-  padding:0 6px 2px;
-}
-
-.statsChartScroll::-webkit-scrollbar{
-  display:none;
-}
-
-.statsChart{
-  display:block;
-  height:auto;
-  max-width:none;
-}
-
-.yearStatsGrid .statSoftBox{
-  padding:10px 11px;
-}
-
-.yearStatsGrid .statSoftBox strong{
-  font-size:20px;
-}
-
-.statsExportBlock{
-  margin:0 0 12px;
-}
-
-.statsSectionLabel{
-  margin:0 0 4px;
-  font-size:13px;
-  line-height:1.2;
-  font-weight:700;
-  color:#3c4043;
-}
-
-.statsSectionHint{
-  margin:0 0 9px;
-  font-size:12.5px;
-  line-height:1.32;
-  color:#5f6368;
-}
-
-.statsTableLabel{
-  margin-top:2px;
-}
-
-.chartModeToggle{
-  display:inline-flex;
-  align-items:center;
-  gap:3px;
-  padding:3px;
-  border-radius:999px;
-  background:#edf1f7;
-  flex:0 0 auto;
-}
-
-.chartModeToggle button{
-  min-height:30px;
-  height:30px;
-  padding:0 11px;
-  border-radius:999px;
-  background:transparent;
-  color:#3c4043;
-  box-shadow:none;
-  font-size:12.5px;
-  font-weight:700;
-}
-
-.chartModeToggle button.active{
-  background:#fff;
-  color:#174ea6;
-  box-shadow:0 1px 2px rgba(60,64,67,.12);
-}
-
-.statsChartHead{
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.statsChart .linePath{
-  fill:none;
-  stroke:#4285f4;
-  stroke-width:4;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-}
-
-.statsChart .lineDot{
-  fill:#4285f4;
-  stroke:#fff;
-  stroke-width:3;
-}
-
-.statsChart .lineArea{
-  fill:#d2e3fc;
-  opacity:.45;
-}
-
-.monthStatsGrid .statSoftBox,
-.yearStatsGrid .statSoftBox{
-  padding:10px 11px;
-}
-
-.monthStatsGrid .statSoftBox strong,
-.yearStatsGrid .statSoftBox strong{
-  font-size:19.5px;
-}
-
-.statsChart{
-  width:auto;
-  min-width:0;
-  min-height:0;
-}
-
-.statsChartCard{
-  margin-bottom:14px;
-}
-
-.statsChartScroll{
-  padding-bottom:0;
-}
-
-.statsSectionHint{
-  max-width:560px;
-}
-
-.statsTableWrap{
-  margin-top:8px;
 }
 
 @keyframes googlePanelIn{
@@ -2458,20 +2118,6 @@ button.shiftItem.googleEvent:focus-visible{
   outline-offset:2px;
 }
 
-.statsTable th{
-  background:#f8fafd;
-}
-
-.statsTable td,
-.statsTable th{
-  padding-top:10px;
-  padding-bottom:10px;
-}
-
-.statsChart [data-chart-date]{
-  cursor:pointer;
-}
-
 .dayViewPage{
   touch-action:pan-y;
 }
@@ -2703,14 +2349,6 @@ dialog#mainMenuDialog.drawerDialog .drawerItem{
   }
 .statSoftBox{
     border-radius:18px;
-  }
-.statsTable{
-    min-width:0;
-    font-size:12.5px;
-  }
-.statsTable th,
-  .statsTable td{
-    padding:8px 8px;
   }
 .dayViewPage{
     width:calc(100% - 16px);
@@ -3034,9 +2672,6 @@ body.view-stats{
 }
 
 
-
-
-
 /* Wspólny szkielet paneli roboczych: wpis zakresowy, formularz wydarzenia dnia i Urlop/L4 */
 .workPanel{
   top:var(--work-viewport-top, 0px);
@@ -3096,47 +2731,6 @@ body.view-stats{
   background:#eef1f6;
 }
 
-.panelCloseBtn{
-  width:42px;
-  height:42px;
-  min-height:42px;
-  padding:0;
-  border-radius:50%;
-  position:relative;
-  background:transparent;
-  color:#111318;
-  box-shadow:none;
-}
-
-.panelCloseBtn::before,
-.panelCloseBtn::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:22px;
-  height:2.4px;
-  border-radius:999px;
-  background:currentColor;
-  transform-origin:center;
-}
-
-.panelCloseBtn::before{transform:translate(-50%,-50%) rotate(45deg);}
-.panelCloseBtn::after{transform:translate(-50%,-50%) rotate(-45deg);}
-
-.panelSaveBtn{
-  min-width:132px;
-  height:46px;
-  min-height:46px;
-  padding:0 24px;
-  border-radius:999px;
-  background:#4285f4;
-  color:#fff;
-  box-shadow:0 2px 5px rgba(66,133,244,.18);
-  font-size:15px;
-  font-weight:800;
-}
-
 .formBackBtn{
   display:inline-flex;
   align-items:center;
@@ -3174,22 +2768,7 @@ dialog.entryPanel .workPanelBar h3{
   letter-spacing:-.035em;
 }
 
-dialog#bulkDialog .modalHead{
-  padding:22px 24px 16px;
-  background:#eef1f6;
-  border:0;
-}
 
-dialog#bulkDialog .modalHead h3{
-  margin:0;
-  font-size:clamp(27px,7.2vw,38px);
-  line-height:1.08;
-  font-weight:680;
-  letter-spacing:-.055em;
-  color:#111318;
-}
-
-dialog#bulkDialog .modalHead .muted,
 dialog#dayDialog .modalHead .muted{
   margin-top:0;
   font-size:clamp(15px,4vw,18px);
@@ -3202,8 +2781,6 @@ dialog#dayDialog .modalHead{
   background:#eef1f6;
   border:0;
 }
-
-dialog#bulkDialog .modalHead .muted{margin-top:8px;}
 
 dialog#bulkDialog .modalBody,
 dialog#dayDialog .modalBody,
@@ -3304,7 +2881,37 @@ dialog#vacDialog textarea{
 }
 
 /* Przełączniki trybu */
-dialog#bulkDialog .rangeModeTabs,
+dialog#bulkDialog .rangeModeTabs{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:0;
+  padding:0;
+  margin:0 0 22px;
+  border:1px solid var(--outline);
+  border-radius:999px;
+  overflow:hidden;
+  background:var(--surface);
+}
+
+dialog#bulkDialog .rangeModeTab{
+  min-width:0;
+  min-height:48px;
+  height:auto;
+  padding:10px 12px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:var(--text);
+  box-shadow:none;
+  font-size:14px;
+  line-height:1.25;
+  font-weight:650;
+}
+
+dialog#bulkDialog .rangeModeTab + .rangeModeTab{border-left:1px solid var(--outline);}
+dialog#bulkDialog .rangeModeTab.active{background:var(--primary-soft);color:var(--primary);}
+dialog#bulkDialog .rangeModeTab:focus-visible{outline:2px solid var(--primary);outline-offset:-4px;}
+
 dialog#vacDialog .rangeModeTabs,
 .statsPage .statsRangeTabs{
   display:grid;
@@ -3316,7 +2923,6 @@ dialog#vacDialog .rangeModeTabs,
   background:#edf1f7;
 }
 
-dialog#bulkDialog .rangeModeTab,
 dialog#vacDialog .rangeModeTab,
 .statsPage .statsRangeTabs .rangeModeTab{
   min-height:42px;
@@ -3330,7 +2936,6 @@ dialog#vacDialog .rangeModeTab,
   font-weight:760;
 }
 
-dialog#bulkDialog .rangeModeTab.active,
 dialog#vacDialog .rangeModeTab.active,
 .statsPage .statsRangeTabs .rangeModeTab.active{
   background:#fff;
@@ -3415,7 +3020,16 @@ dialog#vacDialog .checkRow input[type="checkbox"]{
   align-self:center;
 }
 
-dialog#bulkDialog .checkRow,
+dialog#bulkDialog .checkRow{
+  display:flex;
+  min-height:48px;
+  margin:0;
+  font-weight:500;
+  align-items:center;
+  gap:12px;
+  line-height:1.2;
+}
+
 dialog#vacDialog .checkRow{
   min-height:42px;
   align-items:center;
@@ -3429,33 +3043,6 @@ dialog#vacDialog .checkRow span{
   align-items:center;
   min-height:19px;
   line-height:1.2;
-}
-
-dialog#bulkDialog .actionRow{
-  margin-top:18px;
-  display:flex;
-  justify-content:flex-end;
-  gap:10px;
-  flex-wrap:wrap;
-  background:transparent;
-}
-
-
-dialog#bulkDialog #bulkApply{
-  display:none;
-}
-
-dialog#bulkDialog #bulkRemove{
-  min-height:42px;
-  height:42px;
-  padding:0 18px;
-  border-radius:999px;
-  background:#fff;
-  border:1px solid #f1c7c4;
-  color:#a50e0e;
-  box-shadow:0 1px 2px rgba(60,64,67,.04);
-  font-size:14px;
-  font-weight:760;
 }
 
 /* Formularz pojedynczego wydarzenia dnia */
@@ -3508,6 +3095,18 @@ dialog.entryPanel .formDelete{
 }
 
 dialog.entryPanel .formDelete:hover{background:#fce8e6;}
+
+/* Stopka formularza zbiorczego pozostaje poza przewijaną treścią. */
+dialog#bulkDialog .workPanelContent{padding-bottom:0;}
+
+dialog.entryPanel .bulkFormActions{
+  flex:0 0 auto;
+  gap:8px;
+  margin:0;
+  padding:12px 24px calc(12px + env(safe-area-inset-bottom));
+  background:var(--bg);
+  border-top:1px solid var(--outline);
+}
 
 .statsPage{
   width:100%;
@@ -3564,10 +3163,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   border-radius:var(--radius-list);
 }
 
-.statsPage .statsChartCard{
-  border-radius:var(--radius-hero);
-}
-
 .statsPage .statsActions{
   display:flex;
   flex-wrap:wrap;
@@ -3582,21 +3177,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   border-radius:999px;
 }
 
-.statsPage .statsTableWrap{
-  padding:0;
-  overflow-x:auto;
-}
-
-.statsPage .statsTable{
-  min-width:470px;
-}
-
-.statsPage .statsTable th,
-.statsPage .statsTable td{
-  padding:13px 16px;
-}
-
-
 
 @media (max-width:430px){
   .workPanelBar{
@@ -3604,12 +3184,14 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     padding-right:20px;
   }
 
-  dialog#bulkDialog .modalHead,
+  
   dialog#dayDialog .modalHead,
   dialog#vacDialog .modalHead{
     padding-left:20px;
     padding-right:20px;
   }
+
+  dialog.entryPanel .bulkFormActions{padding-left:20px;padding-right:20px;}
 
   dialog#bulkDialog .modalBody,
   dialog#dayDialog .modalBody,
@@ -3618,33 +3200,14 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     padding-right:20px;
   }
 
-  .panelSaveBtn{
-    min-width:122px;
-    height:44px;
-    min-height:44px;
-    padding:0 22px;
-  }
-
 
   .statsPage{
     padding-left:10px;
     padding-right:10px;
   }
-
-  
-  .statsPage .statsTable th,
-  .statsPage .statsTable td{
-    padding:12px 14px;
-  }
 }
 
-@media(max-width:370px){
-  dialog#bulkDialog .modalHead h3{
-    font-size:26px;
-  }
-
-
-}</style>
+</style>
 
 </head>
 
@@ -3790,7 +3353,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
               </svg>
             </div>
 
-            <div class="statsGrid monthStatsGrid">
+            <div class="statsGrid">
               <div class="statSoftBox"><strong id="monthStatsWorkDays">0</strong><span>Dni pracujące</span></div>
               <div class="statSoftBox"><strong id="monthStatsAbsences">0</strong><span>Nieobecności razem</span></div>
               <div class="statSoftBox"><strong id="monthStatsPaid">0 dni</strong><span>Urlop płatny</span></div>
@@ -3799,40 +3362,8 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
               <div class="statSoftBox"><strong id="monthStatsNotes">0</strong><span>Dni z notatką</span></div>
             </div>
 
-            <div class="statsExportBlock">
-              <div class="statsSectionLabel">Wyeksportuj statystyki</div>
-              <div class="statsActions">
-                <button class="tonal" id="monthStatsPdf" type="button">Raport PDF</button>
-                <button class="tonal" id="monthStatsCsv" type="button">Raport CSV</button>
-              </div>
-            </div>
-
-            <div class="statsChartCard surfaceCard">
-              <div class="statsChartHead">
-                <strong>Wykres godzin w miesiącu</strong>
-                <div class="chartModeToggle" aria-label="Typ wykresu miesiąca">
-                  <button class="active" id="monthChartBars" type="button">Słupkowy</button>
-                  <button id="monthChartLine" type="button">Liniowy</button>
-                </div>
-              </div>
-              <div class="statsChartScroll">
-                <svg id="monthStatsChart" class="statsChart monthStatsChart" viewBox="0 0 360 190" role="img" aria-label="Godziny w dniach miesiąca"></svg>
-              </div>
-            </div>
-
-            <div class="statsSectionLabel statsTableLabel">Podsumowanie miesiąca</div>
-            <div class="statsTableWrap surfaceCard">
-              <table class="statsTable">
-                <thead>
-                  <tr>
-                    <th>Dzień</th>
-                    <th>Godziny</th>
-                    <th>Status</th>
-                    <th>Notatka</th>
-                  </tr>
-                </thead>
-                <tbody id="monthStatsRows"></tbody>
-              </table>
+            <div class="statsActions">
+              <button class="tonal" id="monthStatsPdf" type="button">Raport PDF</button>
             </div>
           </section>
 
@@ -3854,7 +3385,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
               </svg>
             </div>
 
-            <div class="statsGrid yearStatsGrid">
+            <div class="statsGrid">
               <div class="statSoftBox"><strong id="yearStatsWorkDays">0</strong><span>Dni pracujące</span></div>
               <div class="statSoftBox"><strong id="yearStatsAbsences">0</strong><span>Nieobecności razem</span></div>
               <div class="statSoftBox"><strong id="yearStatsPaidUsed">0 dni</strong><span>Urlop wykorzystany</span></div>
@@ -3863,41 +3394,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
               <div class="statSoftBox"><strong id="yearStatsSick">0 dni</strong><span>Zwolnienie L4</span></div>
             </div>
 
-            <div class="statsExportBlock">
-              <div class="statsSectionLabel">Wyeksportuj statystyki</div>
-              <div class="statsActions">
-                <button class="tonal" id="yearStatsCsv" type="button">Raport CSV</button>
-              </div>
-            </div>
-
-            <div class="statsChartCard surfaceCard">
-              <div class="statsChartHead">
-                <strong>Wykres godzin w roku</strong>
-                <div class="chartModeToggle" aria-label="Typ wykresu roku">
-                  <button class="active" id="yearChartBars" type="button">Słupkowy</button>
-                  <button id="yearChartLine" type="button">Liniowy</button>
-                </div>
-              </div>
-              <div class="statsChartScroll">
-                <svg id="yearStatsChart" class="statsChart yearStatsChart" viewBox="0 0 360 190" role="img" aria-label="Suma godzin per miesiąc"></svg>
-              </div>
-            </div>
-
-            <div class="statsSectionLabel statsTableLabel">Podsumowanie roku</div>
-            <div class="statsTableWrap surfaceCard">
-              <table class="statsTable">
-                <thead>
-                  <tr>
-                    <th>Miesiąc</th>
-                    <th>Godziny</th>
-                    <th>Dni</th>
-                    <th>Urlop</th>
-                    <th>Zwolnienie L4</th>
-                  </tr>
-                </thead>
-                <tbody id="yearStatsRows"></tbody>
-              </table>
-            </div>
           </section>
         </div>
           </div>
@@ -4129,35 +3625,27 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     </div>
   </dialog>
 
-  <!-- MODAL GODZINY DLA ZAKRESU DNI -->
-  <dialog id="bulkDialog" class="googlePanel workPanel bulkPanel">
+  <!-- FORMULARZ WPISÓW ZBIORCZYCH -->
+  <dialog id="bulkDialog" class="googlePanel workPanel entryPanel bulkPanel" aria-labelledby="bulkTitle">
     <div class="googlePanelShell workPanelShell">
       <div class="googlePanelBar workPanelBar">
-        <button class="panelCloseBtn" id="bulkPanelClose" type="button" aria-label="Zamknij"></button>
-        <button class="panelSaveBtn" id="bulkPanelSave" type="button">Zapisz</button>
+        <button class="formBackBtn" id="bulkPanelClose" type="button" aria-label="Wstecz"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button>
+        <h3 id="bulkTitle">Wpisy zbiorcze</h3>
       </div>
       <div class="googlePanelContent workPanelContent">
-    <div class="modalHead">
-      <div class="modalHeadInner">
-        <h3 id="bulkTitle">Godziny dla zakresu dni</h3>
-        <div class="muted" id="bulkSubtitle">Ustaw te same godziny pracy dla wybranego zakresu dni.</div>
-      </div>
-    </div>
-
     <div class="modalBody">
-
-      <div class="rangeModeTabs" aria-label="Tryb zakresu dni">
+      <div class="rangeModeTabs" role="group" aria-label="Tryb zakresu dni">
         <button class="rangeModeTab active" id="bulkModeHours" type="button" aria-pressed="true">Godziny pracy</button>
         <button class="rangeModeTab" id="bulkModeLeave" type="button" aria-pressed="false">Urlop / L4</button>
       </div>
 
       <div class="fieldGrid">
         <div>
-          <label>Od</label>
+          <label for="bulkFrom">Od</label>
           <input id="bulkFrom" type="date" />
         </div>
         <div>
-          <label>Do</label>
+          <label for="bulkTo">Do</label>
           <input id="bulkTo" type="date" />
         </div>
       </div>
@@ -4165,11 +3653,11 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       <div class="bulkModePane" id="bulkHoursFields">
         <div class="fieldGrid">
           <div>
-            <label>Wejście</label>
+            <label for="bulkStart">Wejście</label>
             <input id="bulkStart" type="time" />
           </div>
           <div>
-            <label>Wyjście</label>
+            <label for="bulkEnd">Wyjście</label>
             <input id="bulkEnd" type="time" />
           </div>
         </div>
@@ -4182,7 +3670,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
       <div class="bulkModePane bulkLeaveFields" id="bulkLeaveFields" hidden>
         <div style="margin-bottom:16px;">
-          <label>Rodzaj absencji</label>
+          <label for="bulkLeaveType">Rodzaj absencji</label>
           <select id="bulkLeaveType">
             <option value="paid">Urlop płatny</option>
             <option value="unpaid">Urlop bezpłatny</option>
@@ -4191,8 +3679,8 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
         </div>
       </div>
 
-      <div class="bulkOptions">
-        <div class="bulkOptionsTitle">Uwzględnij</div>
+      <div class="bulkOptions" role="group" aria-labelledby="bulkOptionsTitle">
+        <div class="bulkOptionsTitle" id="bulkOptionsTitle">Uwzględnij</div>
         <label class="checkRow">
           <input id="bulkIncludeSat" type="checkbox" />
           <span>Soboty</span>
@@ -4208,14 +3696,14 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       </div>
 
       <div class="muted" style="margin-top:10px;">
-        Domyślnie pomijane są soboty, niedziele i święta. Opcje dotyczą zarówno dodawania, jak i usuwania godzin.
+        Opcje dotyczą dodawania i usuwania godzin oraz statusów. Początkowy wybór wynika z ustawień aplikacji.
       </div>
 
-      <div class="actionRow">
-        <button class="text" id="bulkRemove" type="button">Usuń godziny</button>
-        <button class="filled" id="bulkApply" type="button">Dodaj</button>
-      </div>
     </div>
+      </div>
+      <div class="entryFormActions bulkFormActions">
+        <button class="filled formPrimary" id="bulkApply" type="button">Dodaj godziny</button>
+        <button class="formDelete" id="bulkRemove" type="button">Usuń godziny</button>
       </div>
     </div>
   </dialog>
@@ -4268,9 +3756,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     </div>
   </dialog>
 
-
-
-  
 
   <dialog id="appConfirmDialog" class="appConfirmDialog">
     <div class="appConfirmCard">
@@ -5396,19 +4881,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     return new Intl.DateTimeFormat("pl-PL", { month: "short" }).format(dt).replace(".", "");
   }
 
-  function monthFullPL(monthYM) {
-    const [Y, M] = monthYM.split("-").map(Number);
-    const dt = new Date(Y, M - 1, 1);
-    return capFirst(new Intl.DateTimeFormat("pl-PL", { month: "long" }).format(dt));
-  }
-
-  function fmtDayMonthShortPL(dateISO) {
-    if (!dateISO) return "";
-    const [Y, M, D] = dateISO.split("-").map(Number);
-    const monthNames = ["stycznia","lutego","marca","kwietnia","maja","czerwca","lipca","sierpnia","września","października","listopada","grudnia"];
-    return `${fmtWeekdayPL(dateISO)}, ${D} ${monthNames[M - 1]}`;
-  }
-
   function renderMonthStrip(centerYM) {
     const box = $("monthStripScroller");
     if (!box) return;
@@ -6474,12 +5946,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     $("bulkHoursFields")?.toggleAttribute("hidden", isLeave);
     $("bulkLeaveFields")?.toggleAttribute("hidden", !isLeave);
 
-    if ($("bulkTitle")) $("bulkTitle").textContent = isLeave ? "Urlop / L4 dla zakresu dni" : "Godziny dla zakresu dni";
-    if ($("bulkSubtitle")) $("bulkSubtitle").textContent = isLeave
-      ? "Ustaw urlop lub L4 dla wybranego zakresu dni."
-      : "Ustaw te same godziny pracy dla wybranego zakresu dni.";
-
-    if ($("bulkApply")) $("bulkApply").textContent = isLeave ? "Zapisz" : "Dodaj";
+    if ($("bulkApply")) $("bulkApply").textContent = isLeave ? "Ustaw urlop / L4" : "Dodaj godziny";
     if ($("bulkRemove")) $("bulkRemove").textContent = isLeave ? "Usuń status" : "Usuń godziny";
   }
 
@@ -6520,7 +5987,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     openBulkDialog: openBulk
   });
 
-  // ===== RAPORTY / CSV / AKTUALIZACJA PLIKÓW =====
+  // ===== RAPORT PDF / AKTUALIZACJA PLIKÓW =====
   function escapeHtml(s) {
     return String(s ?? "")
       .replaceAll("&", "&amp;")
@@ -6939,8 +6406,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   let activeStatsMode = "month";
   let activeStatsMonth = "";
   let activeYearStatsYear = null;
-  let activeMonthChartType = "bar";
-  let activeYearChartType = "bar";
 
   function computeMonthStats(monthYM) {
     const entries = db.entries
@@ -6948,7 +6413,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       .sort((a, b) => a.date.localeCompare(b.date));
 
     const totals = { min:0, money:0, workDays:0, paid:0, unpaid:0, sick:0, notes:0 };
-    const days = [];
 
     for (const day of entries) {
       const min = computeDayMinutes(day);
@@ -6964,17 +6428,13 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       if (leaveType === "unpaid") totals.unpaid += 1;
       if (leaveType === "sick") totals.sick += 1;
 
-      if (min > 0 || leaveType || hasNote) {
-        days.push({ date:day.date, min, money, leaveType, note:day.note || "" });
-      }
     }
 
-    return { monthYM, totals, days };
+    return { monthYM, totals };
   }
 
   function computeYearStats(year) {
     const totals = { min:0, money:0, workDays:0, paid:0, unpaid:0, sick:0, notes:0 };
-    const months = [];
 
     for (let month = 1; month <= 12; month++) {
       const monthYM = `${year}-${pad2(month)}`;
@@ -6995,140 +6455,9 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       totals.unpaid += unpaid;
       totals.sick += sick;
 
-      months.push({ monthYM, min, money, workDays, notes, paid, unpaid, sick });
     }
 
-    return { year, totals, months };
-  }
-
-  function renderStatsChart(svgId, items, {
-    type = "bar",
-    labelFn,
-    valueFn,
-    titleFn,
-    showLabelFn = null,
-    chartWidth = 360,
-    barWidth = 26,
-    gapWidth = 16
-  }) {
-    const svg = $(svgId);
-    if (!svg) return;
-
-    const values = items.map(valueFn);
-    const maxMin = Math.max(60, ...values);
-    const chartTop = 22;
-    const chartBottom = 146;
-    const labelY = 176;
-    const chartHeight = chartBottom - chartTop;
-    const baseY = chartBottom;
-    const count = Math.max(1, items.length);
-    const sidePad = type === "line" ? 22 : 20;
-    const gap = type === "line" ? Math.max(24, gapWidth) : gapWidth;
-    const pointStep = type === "line" ? Math.max(38, barWidth + gap) : barWidth + gap;
-    const usedW = type === "line" ? pointStep * Math.max(0, count - 1) : (barWidth * count + gap * (count - 1));
-    chartWidth = Math.max(chartWidth, usedW + sidePad * 2);
-    const startX = sidePad;
-
-    const grid = [0.25, 0.5, 0.75, 1].map(fr => {
-      const y = Math.round(baseY - chartHeight * fr);
-      return `<line class="gridLine" x1="${sidePad - 10}" y1="${y}" x2="${chartWidth - sidePad + 10}" y2="${y}"></line>`;
-    }).join("");
-
-    const points = items.map((item, idx) => {
-      const min = valueFn(item);
-      const x = type === "line" ? startX + idx * pointStep : startX + idx * (barWidth + gap);
-      const h = Math.max(2, Math.round((min / maxMin) * chartHeight));
-      const y = baseY - h;
-      const hours = Math.round((min / 60) * 10) / 10;
-      const value = hours ? String(hours).replace(".", ",") : "";
-      const showLabel = showLabelFn ? showLabelFn(item, idx, count) : true;
-      const label = showLabel ? labelFn(item) : "";
-      return { item, idx, min, x, y, h, value, label };
-    });
-
-    let chartBody = "";
-
-    if (type === "line") {
-      const nonzero = points.filter(p => p.min > 0);
-      const lineD = nonzero.map((p, idx) => `${idx ? "L" : "M"} ${p.x} ${p.y}`).join(" ");
-      const areaD = nonzero.length
-        ? `${lineD} L ${nonzero[nonzero.length - 1].x} ${baseY} L ${nonzero[0].x} ${baseY} Z`
-        : "";
-
-      chartBody = `
-        ${areaD ? `<path class="lineArea" d="${areaD}"></path>` : ""}
-        ${lineD ? `<path class="linePath" d="${lineD}"></path>` : ""}
-        ${points.map(p => `
-          ${p.min > 0 ? `<circle class="lineDot" ${p.item.date ? `data-chart-date="${escapeHtml(p.item.date)}"` : ""} cx="${p.x}" cy="${p.y}" r="6"><title>${escapeHtml(titleFn(p.item))}</title></circle>` : ""}
-          <text class="value" x="${p.x}" y="${Math.max(13, p.y - 10)}" text-anchor="middle">${escapeHtml(p.value)}</text>
-          <text class="label" x="${p.x}" y="${labelY}" text-anchor="middle">${escapeHtml(p.label)}</text>
-        `).join("")}
-      `;
-    } else {
-      chartBody = points.map(p => {
-        const active = p.min > 0 ? "bar" : "barSoft";
-        return `
-          <rect class="${active}" ${p.item.date ? `data-chart-date="${escapeHtml(p.item.date)}"` : ""} x="${p.x}" y="${p.y}" width="${barWidth}" height="${p.h}" rx="8">
-            <title>${escapeHtml(titleFn(p.item))}</title>
-          </rect>
-          <text class="value" x="${p.x + barWidth / 2}" y="${Math.max(13, p.y - 7)}" text-anchor="middle">${escapeHtml(p.value)}</text>
-          <text class="label" x="${p.x + barWidth / 2}" y="${labelY}" text-anchor="middle">${escapeHtml(p.label)}</text>
-        `;
-      }).join("");
-    }
-
-    svg.setAttribute("viewBox", `0 0 ${chartWidth} 190`);
-    svg.setAttribute("width", String(chartWidth));
-    svg.setAttribute("height", "190");
-    svg.innerHTML = `
-      ${grid}
-      <line class="axis" x1="${sidePad - 10}" y1="${baseY}" x2="${chartWidth - sidePad + 10}" y2="${baseY}"></line>
-      ${chartBody}
-    `;
-  }
-
-  function renderMonthStatsChart(monthYM) {
-    const items = db.entries
-      .filter(e => e?.date && ym(e.date) === monthYM && computeDayMinutes(e) > 0)
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .map(e => {
-        const [, , d] = e.date.split("-").map(Number);
-        return { d, date:e.date, min:computeDayMinutes(e) };
-      });
-
-    if (!items.length) {
-      const svg = $("monthStatsChart");
-      if (svg) {
-        svg.setAttribute("viewBox", "0 0 360 190");
-        svg.setAttribute("width", "360");
-        svg.setAttribute("height", "190");
-        svg.innerHTML = `<text class="label" x="180" y="95" text-anchor="middle">Brak godzin pracy w tym miesiącu</text>`;
-      }
-      return;
-    }
-
-    renderStatsChart("monthStatsChart", items, {
-      type:activeMonthChartType,
-      labelFn:item => `${item.d} ${monthShortPL(monthYM)}`,
-      valueFn:item => item.min,
-      titleFn:item => `${item.date}: ${fmtHM(item.min)}`,
-      showLabelFn:() => true,
-      chartWidth:Math.max(300, Math.min(720, items.length * 42 + 44)),
-      barWidth:22,
-      gapWidth:18
-    });
-  }
-
-  function renderYearStatsChart(months) {
-    renderStatsChart("yearStatsChart", months, {
-      type:activeYearChartType,
-      labelFn:m => monthShortPL(m.monthYM),
-      valueFn:m => m.min,
-      titleFn:m => `${monthFullPL(m.monthYM)}: ${fmtHM(m.min)}`,
-      chartWidth:620,
-      barWidth:26,
-      gapWidth:22
-    });
+    return { year, totals };
   }
 
   function setStatsMode(mode) {
@@ -7137,7 +6466,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     $("statsTabYear")?.classList.toggle("active", activeStatsMode === "year");
     $("monthStatsView")?.classList.toggle("active", activeStatsMode === "month");
     $("yearStatsView")?.classList.toggle("active", activeStatsMode === "year");
-    updateChartModeButtons();
     renderStatsPanel();
     if (activeView === "stats") writeAppHistory("replace");
   }
@@ -7161,23 +6489,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     if ($("monthStatsSick")) $("monthStatsSick").textContent = `${data.totals.sick} dni`;
     if ($("monthStatsNotes")) $("monthStatsNotes").textContent = String(data.totals.notes);
 
-    renderMonthStatsChart(activeStatsMonth);
-
-    const rows = $("monthStatsRows");
-    if (rows) {
-      rows.innerHTML = data.days.length ? data.days.map(day => {
-        const status = day.leaveType ? leaveLabel(day.leaveType) : "—";
-        const note = day.note ? escapeHtml(day.note.length > 34 ? day.note.slice(0, 34) + "…" : day.note) : "—";
-        return `
-          <tr>
-            <td>${escapeHtml(fmtDayMonthShortPL(day.date))}</td>
-            <td>${escapeHtml(day.min ? fmtHM(day.min) : "—")}</td>
-            <td>${escapeHtml(status)}</td>
-            <td>${note}</td>
-          </tr>
-        `;
-      }).join("") : `<tr><td colspan="4">Brak danych w tym miesiącu.</td></tr>`;
-    }
   }
 
   function renderYearStats() {
@@ -7201,20 +6512,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     if ($("yearStatsUnpaid")) $("yearStatsUnpaid").textContent = `${data.totals.unpaid} dni`;
     if ($("yearStatsSick")) $("yearStatsSick").textContent = `${data.totals.sick} dni`;
 
-    renderYearStatsChart(data.months);
-
-    const rows = $("yearStatsRows");
-    if (rows) {
-      rows.innerHTML = data.months.map(m => `
-        <tr>
-          <td>${escapeHtml(monthFullPL(m.monthYM))}</td>
-          <td>${escapeHtml(fmtHM(m.min))}</td>
-          <td>${m.workDays}</td>
-          <td>${m.paid + m.unpaid}</td>
-          <td>${m.sick}</td>
-        </tr>
-      `).join("");
-    }
   }
 
   function renderStatsPanel() {
@@ -7245,15 +6542,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     openStatsPanel
   });
 
-  function csvCell(value) {
-    const s = String(value ?? "").replace(/"/g, '""');
-    return `"${s}"`;
-  }
-
-  function csvNumber(value) {
-    return String(value ?? 0).replace(".", ",");
-  }
-
   function downloadFile(filename, content, mime = "text/plain;charset=utf-8", options = {}) {
     const text = options.bom === false ? content : "\ufeff" + content;
     const blob = new Blob([text], { type:mime });
@@ -7276,92 +6564,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   function markExportDone(message) {
     setStatus(message);
     haptic.success();
-  }
-
-  function buildMonthCsv(monthYM) {
-    const rows = [[
-      "Data", "Dzień tygodnia", "Status", "Wejście", "Wyjście", "Czas", "Godziny dziesiętnie", "Wypłata", "Notatka"
-    ]];
-
-    const entries = db.entries
-      .filter(e => e?.date && ym(e.date) === monthYM)
-      .sort((a, b) => a.date.localeCompare(b.date));
-
-    for (const day of entries) {
-      const status = day.leaveType ? leaveLabel(day.leaveType) : "";
-      const note = day.note || "";
-      const shifts = (day.shifts || []).length ? day.shifts : [null];
-
-      for (const shift of shifts) {
-        const mins = shift ? Math.max(0, minutesBetween(day.date, shift.start, shift.end)) : 0;
-        const pay = round2((mins / 60) * (db.settings.rate || 0));
-        rows.push([
-          day.date,
-          capFirst(fmtWeekdayLongPL(day.date)),
-          status,
-          shift?.start || "",
-          shift?.end || "",
-          mins ? fmtHM(mins) : "",
-          mins ? csvNumber(round2(mins / 60)) : "",
-          mins ? csvNumber(pay) : "",
-          note
-        ]);
-      }
-    }
-
-    return rows.map(row => row.map(csvCell).join(";")).join("\n");
-  }
-
-  function buildYearCsv(year) {
-    const data = computeYearStats(year);
-    const rows = [[
-      "Miesiąc", "Godziny", "Godziny dziesiętnie", "Wypłata", "Dni pracujące", "Urlop płatny", "Urlop bezpłatny", "Zwolnienie L4", "Notatki"
-    ]];
-
-    for (const m of data.months) {
-      rows.push([
-        monthShortPL(m.monthYM),
-        fmtHM(m.min),
-        csvNumber(round2(m.min / 60)),
-        csvNumber(m.money),
-        m.workDays,
-        m.paid,
-        m.unpaid,
-        m.sick,
-        m.notes
-      ]);
-    }
-
-    rows.push([
-      "Razem",
-      fmtHM(data.totals.min),
-      csvNumber(round2(data.totals.min / 60)),
-      csvNumber(data.totals.money),
-      data.totals.workDays,
-      data.totals.paid,
-      data.totals.unpaid,
-      data.totals.sick,
-      data.totals.notes
-    ]);
-
-    return rows.map(row => row.map(csvCell).join(";")).join("\n");
-  }
-
-  function exportMonthCsv(monthOverride = "") {
-    haptic.tap();
-    const monthPick = $("monthPick");
-    const monthYM = monthOverride || activeStatsMonth || ((monthPick && monthPick.value) ? monthPick.value : ym(todayISO()));
-    downloadTextFile(`czas-pracy_${monthYM}.csv`, buildMonthCsv(monthYM), "text/csv;charset=utf-8");
-    markExportDone("Wyeksportowano CSV miesiąca.");
-  }
-
-  function exportYearCsv(yearOverride = 0) {
-    haptic.tap();
-    const monthPick = $("monthPick");
-    const monthYM = (monthPick && monthPick.value) ? monthPick.value : ym(todayISO());
-    const year = yearOverride || activeYearStatsYear || yearFromMonthYM(monthYM);
-    downloadTextFile(`czas-pracy_${year}_podsumowanie.csv`, buildYearCsv(year), "text/csv;charset=utf-8");
-    markExportDone("Wyeksportowano CSV roku.");
   }
 
   async function forceRefreshAppFiles() {
@@ -7904,7 +7106,12 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
   const bulkRemoveBtn = $("bulkRemove");
   if (bulkRemoveBtn) {
-    bulkRemoveBtn.onclick = () => {
+    bulkRemoveBtn.onclick = async () => {
+      const isLeave = bulkMode === "leave";
+      const message = isLeave
+        ? "Usunąć status w wybranym zakresie dat?"
+        : "Usunąć wskazany zakres godzin w wybranych dniach?";
+      if (!(await askConfirm(message, isLeave ? "Usuń status" : "Usuń godziny"))) return;
       const from = $("bulkFrom")?.value;
       const to = $("bulkTo")?.value;
       const opts = {
@@ -7940,24 +7147,8 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   const checkUpdateBtn = $("checkUpdateBtn");
   if (checkUpdateBtn) checkUpdateBtn.onclick = checkForAppUpdate;
 
-  function updateChartModeButtons() {
-    $("monthChartBars")?.classList.toggle("active", activeMonthChartType === "bar");
-    $("monthChartLine")?.classList.toggle("active", activeMonthChartType === "line");
-    $("yearChartBars")?.classList.toggle("active", activeYearChartType === "bar");
-    $("yearChartLine")?.classList.toggle("active", activeYearChartType === "line");
-  }
-
   // ===== STATS EVENTS =====
   function handleStatsPageClick(e) {
-    const chartTarget = e.target.closest?.("[data-chart-date]");
-    if (chartTarget) {
-      const date = chartTarget.getAttribute("data-chart-date");
-      if (date) {
-        setActiveView("day", date);
-      }
-      return;
-    }
-
     const btn = e.target.closest?.("button");
     if (!btn) return;
 
@@ -7969,30 +7160,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       case "statsTabYear":
         haptic.tap();
         setStatsMode("year");
-        break;
-      case "monthChartBars":
-        activeMonthChartType = "bar";
-        haptic.tap();
-        updateChartModeButtons();
-        renderMonthStats();
-        break;
-      case "monthChartLine":
-        activeMonthChartType = "line";
-        haptic.tap();
-        updateChartModeButtons();
-        renderMonthStats();
-        break;
-      case "yearChartBars":
-        activeYearChartType = "bar";
-        haptic.tap();
-        updateChartModeButtons();
-        renderYearStats();
-        break;
-      case "yearChartLine":
-        activeYearChartType = "line";
-        haptic.tap();
-        updateChartModeButtons();
-        renderYearStats();
         break;
       case "monthStatsPrev":
         activeStatsMonth = addMonths(activeStatsMonth || $("monthPick")?.value || ym(todayISO()), -1);
@@ -8009,9 +7176,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       case "monthStatsPdf":
         openReportPdf(activeStatsMonth);
         break;
-      case "monthStatsCsv":
-        exportMonthCsv(activeStatsMonth);
-        break;
       case "yearStatsPrev":
         activeYearStatsYear = (activeYearStatsYear || yearFromMonthYM($("monthPick")?.value || ym(todayISO()))) - 1;
         haptic.tap();
@@ -8023,9 +7187,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
         haptic.tap();
         renderStatsPanel();
         writeAppHistory("replace");
-        break;
-      case "yearStatsCsv":
-        exportYearCsv(activeYearStatsYear);
         break;
     }
   }
@@ -8736,7 +7897,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
   syncFabActions();
 
-  onClick("bulkPanelSave", () => { $("bulkApply")?.click(); });
   onClick("dayPanelClose", () => { window.CPApp?.closeDayForm?.(); });
 
 
