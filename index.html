@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.5.16</title>
+  <title>Czas pracy 4.5.17</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -309,11 +309,6 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{
       transform:scale(.997);
     }
 
-.bottomActions{
-      display:flex;
-      justify-content:flex-end;
-      gap:10px;
-    }
 
 .monthSelector{
       display:flex;
@@ -501,20 +496,7 @@ dialog::backdrop{
 
 .modalHeader{margin-bottom:22px}
 
-.backBtn{
-      min-height:40px;
-      height:40px;
-      padding:0 12px;
-      border-radius:var(--radius-pill);
-      background:transparent;
-      color:var(--primary);
-      box-shadow:none;
-      font-size:16px;
-    }
 
-.backBtn svg{display:none}
-
-.backBtn::after{content:"Anuluj"}
 
 .fieldGrid{
       display:grid;
@@ -536,7 +518,7 @@ dialog::backdrop{
 
 .actionRow > *{flex:0 0 auto}
 
-#setVacationRange,#bulkApply,#dlgAddShift{
+#bulkApply{
       background:var(--primary);
       color:#fff;
       min-height:52px;
@@ -544,7 +526,7 @@ dialog::backdrop{
       padding:0 24px;
     }
 
-#clearVacationRange,#bulkRemove{
+#bulkRemove{
       background:transparent;
       color:var(--red);
       box-shadow:none;
@@ -808,10 +790,15 @@ dialog:focus-visible{
   width:20px;
   height:20px;
   flex:0 0 20px;
-  fill:currentColor;
+  fill:none;
   color:#176b3a;
   margin-right:4px;
 }
+
+.shiftItem.googleEvent.noteEvent .eventEditIcon{color:#8d6500;}
+.shiftItem.googleEvent.leaveEvent.vac .eventEditIcon{color:#174ea6;}
+.shiftItem.googleEvent.leaveEvent.unpaid .eventEditIcon{color:#6741a5;}
+.shiftItem.googleEvent.leaveEvent.sick .eventEditIcon{color:#a50e0e;}
 
 .shiftItem.googleEvent.workEvent .eventStripe{
   background:#34a853;
@@ -1428,18 +1415,14 @@ dialog#mainMenuDialog.drawerDialog::backdrop{
   font-weight:650;
 }
 
-#bulkApply,
-#setVacationRange,
-#dlgAddShift{
+#bulkApply{
   min-height:46px;
   padding:0 20px;
   font-size:15px;
   border-radius:999px;
 }
 
-#bulkRemove,
-#clearVacationRange,
-.backBtn{
+#bulkRemove{
   min-height:42px;
   padding:0 16px;
   font-size:15px;
@@ -1578,9 +1561,9 @@ dialog#mainMenuDialog.drawerDialog[open]{
 
 .templateChip{min-height:29px;height:29px;padding:0 9px;font-size:12px;font-weight:650}
 
-#bulkApply,#setVacationRange,#dlgAddShift{min-height:46px;padding:0 20px;font-size:15px;border-radius:999px}
+#bulkApply{min-height:46px;padding:0 20px;font-size:15px;border-radius:999px}
 
-#bulkRemove,#clearVacationRange,.backBtn{min-height:42px;padding:0 16px;font-size:15px;border-radius:999px}
+#bulkRemove{min-height:42px;padding:0 16px;font-size:15px;border-radius:999px}
 
 html.scroll-locked-root,
 html.scroll-locked-root body{
@@ -2700,7 +2683,10 @@ body,
 
 .appHeader.navTopBar{
   background:#eef1f6;
+  padding-top:calc(12px + env(safe-area-inset-top));
 }
+
+.appHeader [hidden]{display:none;}
 
 .monthStrip{
   background:#eef1f6;
@@ -3160,10 +3146,6 @@ body.view-stats .fab-container{
   display:none;
 }
 
-body.view-stats .appHeader,
-body.view-stats .monthStrip{
-  display:none;
-}
 
 @media (max-width:430px){
   .fab-container.fabGoogle{
@@ -3221,49 +3203,18 @@ body.view-stats{
   gap:8px;
 }
 
-.dayViewBottomActions,
-.statsBottomActions{
-  padding:16px 0 0;
-}
 
-.dayViewBottomActions button,
-.statsCloseBottom{
-  width:auto;
-  min-width:136px;
-  min-height:46px;
-  height:46px;
-  padding:0 24px;
-  border-radius:999px;
-  background:#1a73e8;
-  color:#fff;
-  border:none;
-  box-shadow:0 2px 5px rgba(26,115,232,.18);
-  font-size:15px;
-  font-weight:800;
-  flex:0 0 auto;
-}
 
-#dayViewPage .dayViewTop{
-  flex-direction:column;
-}
 
-.dayReturnBar{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  width:100%;
-  margin-bottom:8px;
-  color:var(--text);
-  font-size:18px;
-  font-weight:650;
-}
 
 /* Wspólny szkielet paneli roboczych: wpis zakresowy, formularz wydarzenia dnia i Urlop/L4 */
 .workPanel{
-  width:100vw;
+  top:var(--work-viewport-top, 0px);
+  bottom:auto;
+  width:100%;
   max-width:100vw;
-  height:100dvh;
-  max-height:100dvh;
+  height:var(--work-viewport-height, 100dvh);
+  max-height:var(--work-viewport-height, 100dvh);
   margin:0;
   padding:0;
   border:0;
@@ -3271,10 +3222,13 @@ body.view-stats{
   overflow:hidden;
   background:#eef1f6;
   color:#202124;
+  box-shadow:none;
 }
 
 .workPanel::backdrop{
   background:#eef1f6;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
 }
 
 .workPanelShell{
@@ -3287,6 +3241,7 @@ body.view-stats{
 }
 
 .workPanelBar{
+  flex-shrink:0;
   position:sticky;
   top:0;
   z-index:5;
@@ -3300,6 +3255,7 @@ body.view-stats{
 }
 
 .workPanelContent{
+  touch-action:pan-y;
   flex:1 1 auto;
   min-height:0;
   overflow-x:hidden;
@@ -3370,22 +3326,31 @@ body.view-stats{
 .formBackBtn:hover{background:var(--primary-soft);}
 .formBackBtn:focus-visible{outline:3px solid #8ab4f8;outline-offset:2px;}
 
-dialog.entryPanel{
-  height:var(--entry-viewport-height, 100dvh);
-  max-height:var(--entry-viewport-height, 100dvh);
+dialog.entryPanel .workPanelBar{
+  flex:0 0 auto;
+  min-height:calc(64px + env(safe-area-inset-top));
+  padding:calc(8px + env(safe-area-inset-top)) 16px 8px;
+  justify-content:flex-start;
+  gap:12px;
+  border:0;
 }
 
-dialog#bulkDialog .modalHead,
-dialog#dayDialog .modalHead,
-dialog#vacDialog .modalHead{
+dialog.entryPanel .workPanelBar h3{
+  margin:0;
+  min-width:0;
+  font-size:clamp(20px, 5.5vw, 24px);
+  line-height:1.2;
+  font-weight:650;
+  letter-spacing:-.035em;
+}
+
+dialog#bulkDialog .modalHead{
   padding:22px 24px 16px;
   background:#eef1f6;
   border:0;
 }
 
-dialog#bulkDialog .modalHead h3,
-dialog#dayDialog .modalHead h3,
-dialog#vacDialog .modalHead h3{
+dialog#bulkDialog .modalHead h3{
   margin:0;
   font-size:clamp(27px,7.2vw,38px);
   line-height:1.08;
@@ -3395,13 +3360,20 @@ dialog#vacDialog .modalHead h3{
 }
 
 dialog#bulkDialog .modalHead .muted,
-dialog#dayDialog .modalHead .muted,
-dialog#vacDialog .modalHead .muted{
-  margin-top:8px;
+dialog#dayDialog .modalHead .muted{
+  margin-top:0;
   font-size:clamp(15px,4vw,18px);
   line-height:1.35;
   color:#5f6368;
 }
+
+dialog#dayDialog .modalHead{
+  padding:0 24px 16px;
+  background:#eef1f6;
+  border:0;
+}
+
+dialog#bulkDialog .modalHead .muted{margin-top:8px;}
 
 dialog#bulkDialog .modalBody,
 dialog#dayDialog .modalBody,
@@ -3411,6 +3383,8 @@ dialog#vacDialog .modalBody{
   padding:0 24px 24px;
   background:#eef1f6;
 }
+
+dialog#vacDialog .modalBody{padding-top:12px;}
 
 dialog#bulkDialog label,
 dialog#dayDialog label,
@@ -3636,9 +3610,6 @@ dialog#bulkDialog .actionRow{
   background:transparent;
 }
 
-dialog#bulkDialog .actionRow .backBtn{
-  display:none;
-}
 
 dialog#bulkDialog #bulkApply{
   display:none;
@@ -3694,7 +3665,6 @@ dialog.entryPanel .entryFormActions button{
 }
 
 dialog.entryPanel .formPrimary{
-  order:-1;
   background:var(--primary);
   color:#fff;
   box-shadow:0 2px 5px rgba(26,115,232,.18);
@@ -3736,14 +3706,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   padding:4px 4px 14px;
 }
 
-.statsFullHeader h2{
-  margin:0;
-  font-size:28px;
-  line-height:1.06;
-  font-weight:680;
-  letter-spacing:-.04em;
-  color:#111318;
-}
 
 .statsFullHeader p{
   margin:7px 0 0;
@@ -3755,10 +3717,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 .statsPageContent{
   flex:1 1 auto;
   min-height:0;
-}
-
-.statsPageContent .modalHead{
-  display:none;
 }
 
 .statsPageContent .modalBody{
@@ -3809,27 +3767,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   padding:13px 16px;
 }
 
-.statsBottomActions{
-  display:flex;
-  justify-content:flex-end;
-  padding:16px 0 0;
-  margin-top:auto;
-}
 
-.statsCloseBottom{
-  width:auto;
-  min-width:136px;
-  min-height:46px;
-  height:46px;
-  padding:0 24px;
-  border-radius:999px;
-  background:#1a73e8;
-  color:#fff;
-  border:none;
-  box-shadow:0 2px 5px rgba(26,115,232,.18);
-  font-size:15px;
-  font-weight:800;
-}
 
 @media (max-width:430px){
   .workPanelBar{
@@ -3858,23 +3796,13 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     padding:0 22px;
   }
 
-  .dayViewBottomActions button,
-  .statsCloseBottom{
-    min-width:132px;
-    height:44px;
-    min-height:44px;
-    padding:0 22px;
-  }
 
   .statsPage{
     padding-left:10px;
     padding-right:10px;
   }
 
-  .statsFullHeader h2{
-    font-size:27px;
-  }
-
+  
   .statsPage .statsTable th,
   .statsPage .statsTable td{
     padding:12px 14px;
@@ -3882,21 +3810,11 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 }
 
 @media(max-width:370px){
-  dialog#bulkDialog .modalHead h3,
-  dialog#dayDialog .modalHead h3,
-  dialog#vacDialog .modalHead h3{
+  dialog#bulkDialog .modalHead h3{
     font-size:26px;
   }
 
-  .dayViewBottomActions button,
-  .statsCloseBottom{
-    padding:0 12px;
-    font-size:13px;
-  }
 
-  .statsFullHeader h2{
-    font-size:25px;
-  }
 }</style>
 
 </head>
@@ -3907,7 +3825,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     <header class="appHeader navTopBar">
       <div class="appLeft navLeft">
         <button class="hamburger" id="mainMenuBtn" type="button" aria-label="Menu">
-          <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2Zm0-5h18v-2H3v2Zm0-7v2h18V6H3Z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18h18v-2H3v2Zm0-5h18v-2H3v2Zm0-7v2h18V6H3Z"/></svg>
         </button>
 
         <button class="monthNavButton" id="monthNavToggle" type="button" aria-expanded="false" aria-controls="monthStrip">
@@ -3915,6 +3833,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
           <svg class="monthNavArrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 10l5 5 5-5z"/></svg>
         </button>
 
+        <h1 id="appViewTitle" hidden></h1>
         <input id="monthPick" type="month" aria-label="Wybierz miesiąc" />
       </div>
 
@@ -3971,7 +3890,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
     <section class="dayViewPage monthViewHidden" id="dayViewPage" aria-label="Widok dnia">
       <div class="dayViewTop">
-        <div class="dayReturnBar"><button class="formBackBtn" id="dayViewBack" type="button" aria-label="Wstecz do poprzedniego widoku"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button><span>Dzień</span></div>
         <div class="dayViewNav">
           <button class="tonal" id="dayViewPrev" type="button" aria-label="Poprzedni dzień">‹</button>
           <div class="dayViewDateBlock">
@@ -4041,9 +3959,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
       <div class="weekViewList" id="weekViewList"></div>
 
-      <div class="dayViewBottomActions bottomActions">
-        <button class="tonal" id="weekViewBackToMonth" type="button">Wróć</button>
-      </div>
         </div>
       </div>
     </section>
@@ -4053,18 +3968,10 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       <div class="statsPageShell">
         <article class="statsFullCard">
           <header class="statsFullHeader">
-            <h2>Statystyki</h2>
             <p>Podsumowanie godzin, wypłat i nieobecności.</p>
           </header>
 
           <div class="statsPageContent">
-<div class="modalHead">
-          <div class="modalHeadInner">
-            <h3 id="statsTitle">Statystyki</h3>
-            <div class="muted" id="statsSubtitle">Podsumowanie godzin, wypłat i nieobecności.</div>
-          </div>
-        </div>
-
         <div class="modalBody statsBody">
           <div class="rangeModeTabs statsRangeTabs" role="tablist" aria-label="Zakres statystyk">
             <button class="rangeModeTab active" id="statsTabMonth" type="button">Miesiąc</button>
@@ -4201,9 +4108,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
         </div>
           </div>
 
-          <div class="statsBottomActions bottomActions">
-            <button class="filled statsCloseBottom" id="statsPageClose" type="button">Wróć</button>
-          </div>
         </article>
       </div>
     </section>
@@ -4400,13 +4304,9 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     <div class="googlePanelShell workPanelShell">
       <div class="googlePanelBar workPanelBar">
         <button class="formBackBtn" id="vacPanelClose" type="button" aria-label="Wstecz"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button>
-      </div>
-      <div class="googlePanelContent workPanelContent">
-    <div class="modalHead">
-      <div class="modalHeadInner">
         <h3 id="vacDialogTitle">Dodaj urlop / L4</h3>
       </div>
-    </div>
+      <div class="googlePanelContent workPanelContent">
 
     <div class="modalBody">
       <div style="margin-bottom:16px;">
@@ -4450,8 +4350,8 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       </div>
 
       <div class="entryFormActions">
-        <button class="formDelete" id="clearVacationRange" type="button">Usuń status</button>
         <button class="filled formPrimary" id="setVacationRange" type="button">Zapisz</button>
+        <button class="formDelete" id="clearVacationRange" type="button">Usuń status</button>
       </div>
     </div>
       </div>
@@ -4541,7 +4441,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       </div>
 
       <div class="actionRow">
-        <button class="backBtn" id="bulkBack" aria-label="Zamknij" type="button"></button>
         <button class="text" id="bulkRemove" type="button">Usuń godziny</button>
         <button class="filled" id="bulkApply" type="button">Dodaj</button>
       </div>
@@ -4555,12 +4454,13 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     <div class="googlePanelShell workPanelShell">
       <div class="googlePanelBar workPanelBar">
         <button class="formBackBtn" id="dayPanelClose" type="button" aria-label="Wstecz"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button>
+        <h3 id="dlgTitle">Dodaj godziny</h3>
       </div>
       <div class="googlePanelContent workPanelContent">
 
     <div class="modalHead">
       <div class="modalHeadInner">
-        <h3 id="dlgTitle">Dodaj godziny</h3>
+        
         <div class="muted" id="dlgMeta"></div>
       </div>
     </div>
@@ -4579,8 +4479,8 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
         </div>
 
         <div class="entryFormActions">
-          <button id="dlgDeleteShift" type="button" class="formDelete" hidden>Usuń wpis</button>
           <button id="dlgAddShift" type="button" class="filled formPrimary">Dodaj godziny</button>
+          <button id="dlgDeleteShift" type="button" class="formDelete" hidden>Usuń wpis</button>
         </div>
       </div>
 
@@ -6075,12 +5975,10 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     const note = String(value || "").trim();
     const existing = getDay(dateISO);
     if ((!existing && !note) || (existing?.note || "") === note) return true;
-    const previousNote = existing?.note || "";
-    const day = existing || { date:dateISO, note:"", shifts:[], vacation:false, leaveType:"" };
-    day.note = note;
+    const day = { ...(existing || { date:dateISO, shifts:[], vacation:false, leaveType:"" }), note };
     upsertDay(dateISO, day);
     if (!save()) {
-      if (existing) existing.note = previousNote;
+      if (existing) db.entries[db.entries.findIndex(entry => entry.date === dateISO)] = existing;
       else db.entries = db.entries.filter(entry => entry.date !== dateISO);
       return false;
     }
@@ -6137,7 +6035,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     else if (dlg) dlg.setAttribute("open", "");
     if (window.lockPageScroll) window.lockPageScroll("modal"); else document.body.classList.add("modal-open");
     openOverlay("dayDialog");
-    setTimeout(() => { if (dlg?.open && dlgDate === targetDate) (isNote ? $("dlgNote") : $("dlgStart"))?.focus(); }, 80);
+    setTimeout(() => { if (dlg?.open && dlgDate === targetDate) (isNote ? $("dlgNote") : $("dlgStart"))?.focus({ preventScroll:true }); }, 80);
   }
 
   function openDayAddForm(dateISO = activeDayISO) {
@@ -6164,7 +6062,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
         okText:"Odrzuć zmiany"
       });
       noteClosePending = false;
-      if (!discard) { $("dlgNote")?.focus(); return false; }
+      if (!discard) { $("dlgNote")?.focus({ preventScroll:true }); return false; }
       $("dlgNote").value = originalNote;
     }
     if (options.haptic !== false) haptic.close();
@@ -6269,6 +6167,8 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
 
   // ===== WIDOK DNIA =====
+  const eventEditIcon = '<svg class="eventEditIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m16 3 5 5M3 21l5-1L21 7a2.12 2.12 0 0 0-4-4L4 16l-1 5Z"/></svg>';
+
   function buildDayEventsHTML(dateISO) {
     const day = getDay(dateISO) || { date: dateISO, note: "", shifts: [], vacation: false, leaveType:"" };
     const events = [];
@@ -6298,6 +6198,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
             <div class="times">${escapeHtml(leaveLabel(leaveType))}</div>
             <div class="mins">Cały dzień</div>
           </div>
+          ${eventEditIcon}
         </button>
       `);
     }
@@ -6315,7 +6216,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
             <div class="times">${escapeHtml(s.start || "—")} – ${escapeHtml(s.end || "—")}</div>
             <div class="mins">${m ? (fmtHM(m) + " godz.") : "-"}</div>
           </div>
-          <svg class="eventEditIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.04a1 1 0 0 0 0-1.42l-2.5-2.5a1 1 0 0 0-1.42 0l-1.96 1.96 3.75 3.75 2.13-1.79Z"/></svg>
+          ${eventEditIcon}
         </button>
       `);
     });
@@ -6329,6 +6230,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
             <div class="times">Notatka</div>
             <div class="mins">${escapeHtml(note)}</div>
           </div>
+          ${eventEditIcon}
         </button>
       `);
     }
@@ -6459,13 +6361,23 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     document.body.classList.toggle("view-stats", isStats);
     document.body.classList.toggle("view-month", isMonth);
     window.CPApp?.syncFabActions?.();
+    const navButton = $("mainMenuBtn");
+    navButton?.setAttribute("aria-label", isMonth ? "Menu" : "Wstecz do poprzedniego widoku");
+    navButton?.querySelector("path")?.setAttribute("d", isMonth
+      ? "M3 18h18v-2H3v2Zm0-5h18v-2H3v2Zm0-7v2h18V6H3Z"
+      : "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z");
+    $("monthNavToggle").hidden = !isMonth;
+    $("monthPick").disabled = !isMonth;
+    $("appViewTitle").hidden = isMonth;
+    $("appViewTitle").textContent = isDay ? "Dzień" : isWeek ? "Tydzień" : isStats ? "Statystyki" : "";
+    document.querySelector(".topActions").hidden = !isMonth;
 
     document.querySelector(".calCard")?.classList.toggle("monthViewHidden", !isMonth);
     $("monthSummaryCard")?.classList.toggle("monthViewHidden", !isMonth);
     $("dayViewPage")?.classList.toggle("monthViewHidden", !isDay);
     $("weekViewPage")?.classList.toggle("monthViewHidden", !isWeek);
     $("statsPage")?.classList.toggle("monthViewHidden", !isStats);
-    $("monthStrip")?.toggleAttribute("hidden", !document.body.classList.contains("month-strip-open"));
+    $("monthStrip")?.toggleAttribute("hidden", !isMonth || !document.body.classList.contains("month-strip-open"));
 
     $("drawerMonthView")?.classList.toggle("active", isMonth);
     $("drawerDayView")?.classList.toggle("active", isDay);
@@ -6492,6 +6404,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       date:activeDayISO || todayISO(),
       month:(monthPick && monthPick.value) ? monthPick.value : ym(activeDayISO || todayISO()),
       overlay:extra.overlay || "",
+      drawerView:extra.overlay === "drawer" ? (window.CPApp?.getDrawerView?.() || "main") : "",
       statsMode:activeStatsMode || "month",
       statsMonth:activeStatsMonth || ((monthPick && monthPick.value) ? monthPick.value : ym(todayISO())),
       statsYear:activeYearStatsYear || yearFromMonthYM((monthPick && monthPick.value) ? monthPick.value : ym(todayISO()))
@@ -6504,6 +6417,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       && a.date === b.date
       && a.month === b.month
       && (a.overlay || "") === (b.overlay || "")
+      && (a.drawerView || "") === (b.drawerView || "")
       && a.statsMode === b.statsMode
       && a.statsMonth === b.statsMonth
       && Number(a.statsYear || 0) === Number(b.statsYear || 0));
@@ -6514,8 +6428,8 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     if (!window.history || typeof window.history.replaceState !== "function") return;
 
     const state = getAppHistoryState(extra);
-    // FAB zostaje zastąpiony formularzem, bez pustego wpisu dnia pomiędzy nimi.
-    if (window.history.state?.overlay === "fab" && extra.overlay !== "fab") mode = "replace";
+    // Menu zostaje zastąpione celem, bez pustego wpisu widoku pomiędzy nimi.
+    if (["fab", "drawer"].includes(window.history.state?.overlay) && extra.overlay !== window.history.state.overlay && extra.overlay !== "confirmDialog") mode = "replace";
     if (appHistoryReady && isSameAppHistoryState(window.history.state, state)) {
       appHistoryReady = true;
       return;
@@ -6528,6 +6442,9 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       } else {
         state.cpIndex = (currentAppHistoryState?.cpIndex || 0) + 1;
         window.history.pushState(state, document.title);
+        for (const index of appHistoryStates.keys()) {
+          if (index >= state.cpIndex) appHistoryStates.delete(index);
+        }
       }
       currentAppHistoryState = state;
       appHistoryStates.set(state.cpIndex, state);
@@ -6554,6 +6471,8 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   function closeOverlayFromHistory(overlay, delta = -1) {
     const state = window.history?.state;
     if (!overlay || !state?.cpApp || state.overlay !== overlay || typeof window.history?.back !== "function") return false;
+    const previous = appHistoryStates.get(state.cpIndex + delta);
+    if (!previous?.cpApp || !["month", "day", "week", "stats"].includes(previous.view)) return false;
     if (!historyBackPending) {
       historyBackPending = true;
       window.history.go(delta);
@@ -6589,19 +6508,36 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   }
 
   function closeAppOverlays(keepOverlay = "") {
-    setMonthStripOpen(false, { history:false });
+    if (keepOverlay !== "monthStrip") setMonthStripOpen(false, { history:false });
     if (keepOverlay !== "dayDialog" && dlg?.open) closeDay({ history:false, haptic:false });
     if (keepOverlay !== "vacDialog" && typeof closeVac === "function" && vacDlg?.open) closeVac({ history:false, haptic:false });
     if (keepOverlay !== "bulkDialog" && typeof closeBulk === "function" && bulkDlg?.open) closeBulk({ history:false, haptic:false });
     closeDialogElement("appConfirmDialog");
-    window.CPApp?.closeFabMenu?.({ history:false });
-    closeDialogElement("mainMenuDialog");
-    document.body.classList.remove("drawer-open", "fab-open");
-    window.unlockPageScroll?.("drawer");
+    if (keepOverlay !== "fab") window.CPApp?.closeFabMenu?.({ history:false });
+    if (keepOverlay !== "drawer") {
+      closeDialogElement("mainMenuDialog");
+      document.body.classList.remove("drawer-open");
+      window.unlockPageScroll?.("drawer");
+    }
   }
 
   function applyAppHistoryState(state) {
-    if (!state || !state.cpApp) return false;
+    if (!state?.cpApp || !["month", "day", "week", "stats"].includes(state.view)) return false;
+
+    // A forward entry can refer to a form already closed and no longer holding a draft.
+    // Normalize it instead of retaining an invisible overlay in the history state.
+    const overlayElements = { dayDialog:"dayDialog", vacDialog:"vacDialog", bulkDialog:"bulkDialog", confirmDialog:"appConfirmDialog", drawer:"mainMenuDialog" };
+    const overlayVisible = state.overlay === "fab"
+      ? document.body.classList.contains("fab-open")
+      : state.overlay === "monthStrip"
+        ? document.body.classList.contains("month-strip-open")
+        : !!$(overlayElements[state.overlay])?.open;
+    if (state.overlay && !overlayVisible) {
+      state = { ...state, overlay:"", drawerView:"" };
+      window.history.replaceState(state, document.title);
+      currentAppHistoryState = state;
+      appHistoryStates.set(state.cpIndex, state);
+    }
 
     applyingAppHistory = true;
     try {
@@ -6618,9 +6554,8 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
         activeYearStatsYear = Number(state.statsYear || yearFromMonthYM(activeStatsMonth)) || yearFromMonthYM(activeStatsMonth);
       }
 
-      document.body.classList.remove("month-strip-open");
-      $("monthStrip")?.setAttribute("hidden", "");
       closeAppOverlays(state.overlay || "");
+      if (state.overlay === "drawer") window.CPApp?.restoreDrawerView?.(state.drawerView || "main");
 
       renderAll({ skipSave:true });
       applyActiveView();
@@ -6650,17 +6585,21 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
       }
     }
     currentAppHistoryState = e.state;
-    applyAppHistoryState(e.state);
+    if (!applyAppHistoryState(e.state)) {
+      closeAppOverlays();
+      setActiveView("month", "", { historyMode:"replace" });
+    }
   });
 
   function setActiveView(view, dateISO = "", options = {}) {
     if (!options || options instanceof Event) options = {};
+    // Capture the selected month/period before leaving it.
+    if (options.historyMode !== "none" && !window.history?.state?.overlay) writeAppHistory("replace");
     const mp = $("monthPick");
     activeView = view === "day" ? "day" : (view === "week" ? "week" : (view === "stats" ? "stats" : "month"));
     window.CPApp?.closeFabMenu?.({ history:false, haptic:false });
+    if (activeView !== "month") setMonthStripOpen(false, { history:false });
     if (activeView === "stats") {
-      document.body.classList.remove("month-strip-open");
-      $("monthStrip")?.setAttribute("hidden", "");
       const monthForStats = (mp && mp.value) ? mp.value : ym(activeDayISO || todayISO());
       activeStatsMonth = activeStatsMonth || monthForStats;
       activeYearStatsYear = activeYearStatsYear || yearFromMonthYM(activeStatsMonth);
@@ -6686,7 +6625,9 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     const targetView = view === "day" ? "day" : (view === "week" ? "week" : (view === "stats" ? "stats" : "month"));
 
     const previous = appHistoryStates.get((state?.cpIndex || 0) - 1);
-    if (state?.cpApp && previous?.cpApp && !previous.overlay && previous.view !== activeView && typeof window.history?.back === "function") {
+    if (historyBackPending || restoreNoteHistory) return;
+    if (state?.cpApp && previous?.cpApp && !previous.overlay && ["month", "day", "week", "stats"].includes(previous.view) && typeof window.history?.back === "function") {
+      historyBackPending = true;
       window.history.back();
       return;
     }
@@ -6742,6 +6683,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     clearAppOverlayHistory,
     backIfCurrentOverlay,
     closeAppOverlays,
+    pushDrawerViewHistory: () => writeAppHistory("push", { overlay:"drawer" }),
     setActiveView,
     goBackOrSetActiveView,
     renderDayView,
@@ -7544,8 +7486,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     const data = computeMonthStats(activeStatsMonth);
     const absences = data.totals.paid + data.totals.unpaid + data.totals.sick;
 
-    if ($("statsTitle")) $("statsTitle").textContent = "Statystyki";
-    if ($("statsSubtitle")) $("statsSubtitle").textContent = "Podsumowanie aktualnego miesiąca.";
     if ($("monthStatsCurrent")) $("monthStatsCurrent").textContent = fmtMonthPL(activeStatsMonth);
     if ($("monthStatsHours")) $("monthStatsHours").textContent = fmtHM(data.totals.min);
     if ($("monthStatsPay")) $("monthStatsPay").textContent = pln(data.totals.money);
@@ -7586,8 +7526,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     const paidQuota = Math.max(0, Number(db.settings.leaveQuota || 0));
     const paidLeft = Math.max(0, paidQuota - data.totals.paid);
 
-    if ($("statsTitle")) $("statsTitle").textContent = "Statystyki";
-    if ($("statsSubtitle")) $("statsSubtitle").textContent = "Roczne podsumowanie godzin, wypłaty i nieobecności.";
     if ($("yearStatsCurrent")) $("yearStatsCurrent").textContent = String(activeYearStatsYear);
     if ($("yearStatsHours")) $("yearStatsHours").textContent = fmtHM(data.totals.min);
     if ($("yearStatsPay")) $("yearStatsPay").textContent = pln(data.totals.money);
@@ -7641,11 +7579,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   Object.assign(window.CPApp, {
     openStatsPanel
   });
-
-  function closeStatsPage() {
-    goBackOrSetActiveView("month");
-    window.setSystemBars?.("#eef1f6");
-  }
 
   function csvCell(value) {
     const s = String(value ?? "").replace(/"/g, '""');
@@ -7839,10 +7772,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     if (!btn || !$("dayViewPage")?.contains(btn)) return;
 
     switch (btn.id) {
-      case "dayViewBack":
-        goBackOrSetActiveView("month");
-        break;
-
       case "dayViewPrev":
         animateDayChange(-1);
         break;
@@ -7867,9 +7796,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
     if (!btn || !$("weekViewPage")?.contains(btn)) return;
 
     switch (btn.id) {
-      case "weekViewBackToMonth":
-        goBackOrSetActiveView("month");
-        break;
       case "weekViewPrev":
         animateWeekChange(-1);
         break;
@@ -8442,8 +8368,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   const vacCloseBtn = $("vacPanelClose");
   if (vacCloseBtn) vacCloseBtn.onclick = closeVac;
 
-  const bulkBackBtn = $("bulkBack");
-  if (bulkBackBtn) bulkBackBtn.onclick = closeBulk;
+  $("bulkPanelClose")?.addEventListener("click", closeBulk);
 
   // ===== MONTH EVENTS =====
   const monthToggle = $("monthNavToggle");
@@ -8659,9 +8584,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
         break;
       case "yearStatsCsv":
         exportYearCsv(activeYearStatsYear);
-        break;
-      case "statsPageClose":
-        closeStatsPage();
         break;
     }
   }
@@ -9376,7 +9298,6 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
   syncFabActions();
 
-  onClick("bulkPanelClose", () => { $("bulkBack")?.click(); });
   onClick("bulkPanelSave", () => { $("bulkApply")?.click(); });
   onClick("dayPanelClose", () => { window.CPApp?.closeDayForm?.(); });
 
@@ -9425,7 +9346,7 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
   let currentDrawerView = "main";
 
-  function showDrawerView(name) {
+  function showDrawerView(name, options = {}) {
     const meta = drawerMeta[name] || drawerMeta.main;
     currentDrawerView = drawerMeta[name] ? name : "main";
 
@@ -9445,7 +9366,13 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
     if (drawerFooter) drawerFooter.hidden = !meta.footer;
     if (name === "info") refreshAppInfo();
+    if (drawer?.open && options.history !== false) window.CPApp?.pushDrawerViewHistory?.();
   }
+
+  Object.assign(window.CPApp, {
+    getDrawerView: () => currentDrawerView,
+    restoreDrawerView: name => showDrawerView(name, { history:false })
+  });
 
   function openDrawer() {
     showDrawerView("main");
@@ -9468,21 +9395,18 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   }
 
   // ===== DRAWER EVENTS =====
-  onClick("mainMenuBtn", () => { openDrawer(); });
+  onClick("mainMenuBtn", () => {
+    if (document.body.classList.contains("view-month")) openDrawer();
+    else window.CPApp?.goBackOrSetActiveView?.("month");
+  });
   drawer?.addEventListener("click", (e) => { if (e.target === drawer) closeDrawer(); });
   drawer?.addEventListener("touchmove", (e) => { if (e.target === drawer) e.preventDefault(); }, { passive:false });
   drawer?.addEventListener("cancel", (e) => { e.preventDefault(); closeDrawer(); });
   drawer?.addEventListener("close", () => { document.body.classList.remove("drawer-open"); unlockPageScroll("drawer"); });
-  drawerBack?.addEventListener("click", () => {
-    if (currentDrawerView === "main") closeDrawer();
-    else {
-      showDrawerView("main");
-      haptic.tap();
-    }
-  });
+  drawerBack?.addEventListener("click", closeDrawer);
 
   function goFromDrawer(action, delay = 90) {
-    closeDrawer({ history:false });
+    closeDrawer({ history:false, preserveHistory:true });
     setTimeout(action, delay);
   }
 
@@ -9502,24 +9426,38 @@ dialog.entryPanel .formDelete:hover{background:#fce8e6;}
   });
 
   function setupKeyboardFriendlyModals() {
-    const controls = document.querySelectorAll("dialog input, dialog textarea, dialog select");
-    controls.forEach((el) => {
-      el.addEventListener("focus", () => {
-        document.body.classList.add("keyboard-focus");
-        setTimeout(() => el.scrollIntoView?.({ block:"center", behavior:"smooth" }), 260);
-      });
-      el.addEventListener("blur", () => setTimeout(() => document.body.classList.remove("keyboard-focus"), 120));
+    const viewport = window.visualViewport;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const root = document.documentElement.style;
+      if (viewport && viewport.scale === 1) {
+        root.setProperty("--work-viewport-height", `${viewport.height}px`);
+        root.setProperty("--work-viewport-top", `${viewport.offsetTop}px`);
+      } else {
+        root.removeProperty("--work-viewport-height");
+        root.removeProperty("--work-viewport-top");
+      }
+      const field = document.activeElement;
+      if (!field?.matches("input, textarea, select")) return;
+      const scroller = field.closest(".workPanelContent, .drawerContent");
+      if (!scroller || !field.closest("dialog[open]")) return;
+      const bounds = scroller.getBoundingClientRect();
+      const rect = field.getBoundingClientRect();
+      // Oversized textarea: keep its top in view and allow manual scrolling to actions.
+      if (rect.top < bounds.top || rect.height > bounds.height) {
+        scroller.scrollTop += rect.top - bounds.top;
+      } else if (rect.bottom > bounds.bottom) {
+        scroller.scrollTop += rect.bottom - bounds.bottom;
+      }
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+    document.querySelectorAll("dialog input, dialog textarea, dialog select").forEach(el => {
+      el.addEventListener("focus", schedule);
     });
-    if (window.visualViewport) {
-      const update = () => {
-        document.documentElement.style.setProperty("--entry-viewport-height", `${window.visualViewport.height}px`);
-        const ratio = window.visualViewport.height / window.innerHeight;
-        document.body.classList.toggle("keyboard-open", ratio < 0.78);
-      };
-      window.visualViewport.addEventListener("resize", update);
-      window.visualViewport.addEventListener("scroll", update);
-      update();
-    }
+    viewport?.addEventListener("resize", schedule);
+    viewport?.addEventListener("scroll", schedule);
+    update();
   }
 
   setupKeyboardFriendlyModals();
