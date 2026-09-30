@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.5.15</title>
+  <title>Czas pracy 4.5.16</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -599,13 +599,6 @@ dialog::backdrop{
       margin-bottom:18px;
     }
 
-.addBtnCenter{
-      width:auto;
-      min-height:52px;
-      margin:18px 0 0 auto;
-      display:flex;
-    }
-
 .shiftList{
       display:flex;
       flex-direction:column;
@@ -809,6 +802,15 @@ dialog:focus-visible{
 
 .shiftItem.googleEvent.workEvent{
   background:#eaf6ee;
+}
+
+.shiftItem.googleEvent .eventEditIcon{
+  width:20px;
+  height:20px;
+  flex:0 0 20px;
+  fill:currentColor;
+  color:#176b3a;
+  margin-right:4px;
 }
 
 .shiftItem.googleEvent.workEvent .eventStripe{
@@ -1444,14 +1446,6 @@ dialog#mainMenuDialog.drawerDialog::backdrop{
   border-radius:999px;
 }
 
-#dlgAddShift.addBtnCenter{
-  width:auto;
-  min-width:210px;
-  max-width:100%;
-  margin-left:auto;
-  margin-right:0;
-}
-
 body.modal-open,
 body.drawer-open{
   overflow:hidden;
@@ -1587,8 +1581,6 @@ dialog#mainMenuDialog.drawerDialog[open]{
 #bulkApply,#setVacationRange,#dlgAddShift{min-height:46px;padding:0 20px;font-size:15px;border-radius:999px}
 
 #bulkRemove,#clearVacationRange,.backBtn{min-height:42px;padding:0 16px;font-size:15px;border-radius:999px}
-
-#dlgAddShift.addBtnCenter{width:auto;min-width:210px;max-width:100%;margin-left:auto;margin-right:0}
 
 html.scroll-locked-root,
 html.scroll-locked-root body{
@@ -1797,6 +1789,7 @@ dialog#mainMenuDialog.drawerDialog .drawerBack{
   justify-content:flex-end;
   align-items:center;
   gap:10px;
+  flex-wrap:wrap;
   margin-top:22px;
 }
 
@@ -3250,15 +3243,19 @@ body.view-stats{
   flex:0 0 auto;
 }
 
-.dayViewFooterActions{
-  justify-content:flex-end;
-  gap:10px;
+#dayViewPage .dayViewTop{
+  flex-direction:column;
 }
 
-.dayViewFooterActions button{
-  flex:0 0 auto;
-  min-width:136px;
-  max-width:220px;
+.dayReturnBar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  margin-bottom:8px;
+  color:var(--text);
+  font-size:18px;
+  font-weight:650;
 }
 
 /* Wspólny szkielet paneli roboczych: wpis zakresowy, formularz wydarzenia dnia i Urlop/L4 */
@@ -3354,8 +3351,28 @@ body.view-stats{
   font-weight:800;
 }
 
-dialog#dayDialog .panelSaveBtn{
-  display:none;
+.formBackBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  height:48px;
+  min-height:48px;
+  flex:0 0 48px;
+  padding:0;
+  border-radius:50%;
+  background:transparent;
+  color:var(--text);
+  box-shadow:none;
+}
+
+.formBackBtn svg{width:24px;height:24px;fill:currentColor;}
+.formBackBtn:hover{background:var(--primary-soft);}
+.formBackBtn:focus-visible{outline:3px solid #8ab4f8;outline-offset:2px;}
+
+dialog.entryPanel{
+  height:var(--entry-viewport-height, 100dvh);
+  max-height:var(--entry-viewport-height, 100dvh);
 }
 
 dialog#bulkDialog .modalHead,
@@ -3524,8 +3541,7 @@ dialog#vacDialog .rangeModeTab.active,
 
 /* Karty w panelach roboczych */
 dialog#bulkDialog .quickTemplatesBlock,
-dialog#bulkDialog .bulkOptions,
-dialog#vacDialog .bulkOptions{
+dialog#bulkDialog .bulkOptions{
   background:#fff;
   border:1px solid #e4e8f1;
   border-radius:22px;
@@ -3537,12 +3553,26 @@ dialog#bulkDialog .quickTemplatesBlock{
   padding:16px 18px;
 }
 
-dialog#bulkDialog .bulkOptions,
-dialog#vacDialog .bulkOptions{
+dialog#bulkDialog .bulkOptions{
   margin:20px 0 0;
   padding:18px;
   border-top:0;
   border-bottom:0;
+}
+
+dialog#vacDialog .leaveOptions{
+  margin:18px 0 0;
+  padding:0;
+  border:0;
+  background:transparent;
+  box-shadow:none;
+}
+
+dialog#vacDialog .leaveOptions .checkRow{
+  display:flex;
+  min-height:48px;
+  margin:0;
+  font-weight:500;
 }
 
 .bulkOptionsTitle{
@@ -3597,8 +3627,7 @@ dialog#vacDialog .checkRow span{
   line-height:1.2;
 }
 
-dialog#bulkDialog .actionRow,
-dialog#vacDialog .actionRow{
+dialog#bulkDialog .actionRow{
   margin-top:18px;
   display:flex;
   justify-content:flex-end;
@@ -3607,18 +3636,15 @@ dialog#vacDialog .actionRow{
   background:transparent;
 }
 
-dialog#bulkDialog .actionRow .backBtn,
-dialog#vacDialog .actionRow .backBtn{
+dialog#bulkDialog .actionRow .backBtn{
   display:none;
 }
 
-dialog#bulkDialog #bulkApply,
-dialog#vacDialog #setVacationRange{
+dialog#bulkDialog #bulkApply{
   display:none;
 }
 
-dialog#bulkDialog #bulkRemove,
-dialog#vacDialog #clearVacationRange{
+dialog#bulkDialog #bulkRemove{
   min-height:42px;
   height:42px;
   padding:0 18px;
@@ -3641,7 +3667,7 @@ dialog#dayDialog .dayEntryForm{
 }
 
 dialog#dayDialog .dayEntryForm[hidden],
-dialog#dayDialog .entryFormActions button[hidden]{
+dialog.entryPanel .entryFormActions button[hidden]{
   display:none;
 }
 
@@ -3649,63 +3675,39 @@ dialog#dayDialog .dayEntryForm .timeGrid{
   margin-bottom:18px;
 }
 
-dialog#dayDialog .dayNoteField label{
-  display:block;
-  margin:0 0 10px;
+dialog.entryPanel .entryFormActions{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-top:24px;
 }
 
-dialog#dayDialog .dayNoteField textarea{
-  display:block;
+dialog.entryPanel .entryFormActions button{
   width:100%;
-  max-width:100%;
-  min-height:116px;
-  padding:16px 18px;
-  background:#fff;
-  border:1px solid #dfe3eb;
-  border-radius:20px;
-  box-shadow:0 1px 2px rgba(60,64,67,.035);
-}
-
-dialog#dayDialog .entryFormActions{
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:10px;
-  margin-top:18px;
-  flex-wrap:wrap;
-}
-
-dialog#dayDialog .entryFormActions .error-tonal{
-  min-height:46px;
-  padding:0 22px;
-}
-
-dialog#dayDialog #dlgAddShift.addBtnCenter{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:auto;
-  min-width:156px;
-  max-width:max-content;
-  height:46px;
-  min-height:46px;
+  min-height:48px;
+  height:48px;
   margin:0;
-  padding:0 28px;
+  padding:0 24px;
   border-radius:999px;
-  background:#4285f4;
-  color:#fff;
-  box-shadow:0 2px 5px rgba(66,133,244,.18);
   font-size:15px;
-  font-weight:800;
+  font-weight:750;
 }
 
-dialog#dayDialog .noteAutosaveStatus{
-  min-height:20px;
-  margin-top:12px;
-  color:#5f6368;
-  font-size:13px;
-  line-height:1.35;
+dialog.entryPanel .formPrimary{
+  order:-1;
+  background:var(--primary);
+  color:#fff;
+  box-shadow:0 2px 5px rgba(26,115,232,.18);
 }
+
+dialog.entryPanel .formDelete{
+  background:transparent;
+  color:#a50e0e;
+  border:1px solid #f1c7c4;
+  box-shadow:none;
+}
+
+dialog.entryPanel .formDelete:hover{background:#fce8e6;}
 
 .statsPage{
   width:100%;
@@ -3864,13 +3866,6 @@ dialog#dayDialog .noteAutosaveStatus{
     padding:0 22px;
   }
 
-  dialog#dayDialog #dlgAddShift.addBtnCenter{
-    min-width:150px;
-    height:44px;
-    min-height:44px;
-    padding:0 24px;
-  }
-
   .statsPage{
     padding-left:10px;
     padding-right:10px;
@@ -3897,11 +3892,6 @@ dialog#dayDialog .noteAutosaveStatus{
   .statsCloseBottom{
     padding:0 12px;
     font-size:13px;
-  }
-
-  dialog#dayDialog #dlgAddShift.addBtnCenter{
-    min-width:140px;
-    padding:0 22px;
   }
 
   .statsFullHeader h2{
@@ -3981,6 +3971,7 @@ dialog#dayDialog .noteAutosaveStatus{
 
     <section class="dayViewPage monthViewHidden" id="dayViewPage" aria-label="Widok dnia">
       <div class="dayViewTop">
+        <div class="dayReturnBar"><button class="formBackBtn" id="dayViewBack" type="button" aria-label="Wstecz do poprzedniego widoku"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button><span>Dzień</span></div>
         <div class="dayViewNav">
           <button class="tonal" id="dayViewPrev" type="button" aria-label="Poprzedni dzień">‹</button>
           <div class="dayViewDateBlock">
@@ -4018,9 +4009,6 @@ dialog#dayDialog .noteAutosaveStatus{
         <div class="shiftList dayViewEvents" id="dayViewEvents"></div>
       </div>
 
-      <div class="dayViewBottomActions bottomActions dayViewFooterActions">
-        <button class="tonal" id="dayViewBackToMonth" type="button">Wróć</button>
-      </div>
         </div>
       </div>
     </section>
@@ -4408,23 +4396,21 @@ dialog#dayDialog .noteAutosaveStatus{
     </div>
   </dialog>
 
-  <dialog id="vacDialog" class="googlePanel workPanel leavePanel">
+  <dialog id="vacDialog" class="googlePanel workPanel entryPanel leavePanel" aria-labelledby="vacDialogTitle">
     <div class="googlePanelShell workPanelShell">
       <div class="googlePanelBar workPanelBar">
-        <button class="panelCloseBtn" id="vacPanelClose" type="button" aria-label="Zamknij"></button>
-        <button class="panelSaveBtn" id="vacPanelSave" type="button">Zapisz</button>
+        <button class="formBackBtn" id="vacPanelClose" type="button" aria-label="Wstecz"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button>
       </div>
       <div class="googlePanelContent workPanelContent">
     <div class="modalHead">
       <div class="modalHeadInner">
         <h3 id="vacDialogTitle">Dodaj urlop / L4</h3>
-        <div class="muted">Ustaw status w zakresie dat. Status nie usuwa wpisanych godzin pracy.</div>
       </div>
     </div>
 
     <div class="modalBody">
       <div style="margin-bottom:16px;">
-        <label>Rodzaj absencji</label>
+        <label for="vacType">Rodzaj absencji</label>
         <select id="vacType">
           <option value="paid">Urlop płatny</option>
           <option value="unpaid">Urlop bezpłatny</option>
@@ -4434,11 +4420,11 @@ dialog#dayDialog .noteAutosaveStatus{
 
       <div class="fieldGrid">
         <div>
-          <label>Od</label>
+          <label for="vacFrom">Od</label>
           <input id="vacFrom" type="date" />
         </div>
         <div>
-          <label>Do</label>
+          <label for="vacTo">Do</label>
           <input id="vacTo" type="date" />
         </div>
       </div>
@@ -4460,13 +4446,12 @@ dialog#dayDialog .noteAutosaveStatus{
       </div>
 
       <div class="muted" style="margin-top:10px;">
-        Domyślnie pomijane są soboty, niedziele i święta. Opcje dotyczą zarówno dodawania, jak i usuwania statusu.
+        Opcje dotyczą zapisu i usuwania statusu. Godziny pracy pozostają bez zmian.
       </div>
 
-      <div class="actionRow">
-        <button class="backBtn blue" id="vacBack" aria-label="Zamknij" type="button"></button>
-        <button class="text" id="clearVacationRange" type="button">Usuń status</button>
-        <button class="filled" id="setVacationRange" type="button">Zapisz</button>
+      <div class="entryFormActions">
+        <button class="formDelete" id="clearVacationRange" type="button">Usuń status</button>
+        <button class="filled formPrimary" id="setVacationRange" type="button">Zapisz</button>
       </div>
     </div>
       </div>
@@ -4566,10 +4551,10 @@ dialog#dayDialog .noteAutosaveStatus{
   </dialog>
 
   <!-- FORMULARZ POJEDYNCZEGO WYDARZENIA DNIA -->
-  <dialog id="dayDialog" class="googlePanel workPanel dayPanel">
+  <dialog id="dayDialog" class="googlePanel workPanel entryPanel dayPanel" aria-labelledby="dlgTitle" aria-describedby="dlgMeta">
     <div class="googlePanelShell workPanelShell">
       <div class="googlePanelBar workPanelBar">
-        <button class="panelCloseBtn" id="dayPanelClose" type="button" aria-label="Zamknij"></button>
+        <button class="formBackBtn" id="dayPanelClose" type="button" aria-label="Wstecz"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button>
       </div>
       <div class="googlePanelContent workPanelContent">
 
@@ -4584,28 +4569,28 @@ dialog#dayDialog .noteAutosaveStatus{
       <div class="dayEntryForm" id="dlgShiftForm">
         <div class="timeGrid">
           <div>
-            <label>Wejście</label>
+            <label for="dlgStart">Wejście</label>
             <input id="dlgStart" type="time" />
           </div>
           <div>
-            <label>Wyjście</label>
+            <label for="dlgEnd">Wyjście</label>
             <input id="dlgEnd" type="time" />
           </div>
         </div>
 
         <div class="entryFormActions">
-          <button id="dlgDeleteShift" type="button" class="error-tonal" hidden>Usuń wpis</button>
-          <button id="dlgAddShift" type="button" class="filled addBtnCenter">Dodaj godziny</button>
+          <button id="dlgDeleteShift" type="button" class="formDelete" hidden>Usuń wpis</button>
+          <button id="dlgAddShift" type="button" class="filled formPrimary">Dodaj godziny</button>
         </div>
       </div>
 
       <div class="dayEntryForm dayNoteField" id="dlgNoteForm" hidden>
-        <label for="dlgNote">Notatka dnia</label>
-        <textarea id="dlgNote" placeholder="Zapisuje się automatycznie..."></textarea>
+        <label for="dlgNote">Treść notatki</label>
+        <textarea id="dlgNote" placeholder="Wpisz notatkę do dnia..."></textarea>
         <div class="entryFormActions">
-          <button id="dlgDeleteNote" type="button" class="error-tonal" hidden>Usuń notatkę</button>
+          <button id="dlgSaveNote" type="button" class="filled formPrimary">Zapisz</button>
+          <button id="dlgDeleteNote" type="button" class="formDelete" hidden>Usuń notatkę</button>
         </div>
-        <div class="noteAutosaveStatus" id="dlgNoteAutosave" aria-live="polite">Zmiany zapisują się automatycznie.</div>
       </div>
     </div>
       </div>
@@ -4754,6 +4739,8 @@ dialog#dayDialog .noteAutosaveStatus{
     }
   }
 
+  let finishAppDialogFromHistory = null;
+
   function openAppDialog({ title = "Komunikat", message = "", okText = "OK", cancelText = "", tone = "" } = {}) {
     return new Promise((resolve) => {
       const dlg = $("appConfirmDialog");
@@ -4774,13 +4761,22 @@ dialog#dayDialog .noteAutosaveStatus{
       cancel.hidden = !cancelText;
       setAppConfirmTone(tone);
 
-      const cleanup = (result) => {
+      let chosenResult = false;
+      let closing = false;
+      const finish = () => {
         ok.onclick = null;
         cancel.onclick = null;
         dlg.oncancel = null;
         if (dlg.open) dlg.close();
-        window.CPApp?.closeOverlay?.("confirmDialog", { history:false });
-        resolve(result);
+        finishAppDialogFromHistory = null;
+        resolve(chosenResult);
+      };
+      finishAppDialogFromHistory = finish;
+      const cleanup = (result) => {
+        if (closing) return;
+        closing = true;
+        chosenResult = result;
+        if (!window.CPApp?.closeOverlay?.("confirmDialog")) finish();
       };
 
       ok.onclick = () => cleanup(true);
@@ -4792,7 +4788,7 @@ dialog#dayDialog .noteAutosaveStatus{
 
       if (typeof dlg.showModal === "function") dlg.showModal();
       else dlg.setAttribute("open", "");
-      if (!window.history?.state?.overlay) window.CPApp?.openOverlay?.("confirmDialog");
+      window.CPApp?.openOverlay?.("confirmDialog");
     });
   }
 
@@ -6061,8 +6057,8 @@ dialog#dayDialog .noteAutosaveStatus{
   let dlgDate = null;
   let dlgMode = "";
   let dlgShiftIndex = -1;
-  let noteTimer = null;
-  let pendingNoteSave = null;
+  let originalNote = "";
+  let noteClosePending = false;
 
   function setDayDialogMeta(dateISO) {
     if (!$("dlgMeta")) return;
@@ -6078,39 +6074,27 @@ dialog#dayDialog .noteAutosaveStatus{
     if (!isValidDateISO(dateISO)) return false;
     const note = String(value || "").trim();
     const existing = getDay(dateISO);
-    if (!existing && !note) return false;
-    if ((existing?.note || "").trim() === note) return false;
-
-    const day = existing || { date: dateISO, note: "", shifts: [], vacation: false, leaveType:"" };
+    if ((!existing && !note) || (existing?.note || "") === note) return true;
+    const previousNote = existing?.note || "";
+    const day = existing || { date:dateISO, note:"", shifts:[], vacation:false, leaveType:"" };
     day.note = note;
     upsertDay(dateISO, day);
-    save();
-    renderAll();
+    if (!save()) {
+      if (existing) existing.note = previousNote;
+      else db.entries = db.entries.filter(entry => entry.date !== dateISO);
+      return false;
+    }
+    renderAll({ skipSave:true });
     if (showStatus) setStatus("Zapisano notatkę.");
     return true;
   }
 
-  function commitPendingNoteSave({ showStatus = true } = {}) {
-    if (!pendingNoteSave) return false;
-    clearTimeout(noteTimer);
-    noteTimer = null;
-    const pending = pendingNoteSave;
-    pendingNoteSave = null;
-    const changed = saveNoteForDate(pending.dateISO, pending.value, { showStatus });
-    if ($("dlgNoteAutosave") && dlgMode === "note" && dlgDate === pending.dateISO) {
-      $("dlgNoteAutosave").textContent = changed ? "Zapisano automatycznie." : "Zmiany zapisują się automatycznie.";
-      $("dlgDeleteNote").hidden = !((getDay(pending.dateISO)?.note || "").trim());
-    }
-    return changed;
-  }
-
-  function cancelPendingNoteSave() {
-    clearTimeout(noteTimer);
-    noteTimer = null;
-    pendingNoteSave = null;
+  function hasUnsavedNote() {
+    return !!(dlg?.open && dlgMode === "note" && $("dlgNote").value !== originalNote);
   }
 
   function openDayForm(dateISO, mode, shiftIndex = -1) {
+    if (dlg?.open) return;
     const targetDate = isValidDateISO(dateISO) ? dateISO : activeDayISO;
     const day = getDay(targetDate) || { date: targetDate, note: "", shifts: [], vacation: false, leaveType:"" };
     const isNote = mode === "note";
@@ -6122,7 +6106,6 @@ dialog#dayDialog .noteAutosaveStatus{
       return;
     }
 
-    commitPendingNoteSave({ showStatus:false });
     haptic.open();
     dlgDate = targetDate;
     dlgMode = isNote ? "note" : (isEdit ? "shift-edit" : "shift-add");
@@ -6136,9 +6119,9 @@ dialog#dayDialog .noteAutosaveStatus{
     setDayDialogMeta(targetDate);
 
     if (isNote) {
-      if ($("dlgNote")) $("dlgNote").value = day.note || "";
+      originalNote = day.note || "";
+      if ($("dlgNote")) $("dlgNote").value = originalNote;
       if ($("dlgDeleteNote")) $("dlgDeleteNote").hidden = !((day.note || "").trim());
-      if ($("dlgNoteAutosave")) $("dlgNoteAutosave").textContent = "Zmiany zapisują się automatycznie.";
     } else {
       const last = db?.settings?.lastShift;
       if ($("dlgStart")) $("dlgStart").value = shift?.start || last?.start || "";
@@ -6154,7 +6137,7 @@ dialog#dayDialog .noteAutosaveStatus{
     else if (dlg) dlg.setAttribute("open", "");
     if (window.lockPageScroll) window.lockPageScroll("modal"); else document.body.classList.add("modal-open");
     openOverlay("dayDialog");
-    setTimeout(() => (isNote ? $("dlgNote") : $("dlgStart"))?.focus(), 80);
+    setTimeout(() => { if (dlg?.open && dlgDate === targetDate) (isNote ? $("dlgNote") : $("dlgStart"))?.focus(); }, 80);
   }
 
   function openDayAddForm(dateISO = activeDayISO) {
@@ -6169,14 +6152,27 @@ dialog#dayDialog .noteAutosaveStatus{
     openDayForm(dateISO, "note");
   }
 
-  function closeDay(options = {}) {
+  async function closeDay(options = {}) {
     if (!options || options instanceof Event) options = {};
-    commitPendingNoteSave({ showStatus:false });
+    if (hasUnsavedNote()) {
+      if (noteClosePending) return false;
+      noteClosePending = true;
+      const discard = await openAppDialog({
+        title:"Niezapisane zmiany",
+        message:"Masz niezapisane zmiany. Czy chcesz je odrzucić?",
+        cancelText:"Kontynuuj edycję",
+        okText:"Odrzuć zmiany"
+      });
+      noteClosePending = false;
+      if (!discard) { $("dlgNote")?.focus(); return false; }
+      $("dlgNote").value = originalNote;
+    }
     if (options.haptic !== false) haptic.close();
     if (closeOverlay("dayDialog", options)) return;
     dlgDate = null;
     dlgMode = "";
     dlgShiftIndex = -1;
+    originalNote = "";
     if (dlg && typeof dlg.close === "function" && dlg.open) dlg.close();
     else if (dlg) dlg.removeAttribute("open");
     if (window.unlockPageScroll) window.unlockPageScroll("modal"); else document.body.classList.remove("modal-open");
@@ -6193,8 +6189,7 @@ dialog#dayDialog .noteAutosaveStatus{
 
   if (dlg) {
     dlg.addEventListener("close", () => {
-      commitPendingNoteSave({ showStatus:false });
-      document.body.classList.remove("modal-open");
+      window.unlockPageScroll?.("modal");
       window.CPApp?.setSystemBars?.("#eef1f6");
     });
     dlg.addEventListener("cancel", (e) => { e.preventDefault(); closeDay(); });
@@ -6247,23 +6242,26 @@ dialog#dayDialog .noteAutosaveStatus{
     closeDay({ haptic:false });
   });
 
-  $("dlgNote")?.addEventListener("input", () => {
-    if (!dlgDate || dlgMode !== "note") return;
-    pendingNoteSave = { dateISO:dlgDate, value:$("dlgNote").value || "" };
-    clearTimeout(noteTimer);
-    if ($("dlgNoteAutosave")) $("dlgNoteAutosave").textContent = "Zapisywanie…";
-    noteTimer = setTimeout(() => commitPendingNoteSave(), 250);
+  $("dlgSaveNote")?.addEventListener("click", () => {
+    if (!dlgDate || dlgMode !== "note" || noteClosePending) return;
+    if (!saveNoteForDate(dlgDate, $("dlgNote").value)) return;
+    originalNote = $("dlgNote").value;
+    haptic.success();
+    closeDay({ haptic:false });
+  });
+
+  window.addEventListener("beforeunload", (event) => {
+    if (!hasUnsavedNote()) return;
+    event.preventDefault();
+    event.returnValue = "";
   });
 
   $("dlgDeleteNote")?.addEventListener("click", async () => {
     if (!dlgDate || dlgMode !== "note") return;
     if (!(await askConfirm("Usunąć notatkę z tego dnia?", "Usuń notatkę"))) return;
-    cancelPendingNoteSave();
-    const day = getDay(dlgDate);
-    if (!day) return;
-    day.note = "";
-    save();
-    renderAll();
+    if (!saveNoteForDate(dlgDate, "", { showStatus:false })) return;
+    $("dlgNote").value = "";
+    originalNote = "";
     setStatus("Usunięto notatkę.");
     haptic.warning();
     closeDay({ haptic:false });
@@ -6317,6 +6315,7 @@ dialog#dayDialog .noteAutosaveStatus{
             <div class="times">${escapeHtml(s.start || "—")} – ${escapeHtml(s.end || "—")}</div>
             <div class="mins">${m ? (fmtHM(m) + " godz.") : "-"}</div>
           </div>
+          <svg class="eventEditIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.04a1 1 0 0 0 0-1.42l-2.5-2.5a1 1 0 0 0-1.42 0l-1.96 1.96 3.75 3.75 2.13-1.79Z"/></svg>
         </button>
       `);
     });
@@ -6480,6 +6479,10 @@ dialog#dayDialog .noteAutosaveStatus{
   // ===== APP HISTORY / SYSTEM BACK =====
   let appHistoryReady = false;
   let applyingAppHistory = false;
+  let currentAppHistoryState = null;
+  let restoreNoteHistory = null;
+  let historyBackPending = false;
+  const appHistoryStates = new Map();
 
   function getAppHistoryState(extra = {}) {
     const monthPick = $("monthPick");
@@ -6511,17 +6514,23 @@ dialog#dayDialog .noteAutosaveStatus{
     if (!window.history || typeof window.history.replaceState !== "function") return;
 
     const state = getAppHistoryState(extra);
-    if (isSameAppHistoryState(window.history.state, state)) {
+    // FAB zostaje zastąpiony formularzem, bez pustego wpisu dnia pomiędzy nimi.
+    if (window.history.state?.overlay === "fab" && extra.overlay !== "fab") mode = "replace";
+    if (appHistoryReady && isSameAppHistoryState(window.history.state, state)) {
       appHistoryReady = true;
       return;
     }
 
     try {
       if (mode === "replace" || !appHistoryReady || typeof window.history.pushState !== "function") {
+        state.cpIndex = currentAppHistoryState?.cpIndex || 0;
         window.history.replaceState(state, document.title);
       } else {
+        state.cpIndex = (currentAppHistoryState?.cpIndex || 0) + 1;
         window.history.pushState(state, document.title);
       }
+      currentAppHistoryState = state;
+      appHistoryStates.set(state.cpIndex, state);
       appHistoryReady = true;
     } catch (err) {
       console.warn("Nie udało się zapisać historii widoku:", err);
@@ -6542,10 +6551,13 @@ dialog#dayDialog .noteAutosaveStatus{
     writeAppHistory("replace", { overlay:"" });
   }
 
-  function closeOverlayFromHistory(overlay) {
+  function closeOverlayFromHistory(overlay, delta = -1) {
     const state = window.history?.state;
     if (!overlay || !state?.cpApp || state.overlay !== overlay || typeof window.history?.back !== "function") return false;
-    window.history.back();
+    if (!historyBackPending) {
+      historyBackPending = true;
+      window.history.go(delta);
+    }
     return true;
   }
 
@@ -6555,7 +6567,8 @@ dialog#dayDialog .noteAutosaveStatus{
 
   function closeOverlay(overlay, options = {}) {
     if (!options || options instanceof Event) options = {};
-    if (options.history !== false && closeOverlayFromHistory(overlay)) return true;
+    if (options.preserveHistory) return false;
+    if (options.history !== false && closeOverlayFromHistory(overlay, options.historyDelta || -1)) return true;
     clearOverlayHistory(overlay);
     return false;
   }
@@ -6568,22 +6581,22 @@ dialog#dayDialog .noteAutosaveStatus{
     const el = $(id);
     if (!el) return;
     if (id === "appConfirmDialog" && el.open) {
-      $("appConfirmCancel")?.click();
+      finishAppDialogFromHistory?.();
       return;
     }
     if (typeof el.close === "function" && el.open) el.close();
     else el.removeAttribute("open");
   }
 
-  function closeAppOverlays() {
+  function closeAppOverlays(keepOverlay = "") {
     setMonthStripOpen(false, { history:false });
-    if (dlg?.open) closeDay({ history:false, haptic:false });
-    if (typeof closeVac === "function" && vacDlg?.open) closeVac({ history:false, haptic:false });
-    if (typeof closeBulk === "function" && bulkDlg?.open) closeBulk({ history:false, haptic:false });
+    if (keepOverlay !== "dayDialog" && dlg?.open) closeDay({ history:false, haptic:false });
+    if (keepOverlay !== "vacDialog" && typeof closeVac === "function" && vacDlg?.open) closeVac({ history:false, haptic:false });
+    if (keepOverlay !== "bulkDialog" && typeof closeBulk === "function" && bulkDlg?.open) closeBulk({ history:false, haptic:false });
     closeDialogElement("appConfirmDialog");
     window.CPApp?.closeFabMenu?.({ history:false });
     closeDialogElement("mainMenuDialog");
-    document.body.classList.remove("drawer-open", "modal-open", "fab-open");
+    document.body.classList.remove("drawer-open", "fab-open");
     window.unlockPageScroll?.("drawer");
   }
 
@@ -6607,7 +6620,7 @@ dialog#dayDialog .noteAutosaveStatus{
 
       document.body.classList.remove("month-strip-open");
       $("monthStrip")?.setAttribute("hidden", "");
-      closeAppOverlays();
+      closeAppOverlays(state.overlay || "");
 
       renderAll({ skipSave:true });
       applyActiveView();
@@ -6619,6 +6632,24 @@ dialog#dayDialog .noteAutosaveStatus{
   }
 
   window.addEventListener("popstate", (e) => {
+    historyBackPending = false;
+    if (restoreNoteHistory) {
+      const resume = restoreNoteHistory;
+      restoreNoteHistory = null;
+      currentAppHistoryState = e.state;
+      resume();
+      return;
+    }
+    if (hasUnsavedNote() && !$("appConfirmDialog")?.open && currentAppHistoryState?.overlay === "dayDialog") {
+      const steps = currentAppHistoryState.cpIndex - (e.state?.cpIndex ?? 0);
+      if (steps) {
+        // Przywróć istniejący wpis formularza przed pytaniem; bez pushState.
+        restoreNoteHistory = () => closeDay({ historyDelta:-steps });
+        window.history.go(steps);
+        return;
+      }
+    }
+    currentAppHistoryState = e.state;
     applyAppHistoryState(e.state);
   });
 
@@ -6654,7 +6685,8 @@ dialog#dayDialog .noteAutosaveStatus{
     const state = window.history?.state;
     const targetView = view === "day" ? "day" : (view === "week" ? "week" : (view === "stats" ? "stats" : "month"));
 
-    if (state?.cpApp && state.view !== targetView && typeof window.history?.back === "function") {
+    const previous = appHistoryStates.get((state?.cpIndex || 0) - 1);
+    if (state?.cpApp && previous?.cpApp && !previous.overlay && previous.view !== activeView && typeof window.history?.back === "function") {
       window.history.back();
       return;
     }
@@ -6807,10 +6839,12 @@ dialog#dayDialog .noteAutosaveStatus{
     if (window.unlockPageScroll) window.unlockPageScroll("modal"); else document.body.classList.remove("modal-open");
     window.CPApp?.setSystemBars?.("#eef1f6");
   }
-  function openVacationForDate(dateISO = activeDayISO) {
+  async function openVacationForDate(dateISO = activeDayISO) {
     const target = isValidDateISO(dateISO) ? dateISO : todayISO();
     const wasDayDialogOpen = !!(dlg && dlg.open);
-    if (wasDayDialogOpen) closeDay({ history:false });
+    if (wasDayDialogOpen) {
+      if (await closeDay({ history:false }) === false) return;
+    }
     setTimeout(() => openVac(target), wasDayDialogOpen ? 80 : 0);
   }
   if (vacDlg) {
@@ -7805,7 +7839,7 @@ dialog#dayDialog .noteAutosaveStatus{
     if (!btn || !$("dayViewPage")?.contains(btn)) return;
 
     switch (btn.id) {
-      case "dayViewBackToMonth":
+      case "dayViewBack":
         goBackOrSetActiveView("month");
         break;
 
@@ -8405,8 +8439,8 @@ dialog#dayDialog .noteAutosaveStatus{
     page.dataset.swipeReady = "1";
   })();
 
-  const vacBackBtn = $("vacBack");
-  if (vacBackBtn) vacBackBtn.onclick = closeVac;
+  const vacCloseBtn = $("vacPanelClose");
+  if (vacCloseBtn) vacCloseBtn.onclick = closeVac;
 
   const bulkBackBtn = $("bulkBack");
   if (bulkBackBtn) bulkBackBtn.onclick = closeBulk;
@@ -8463,7 +8497,8 @@ dialog#dayDialog .noteAutosaveStatus{
 
   const clearVacationRangeBtn = $("clearVacationRange");
   if (clearVacationRangeBtn) {
-    clearVacationRangeBtn.onclick = () => {
+    clearVacationRangeBtn.onclick = async () => {
+      if (!(await askConfirm("Usunąć status w wybranym zakresie dat?", "Usuń status"))) return;
       const from = $("vacFrom")?.value;
       const to = $("vacTo")?.value;
       const res = clearLeaveRange(from, to, {
@@ -9326,7 +9361,7 @@ dialog#dayDialog .noteAutosaveStatus{
     const btn = e.target.closest?.(".fabActionPill");
     if (!btn) return;
 
-    closeFabMenu({ history:false });
+    closeFabMenu({ history:false, preserveHistory:true });
 
     const handlers = {
       fabBulkAction: () => window.CPApp?.openBulkDialog?.(),
@@ -9341,8 +9376,6 @@ dialog#dayDialog .noteAutosaveStatus{
 
   syncFabActions();
 
-  onClick("vacPanelClose", () => { $("vacBack")?.click(); });
-  onClick("vacPanelSave", () => { $("setVacationRange")?.click(); });
   onClick("bulkPanelClose", () => { $("bulkBack")?.click(); });
   onClick("bulkPanelSave", () => { $("bulkApply")?.click(); });
   onClick("dayPanelClose", () => { window.CPApp?.closeDayForm?.(); });
@@ -9479,6 +9512,7 @@ dialog#dayDialog .noteAutosaveStatus{
     });
     if (window.visualViewport) {
       const update = () => {
+        document.documentElement.style.setProperty("--entry-viewport-height", `${window.visualViewport.height}px`);
         const ratio = window.visualViewport.height / window.innerHeight;
         document.body.classList.toggle("keyboard-open", ratio < 0.78);
       };
