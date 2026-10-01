@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 4.5.21</title>
+  <title>Czas pracy 4.5.22</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -1580,34 +1580,8 @@ dialog#mainMenuDialog.drawerDialog .drawerBack{
   bottom:calc(76px + env(safe-area-inset-bottom));
 }
 
-.rangeModeTabs{
-  display:flex;
-  gap:8px;
-  padding:4px;
-  margin:0 0 12px;
-  border-radius:999px;
-  background:#f1f4f9;
-}
 
-.rangeModeTab{
-  flex:1 1 0;
-  min-height:38px;
-  height:38px;
-  padding:0 12px;
-  border-radius:999px;
-  background:transparent;
-  color:#3c4043;
-  box-shadow:none;
-  font-size:14px;
-  font-weight:700;
-  white-space:nowrap;
-  opacity:1;
-}
 
-.rangeModeTab.active{
-  background:#d7e3ff;
-  color:#174ea6;
-}
 
 .rangeModeTab.soon{
   color:#6f7785;
@@ -1723,22 +1697,12 @@ dialog#mainMenuDialog.drawerDialog .drawerBack{
 
 .statsPeriodBar{
   display:grid;
-  grid-template-columns:42px 1fr 42px;
+  grid-template-columns:44px minmax(0,1fr) 44px;
   align-items:center;
   gap:12px;
   margin:0 0 10px;
 }
 
-.statsPeriodBar button{
-  width:42px;
-  height:42px;
-  min-height:42px;
-  padding:0;
-  border-radius:50%;
-  font-size:24px;
-  line-height:1;
-  box-shadow:none;
-}
 
 .statsPeriodBar strong{
   min-width:0;
@@ -1925,20 +1889,11 @@ dialog.googlePanel[open],
   flex:1 1 auto;
   min-width:0;
   display:grid;
-  grid-template-columns:40px minmax(0,1fr) 40px;
+  grid-template-columns:44px minmax(0,1fr) 44px;
   align-items:center;
   gap:8px;
 }
 
-.dayViewNav button{
-  width:40px;
-  height:40px;
-  min-height:40px;
-  padding:0;
-  border-radius:50%;
-  font-size:24px;
-  line-height:1;
-}
 
 .dayViewDateBlock{
   min-width:0;
@@ -2073,16 +2028,7 @@ dialog.googlePanel[open],
   min-height:38px;
 }
 
-.rangeModeTabs{
-  margin-bottom:16px;
-  background:#edf1f7;
-}
 
-.rangeModeTab.active{
-  background:#fff;
-  color:#174ea6;
-  box-shadow:0 1px 2px rgba(60,64,67,.10);
-}
 
 .shiftItem.googleEvent{
   border-radius:16px;
@@ -2187,55 +2133,43 @@ body,
   background:#eef1f6;
 }
 
-#dayViewPrev,
-#dayViewNext,
-#monthStatsPrev,
-#monthStatsNext,
-#yearStatsPrev,
-#yearStatsNext{
-  position:relative;
-  font-size:0;
-  color:#174ea6;
+button.dateNavBtn{
+  width:44px;
+  height:44px;
+  min-height:44px;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:var(--primary-soft);
+  color:var(--on-primary-soft);
+  box-shadow:none;
 }
 
-#dayViewPrev::before,
-#dayViewNext::before,
-#monthStatsPrev::before,
-#monthStatsNext::before,
-#yearStatsPrev::before,
-#yearStatsNext::before{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:10px;
-  height:10px;
-  border-bottom:2.4px solid currentColor;
-  transform-origin:center;
+.dateNavBtn svg{
+  display:block;
+  width:24px;
+  height:24px;
+  fill:currentColor;
+  flex:0 0 auto;
 }
 
-#dayViewPrev::before,
-#monthStatsPrev::before,
-#yearStatsPrev::before{
-  border-left:2.4px solid currentColor;
-  transform:translate(-42%,-50%) rotate(45deg);
+button.dateNavBtn:active{
+  background:color-mix(in srgb, var(--on-primary-soft) 12%, var(--primary-soft));
+  transform:scale(.96);
 }
 
-#dayViewNext::before,
-#monthStatsNext::before,
-#yearStatsNext::before{
-  border-right:2.4px solid currentColor;
-  transform:translate(-58%,-50%) rotate(-45deg);
+button.dateNavBtn:focus-visible{
+  outline:2px solid var(--primary);
+  outline-offset:2px;
 }
 
-.rangeModeTab{
-  cursor:pointer;
-}
-
-.rangeModeTab.active{
-  background:#fff;
-  color:#174ea6;
-  box-shadow:0 1px 2px rgba(60,64,67,.10);
+@media (hover:hover) and (pointer:fine){
+  button.dateNavBtn:hover{
+    background:color-mix(in srgb, var(--on-primary-soft) 8%, var(--primary-soft));
+  }
+  button.dateNavBtn:active{
+    background:color-mix(in srgb, var(--on-primary-soft) 12%, var(--primary-soft));
+  }
 }
 
 .rangeModeTab.soon,
@@ -2325,15 +2259,6 @@ dialog#mainMenuDialog.drawerDialog .drawerItem{
     padding:0 9px;
   }
 
-.rangeModeTabs{
-    gap:6px;
-  }
-.rangeModeTab{
-    min-height:36px;
-    height:36px;
-    padding:0 10px;
-    font-size:13px;
-  }
 .rangeModeTab.soon span{
     padding:3px 5px;
     font-size:10px;
@@ -2666,7 +2591,7 @@ body.view-stats{
   flex:1 1 auto;
   min-width:0;
   display:grid;
-  grid-template-columns:40px minmax(0,1fr) 40px;
+  grid-template-columns:44px minmax(0,1fr) 44px;
   align-items:center;
   gap:8px;
 }
@@ -2880,67 +2805,60 @@ dialog#vacDialog textarea{
   resize:none;
 }
 
-/* Przełączniki trybu */
-dialog#bulkDialog .rangeModeTabs{
+/* Wspólny przełącznik trybu: wpisy zbiorcze i statystyki. */
+.rangeModeTabs{
   display:grid;
   grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-  gap:0;
-  padding:0;
-  margin:0 0 22px;
-  border:1px solid var(--outline);
-  border-radius:999px;
-  overflow:hidden;
-  background:var(--surface);
-}
-
-dialog#bulkDialog .rangeModeTab{
-  min-width:0;
-  min-height:48px;
-  height:auto;
-  padding:10px 12px;
-  border:0;
-  border-radius:0;
-  background:transparent;
-  color:var(--text);
-  box-shadow:none;
-  font-size:14px;
-  line-height:1.25;
-  font-weight:650;
-}
-
-dialog#bulkDialog .rangeModeTab + .rangeModeTab{border-left:1px solid var(--outline);}
-dialog#bulkDialog .rangeModeTab.active{background:var(--primary-soft);color:var(--primary);}
-dialog#bulkDialog .rangeModeTab:focus-visible{outline:2px solid var(--primary);outline-offset:-4px;}
-
-dialog#vacDialog .rangeModeTabs,
-.statsPage .statsRangeTabs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
   gap:4px;
   padding:4px;
   margin:0 0 22px;
-  border-radius:999px;
+  border:0;
+  border-radius:var(--radius-pill);
   background:#edf1f7;
 }
 
-dialog#vacDialog .rangeModeTab,
-.statsPage .statsRangeTabs .rangeModeTab{
+button.rangeModeTab{
+  min-width:0;
   min-height:42px;
   height:42px;
   padding:0 14px;
-  border-radius:999px;
+  border:0;
+  border-radius:var(--radius-pill);
   background:transparent;
   color:#3c4043;
   box-shadow:none;
   font-size:14px;
   font-weight:760;
+  white-space:nowrap;
+  opacity:1;
+  cursor:pointer;
 }
 
-dialog#vacDialog .rangeModeTab.active,
-.statsPage .statsRangeTabs .rangeModeTab.active{
-  background:#fff;
+.rangeModeTab.active{
+  background:var(--surface);
   color:#174ea6;
   box-shadow:0 1px 2px rgba(60,64,67,.12);
+}
+
+.rangeModeTab:active{
+  background:var(--primary-soft);
+}
+
+.rangeModeTab:focus-visible{
+  outline:2px solid var(--primary);
+  outline-offset:-4px;
+}
+
+@media (hover:hover) and (pointer:fine){
+  .rangeModeTab:hover{
+    background:color-mix(in srgb, var(--primary-soft) 30%, #edf1f7);
+  }
+  .rangeModeTab.active:hover{
+    background:color-mix(in srgb, var(--primary-soft) 20%, var(--surface));
+  }
+  .rangeModeTab:active{
+    background:var(--primary-soft);
+  }
 }
 
 .bulkModePane[hidden],
@@ -3280,12 +3198,12 @@ dialog.entryPanel .bulkFormActions{
     <section class="dayViewPage monthViewHidden" id="dayViewPage" aria-label="Widok dnia">
       <div class="dayViewTop">
         <div class="dayViewNav">
-          <button class="tonal" id="dayViewPrev" type="button" aria-label="Poprzedni dzień">‹</button>
+          <button class="dateNavBtn" id="dayViewPrev" type="button" aria-label="Poprzedni dzień"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
           <div class="dayViewDateBlock">
             <strong id="dayViewDate">—</strong>
             <span id="dayViewMeta">—</span>
           </div>
-          <button class="tonal" id="dayViewNext" type="button" aria-label="Następny dzień">›</button>
+          <button class="dateNavBtn" id="dayViewNext" type="button" aria-label="Następny dzień"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
         </div>
       </div>
 
@@ -3336,9 +3254,9 @@ dialog.entryPanel .bulkFormActions{
 
           <section class="statsView active" id="monthStatsView">
             <div class="statsPeriodBar">
-              <button class="tonal" id="monthStatsPrev" type="button" aria-label="Poprzedni miesiąc">‹</button>
+              <button class="dateNavBtn" id="monthStatsPrev" type="button" aria-label="Poprzedni miesiąc"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
               <strong id="monthStatsCurrent">—</strong>
-              <button class="tonal" id="monthStatsNext" type="button" aria-label="Następny miesiąc">›</button>
+              <button class="dateNavBtn" id="monthStatsNext" type="button" aria-label="Następny miesiąc"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
             </div>
 
             <div class="statsHero heroCard">
@@ -3368,9 +3286,9 @@ dialog.entryPanel .bulkFormActions{
 
           <section class="statsView" id="yearStatsView">
             <div class="statsPeriodBar">
-              <button class="tonal" id="yearStatsPrev" type="button" aria-label="Poprzedni rok">‹</button>
+              <button class="dateNavBtn" id="yearStatsPrev" type="button" aria-label="Poprzedni rok"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
               <strong id="yearStatsCurrent">2026</strong>
-              <button class="tonal" id="yearStatsNext" type="button" aria-label="Następny rok">›</button>
+              <button class="dateNavBtn" id="yearStatsNext" type="button" aria-label="Następny rok"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
             </div>
 
             <div class="statsHero heroCard">
@@ -3410,7 +3328,7 @@ dialog.entryPanel .bulkFormActions{
   <div class="fab-container fabGoogle" id="fabContainer" hidden>
     <div class="fabActions" id="fabActions" hidden>
       <button class="fabActionPill" id="fabDayHoursAction" type="button" data-fab-view="day" data-fab-order="1" hidden>
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2Zm1 5h-2v6l5 3 .9-1.45-3.9-2.32V7Zm6 2v3h3v2h-3v3h-2v-3h-3v-2h3V9h2Z"/></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
         <span>Dodaj godziny</span>
       </button>
 
