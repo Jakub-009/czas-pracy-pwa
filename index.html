@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 5.0.2</title>
+  <title>Czas pracy 5.0.3</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -74,6 +74,12 @@
   --month-title-size: clamp(22px, 6.1vw, 28px);
   --dow-size: clamp(12px, 3vw, 15px);
   --day-height: clamp(84px, 12.7dvh, 112px);
+  --day-cell-border: 1px;
+  --day-cell-pad-top: 4px;
+  --day-cell-pad-bottom: 6px;
+  --day-top-pad-top: 1px;
+  --day-top-pad-bottom: 4px;
+  --pill-gap: 2px;
   --day-num-size: clamp(10.5px, 2.75vw, 13px);
   --day-num-box: clamp(17px, 4.55vw, 21px);
   --today-badge-h: clamp(17px, 4.25vw, 20px);
@@ -2180,7 +2186,7 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   max-height: var(--day-height);
   border-radius: 8px;
   background: #f8f9fa;
-  border: 1px solid rgba(60,64,67,.035);
+  border: var(--day-cell-border) solid rgba(60,64,67,.035);
   box-shadow: none;
   overflow: hidden;
 }
@@ -2189,8 +2195,8 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   position: relative;
   cursor: pointer;
   contain: layout paint;
-  padding-top: 4px;
-  padding-bottom: 6px;
+  padding-top: var(--day-cell-pad-top);
+  padding-bottom: var(--day-cell-pad-bottom);
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -2223,7 +2229,7 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 1px 0 4px 4px;
+  padding: var(--day-top-pad-top) 0 var(--day-top-pad-bottom) 4px;
 }
 
 .dayNum {
@@ -2279,7 +2285,7 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--pill-gap);
   padding: 0 2px;
   overflow: hidden;
 }
@@ -3758,6 +3764,7 @@ dialog.entryPanel .bulkFormActions {
   const LAST_BACKUP_KEY = "worktime_last_backup_iso";
   const BROKEN_STORAGE_PREFIX = STORAGE_KEY + "_broken_";
   const LEAVE_TYPES = ["", "paid", "unpaid", "sick"];
+  const MAX_CALENDAR_PILLS = 4;
   const DEFAULT_TEMPLATES = [
     { start:"06:00", end:"14:00" },
     { start:"14:00", end:"22:00" },
@@ -4249,7 +4256,7 @@ dialog.entryPanel .bulkFormActions {
     if (label) pills.push(buildPillHTML(leavePillClass(day.leaveType),label));
     if (note) pills.push(buildPillHTML("note","Notatka"));
     if (!label && !note && !shifts.length && isMissingWorkday(day?.date,day)) pills.push(buildPillHTML("missing","Brak wpisu"));
-    const max = label || note ? 4 : 3, slots = Math.max(0,max - pills.length);
+    const max = label || note ? MAX_CALENDAR_PILLS : 3, slots = Math.max(0,max - pills.length);
     const visible = shifts.length > slots && slots > 0 ? slots - 1 : slots;
     for (const shift of shifts.slice(0,visible)) pills.push(buildPillHTML("work",`${shift?.start || "—"}–${shift?.end || "—"}`));
     const extra = Math.max(0,shifts.length - visible);
@@ -4292,19 +4299,29 @@ dialog.entryPanel .bulkFormActions {
     if (width <= 0) return false;
     const viewport = Math.round(window.innerWidth || width), cell = Math.max(36,(width - 24) / 7);
     const narrow = viewport <= 430;
-    const height = viewport <= 360 ? clampNumber(cell*1.78,78,92) : narrow ? clampNumber(cell*1.86,82,98) : clampNumber(cell*1.52,88,112);
-    const num = clampNumber(height*.135,narrow ? 10.5 : 11.5,narrow ? 13.5 : 14.5);
-    const pill = clampNumber(height*.145,narrow ? 11 : 12,narrow ? 14 : 15);
-    const key = [width,Math.round(height),Math.round(num*10),Math.round(pill*10)].join(":");
+    const baseHeight = viewport <= 360 ? clampNumber(cell*1.78,78,92) : narrow ? clampNumber(cell*1.86,82,98) : clampNumber(cell*1.52,88,112);
+    // Tekst i pastylki zachowują rozmiar bazowy; dodatkowe miejsce zwiększa tylko kafelek.
+    const num = clampNumber(baseHeight*.135,narrow ? 10.5 : 11.5,narrow ? 13.5 : 14.5);
+    const pill = clampNumber(baseHeight*.145,narrow ? 11 : 12,narrow ? 14 : 15);
+    const values = {
+      "day-height":baseHeight,"day-num-size":num,
+      "day-num-box":clampNumber(baseHeight*.235,narrow ? 18 : 19,narrow ? 23 : 24),
+      "today-badge-h":clampNumber(baseHeight*.215,narrow ? 18 : 19,narrow ? 21 : 22),
+      "today-badge-w":clampNumber(baseHeight*.325,narrow ? 26 : 27,narrow ? 32 : 33),
+      "pill-height":pill,"pill-size":clampNumber(baseHeight*.078,narrow ? 6.4 : 7.1,narrow ? 7.7 : 8.7)
+    };
+    const layout = getComputedStyle(document.documentElement);
+    const layoutSize = name => Number.parseFloat(layout.getPropertyValue("--" + name)) || 0;
+    const headerHeight = Math.max(values["day-num-box"],values["today-badge-h"])
+      + layoutSize("day-top-pad-top") + layoutSize("day-top-pad-bottom");
+    const minHeight = headerHeight + MAX_CALENDAR_PILLS * pill
+      + (MAX_CALENDAR_PILLS - 1) * layoutSize("pill-gap")
+      + layoutSize("day-cell-pad-top") + layoutSize("day-cell-pad-bottom")
+      + 2 * layoutSize("day-cell-border");
+    values["day-height"] = Math.max(baseHeight,Math.ceil(minHeight));
+    const key = [width,Math.round(values["day-height"]),Math.round(num*10),Math.round(pill*10)].join(":");
     if (key === ui.geometryKey) return false;
     ui.geometryKey = key;
-    const values = {
-      "day-height":height,"day-num-size":num,
-      "day-num-box":clampNumber(height*.235,narrow ? 18 : 19,narrow ? 23 : 24),
-      "today-badge-h":clampNumber(height*.215,narrow ? 18 : 19,narrow ? 21 : 22),
-      "today-badge-w":clampNumber(height*.325,narrow ? 26 : 27,narrow ? 32 : 33),
-      "pill-height":pill,"pill-size":clampNumber(height*.078,narrow ? 6.4 : 7.1,narrow ? 7.7 : 8.7)
-    };
     for (const [name,value] of Object.entries(values)) document.documentElement.style.setProperty("--" + name,px(value));
     document.documentElement.style.setProperty("--cal-geometry-key",`"${key}"`);
     return true;
@@ -4885,7 +4902,7 @@ dialog.entryPanel .bulkFormActions {
     info:{title:"Informacje",sub:"Wersja aplikacji i status błędów",footer:false}
   };
   function refreshAppInfo() {
-    text("appVersionLabel","5.0.2");
+    text("appVersionLabel","5.0.3");
     const errors = window.__appErrors;
     text("appErrorState",errors.length ? errors.length === 1 ? "1 błąd" : `${errors.length} błędów` : "Brak błędów");
     $("clearAppErrors").hidden = $("appErrorBox").hidden = !errors.length;
@@ -5882,8 +5899,8 @@ dialog.entryPanel .bulkFormActions {
     setupKeyboardFriendlyModals();
     renderAll();
     writeAppHistory("replace");
-    text("appVersionFooter","Wersja 5.0.2");
-    text("appVersionLabel","5.0.2");
+    text("appVersionFooter","Wersja 5.0.3");
+    text("appVersionLabel","5.0.3");
     setupPWA();
     if (pendingStorageWarning) { setStatus(pendingStorageWarning); pendingStorageWarning = ""; }
     const last = getLastBackupISO(), elapsed = daysSince(last);
