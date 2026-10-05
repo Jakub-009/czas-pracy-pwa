@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 5.0.1</title>
+  <title>Czas pracy 5.0.2</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -1593,8 +1593,8 @@ dialog.googlePanel[open], .appConfirmDialog[open] {
 .appToast {
   position: fixed;
   left: 50%;
-  bottom: calc(104px + env(safe-area-inset-bottom) + var(--viewport-bottom-inset, 0px));
-  transform: translate(-50%, 20px);
+  top: calc(12px + env(safe-area-inset-top) + var(--work-viewport-top, 0px));
+  transform: translate(-50%, calc(-100% - 12px - env(safe-area-inset-top)));
   z-index: 90;
   width: min(520px, calc(100% - 32px));
   min-height: 52px;
@@ -4287,7 +4287,9 @@ dialog.entryPanel .bulkFormActions {
   const clampNumber = (value,min,max) => Math.max(min,Math.min(max,value));
   const px = value => `${Math.round(value * 10) / 10}px`;
   function updateCalendarGeometryVars() {
-    const width = Math.round($("calSwipeArea")?.clientWidth || document.documentElement.clientWidth || window.innerWidth || 360);
+    const width = Math.round($("calSwipeArea")?.clientWidth || 0);
+    // Ukryty kalendarz nie ma geometrii: zachowujemy ostatni prawidłowy pomiar.
+    if (width <= 0) return false;
     const viewport = Math.round(window.innerWidth || width), cell = Math.max(36,(width - 24) / 7);
     const narrow = viewport <= 430;
     const height = viewport <= 360 ? clampNumber(cell*1.78,78,92) : narrow ? clampNumber(cell*1.86,82,98) : clampNumber(cell*1.52,88,112);
@@ -4394,12 +4396,13 @@ dialog.entryPanel .bulkFormActions {
     syncFabActions();
   }
   function renderAll() {
+    // Widok musi być widoczny, zanim obliczymy zależne od jego szerokości rozmiary.
+    applyActiveView();
     renderCalendar();
     renderQuickTemplatesUI();
     if (ui.stripOpen) renderMonthStrip(getCurrentMonthYM());
     if (ui.view === "day") renderDayView();
     renderStatsPanel();
-    applyActiveView();
     text("todayIconNum",String(new Date().getDate()));
   }
 
@@ -4882,7 +4885,7 @@ dialog.entryPanel .bulkFormActions {
     info:{title:"Informacje",sub:"Wersja aplikacji i status błędów",footer:false}
   };
   function refreshAppInfo() {
-    text("appVersionLabel","5.0.1");
+    text("appVersionLabel","5.0.2");
     const errors = window.__appErrors;
     text("appErrorState",errors.length ? errors.length === 1 ? "1 błąd" : `${errors.length} błędów` : "Brak błędów");
     $("clearAppErrors").hidden = $("appErrorBox").hidden = !errors.length;
@@ -4926,11 +4929,9 @@ dialog.entryPanel .bulkFormActions {
       if (viewport?.scale === 1) {
         root.setProperty("--work-viewport-height",viewport.height + "px");
         root.setProperty("--work-viewport-top",viewport.offsetTop + "px");
-        root.setProperty("--viewport-bottom-inset",Math.max(0,window.innerHeight - viewport.height - viewport.offsetTop) + "px");
       } else {
         root.removeProperty("--work-viewport-height");
         root.removeProperty("--work-viewport-top");
-        root.removeProperty("--viewport-bottom-inset");
       }
       const field = document.activeElement;
       if (!field?.matches("input,textarea,select") || !field.closest("dialog[open]")) return;
@@ -5881,8 +5882,8 @@ dialog.entryPanel .bulkFormActions {
     setupKeyboardFriendlyModals();
     renderAll();
     writeAppHistory("replace");
-    text("appVersionFooter","Wersja 5.0.1");
-    text("appVersionLabel","5.0.1");
+    text("appVersionFooter","Wersja 5.0.2");
+    text("appVersionLabel","5.0.2");
     setupPWA();
     if (pendingStorageWarning) { setStatus(pendingStorageWarning); pendingStorageWarning = ""; }
     const last = getLastBackupISO(), elapsed = daysSince(last);
