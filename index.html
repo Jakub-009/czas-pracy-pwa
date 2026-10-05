@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 5.0.0</title>
+  <title>Czas pracy 5.0.1</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -1593,36 +1593,35 @@ dialog.googlePanel[open], .appConfirmDialog[open] {
 .appToast {
   position: fixed;
   left: 50%;
-  top: calc(12px + env(safe-area-inset-top));
-  transform: translate(-50%, -18px);
+  bottom: calc(104px + env(safe-area-inset-bottom) + var(--viewport-bottom-inset, 0px));
+  transform: translate(-50%, 20px);
   z-index: 90;
-  max-width: min(520px, calc(100vw - 28px));
-  min-height: 44px;
-  padding: 10px 16px 10px 14px;
-  border-radius: var(--radius-pill);
+  width: min(520px, calc(100% - 32px));
+  min-height: 52px;
+  padding: 14px 18px;
+  border-radius: 16px;
   background: var(--surface);
-  color: var(--ink);
+  color: var(--text);
   border: 1px solid var(--field-outline);
-  box-shadow: 0 8px 24px rgba(60,64,67,.16);
+  box-shadow: 0 6px 20px rgba(60,64,67,.14);
   font-size: 14px;
-  line-height: 1.25;
-  font-weight: 650;
+  line-height: 1.45;
+  font-weight: 600;
   opacity: 0;
   pointer-events: none;
   display: flex;
   align-items: center;
-  gap: 10px;
-  transition: opacity .18s ease, transform .18s var(--motion-ease);
+  transition: opacity var(--motion-normal) ease, transform var(--motion-normal) var(--motion-ease);
 }
 
-.appToast::before {
-  content: "";
-  width: 10px;
-  height: 10px;
-  flex: 0 0 auto;
-  border-radius: var(--radius-pill);
-  background: var(--primary);
-  box-shadow: 0 0 0 5px #e8f0fe;
+.appToast[hidden] {
+  display: none;
+}
+
+.appToastText {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .appToast.show {
@@ -2286,25 +2285,30 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
 }
 
 .pill {
-  height: var(--pill-height);
   min-height: var(--pill-height);
-  max-height: var(--pill-height);
+  min-width: 0;
   max-width: 100%;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   border-radius: 4px;
   padding: 0 2px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-align: left;
-  text-overflow: clip;
   font-size: var(--pill-size);
-  line-height: 1;
+  line-height: 1.2;
   font-weight: 660;
   letter-spacing: -.045em;
   font-variant-numeric: tabular-nums;
-  box-shadow: none;
+}
+
+.pillText {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  text-align: center;
 }
 
 .pill.work {
@@ -2341,7 +2345,6 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
 .pill.more {
   background: transparent;
   color: var(--muted-ink);
-  justify-content: center;
   font-size: calc(var(--pill-size) + 1px);
   font-weight: 720;
 }
@@ -3378,8 +3381,10 @@ dialog.entryPanel .bulkFormActions {
       </div>
     </section>
 
-    <div class="appToast" id="appToast" hidden role="status" aria-live="polite"></div>
+  </div>
 
+  <div class="appToast" id="appToast" hidden role="status" aria-live="polite" aria-atomic="true">
+    <span class="appToastText" id="appToastText"></span>
   </div>
 
   <div class="fabScrim" id="fabScrim" hidden></div>
@@ -4233,19 +4238,22 @@ dialog.entryPanel .bulkFormActions {
     for (const id of booleanSettings) if ($(id)) $(id).checked = !!db.settings[id];
     renderTemplates();
   }
+  function buildPillHTML(type, label) {
+    return `<div class="pill ${type}"><span class="pillText">${escapeHtml(label)}</span></div>`;
+  }
   function buildPillsHTML(day) {
     const shifts = (day?.shifts || []).slice().sort((a,b) => (a.start || "").localeCompare(b.start || ""));
     const label = leaveLabel(day?.leaveType);
     const note = !!(day?.note && day.note.trim());
     const pills = [];
-    if (label) pills.push(`<div class="pill ${leavePillClass(day.leaveType)}">${label}</div>`);
-    if (note) pills.push('<div class="pill note">Notatka</div>');
-    if (!label && !note && !shifts.length && isMissingWorkday(day?.date,day)) pills.push('<div class="pill missing">Brak wpisu</div>');
+    if (label) pills.push(buildPillHTML(leavePillClass(day.leaveType),label));
+    if (note) pills.push(buildPillHTML("note","Notatka"));
+    if (!label && !note && !shifts.length && isMissingWorkday(day?.date,day)) pills.push(buildPillHTML("missing","Brak wpisu"));
     const max = label || note ? 4 : 3, slots = Math.max(0,max - pills.length);
     const visible = shifts.length > slots && slots > 0 ? slots - 1 : slots;
-    for (const shift of shifts.slice(0,visible)) pills.push(`<div class="pill work">${shift?.start || "—"}–${shift?.end || "—"}</div>`);
+    for (const shift of shifts.slice(0,visible)) pills.push(buildPillHTML("work",`${shift?.start || "—"}–${shift?.end || "—"}`));
     const extra = Math.max(0,shifts.length - visible);
-    if (extra > 0 && pills.length < max) pills.push(`<div class="pill more">+${extra}</div>`);
+    if (extra > 0 && pills.length < max) pills.push(buildPillHTML("more",`+${extra}`));
     return `<div class="pillStack">${pills.join("")}</div>`;
   }
   function buildCalendarHTML(month) {
@@ -4820,13 +4828,16 @@ dialog.entryPanel .bulkFormActions {
   function showToast(message) {
     const toast = $("appToast");
     if (!message) return;
-    toast.textContent = message;
+    clearTimeout(ui.toastTimer);
+    text("appToastText",message);
     toast.hidden = false;
     requestAnimationFrame(() => toast.classList.add("show"));
-    clearTimeout(ui.toastTimer);
     ui.toastTimer = setTimeout(() => {
       toast.classList.remove("show");
-      setTimeout(() => { toast.hidden = true; },180);
+      ui.toastTimer = setTimeout(() => {
+        toast.hidden = true;
+        ui.toastTimer = 0;
+      },180);
     },3200);
   }
   function setStatus(message) {
@@ -4871,7 +4882,7 @@ dialog.entryPanel .bulkFormActions {
     info:{title:"Informacje",sub:"Wersja aplikacji i status błędów",footer:false}
   };
   function refreshAppInfo() {
-    text("appVersionLabel","5.0.0");
+    text("appVersionLabel","5.0.1");
     const errors = window.__appErrors;
     text("appErrorState",errors.length ? errors.length === 1 ? "1 błąd" : `${errors.length} błędów` : "Brak błędów");
     $("clearAppErrors").hidden = $("appErrorBox").hidden = !errors.length;
@@ -4915,9 +4926,11 @@ dialog.entryPanel .bulkFormActions {
       if (viewport?.scale === 1) {
         root.setProperty("--work-viewport-height",viewport.height + "px");
         root.setProperty("--work-viewport-top",viewport.offsetTop + "px");
+        root.setProperty("--viewport-bottom-inset",Math.max(0,window.innerHeight - viewport.height - viewport.offsetTop) + "px");
       } else {
         root.removeProperty("--work-viewport-height");
         root.removeProperty("--work-viewport-top");
+        root.removeProperty("--viewport-bottom-inset");
       }
       const field = document.activeElement;
       if (!field?.matches("input,textarea,select") || !field.closest("dialog[open]")) return;
@@ -5868,8 +5881,8 @@ dialog.entryPanel .bulkFormActions {
     setupKeyboardFriendlyModals();
     renderAll();
     writeAppHistory("replace");
-    text("appVersionFooter","Wersja 5.0.0");
-    text("appVersionLabel","5.0.0");
+    text("appVersionFooter","Wersja 5.0.1");
+    text("appVersionLabel","5.0.1");
     setupPWA();
     if (pendingStorageWarning) { setStatus(pendingStorageWarning); pendingStorageWarning = ""; }
     const last = getLastBackupISO(), elapsed = daysSince(last);
