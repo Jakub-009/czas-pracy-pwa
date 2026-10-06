@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 5.0.4</title>
+  <title>Czas pracy 5.0.5</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -75,10 +75,10 @@
   --dow-size: clamp(12px, 3vw, 15px);
   --day-height: clamp(84px, 12.7dvh, 112px);
   --day-cell-border: 1px;
-  --day-cell-pad-top: 4px;
-  --day-cell-pad-bottom: 6px;
+  --day-cell-pad-top: 3px;
+  --day-cell-pad-bottom: 3px;
   --day-top-pad-top: 1px;
-  --day-top-pad-bottom: 4px;
+  --day-top-pad-bottom: 2px;
   --pill-gap: 2px;
   --pill-side-pad: clamp(1px, calc(2.5vw - 7px), 2px);
   --day-num-size: clamp(10.5px, 2.75vw, 13px);
@@ -1447,10 +1447,6 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
   color: #a50e0e;
 }
 
-.statsBody {
-  padding-top: 0;
-}
-
 .statsView {
   display: none;
 }
@@ -1467,7 +1463,12 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
   margin: 0 0 10px;
 }
 
-.statsPeriodBar strong {
+.statsMonthLabel {
+  margin: 0 0 10px;
+  text-align: center;
+}
+
+.statsPeriodBar strong, .statsMonthLabel strong {
   min-width: 0;
   text-align: center;
   font-size: 21px;
@@ -1553,6 +1554,7 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
 }
 
 .statsActions {
+  align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -1560,8 +1562,10 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
 }
 
 .statsActions button {
-  min-height: 40px;
-  padding: 0 16px;
+  min-height: 42px;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
 }
 
 @keyframes googlePanelIn {
@@ -2107,7 +2111,7 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   background: var(--bg);
 }
 
-.monthViewHidden, .calCard.monthViewHidden, .monthSummaryCard.monthViewHidden, .dayViewPage.monthViewHidden {
+.monthViewHidden, .calCard.monthViewHidden, .dayViewPage.monthViewHidden {
   display: none;
 }
 
@@ -2227,6 +2231,8 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
 }
 
 .dayTop {
+  flex: 0 0 auto;
+  min-height: calc(var(--day-num-box) + var(--day-top-pad-top) + var(--day-top-pad-bottom));
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -2349,11 +2355,16 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   border: 1px dashed var(--outline);
 }
 
-.pill.more {
-  background: transparent;
+.pillCount {
+  flex: 0 0 auto;
+  margin-top: auto;
+  min-width: 0;
   color: var(--muted-ink);
   font-size: calc(var(--pill-size) + 1px);
+  line-height: 1;
   font-weight: 720;
+  text-align: center;
+  white-space: nowrap;
 }
 
 #calSwipeArea.is-swiping {
@@ -2383,89 +2394,6 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
 
 #calSwipeArea.is-swiping .dayNum, #calSwipeArea.is-swiping .pill {
   transition: none;
-}
-
-.monthSummaryCard {
-  width: calc(100% - 20px);
-  margin: 10px 10px 0;
-  padding: 14px 14px;
-  display: grid;
-  grid-template-columns: 42px minmax(0,1fr) 24px;
-  align-items: center;
-  gap: 13px;
-  border: 1px solid var(--field-outline);
-  border-radius: 26px;
-  background: linear-gradient(180deg,var(--surface) 0%,#f8fafd 100%);
-  color: var(--ink);
-  box-shadow: 0 1px 3px rgba(60,64,67,.08);
-  text-align: left;
-  cursor: pointer;
-}
-
-.monthSummaryCard:active {
-  transform: scale(.995);
-}
-
-.monthSummaryIcon {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: #e8f0fe;
-  color: var(--primary);
-}
-
-.monthSummaryIcon svg {
-  width: 24px;
-  height: 24px;
-  fill: currentColor;
-}
-
-.monthSummaryText {
-  min-width: 0;
-}
-
-.monthSummaryKicker {
-  font-size: 13px;
-  line-height: 1.2;
-  font-weight: 720;
-  color: #3c4043;
-}
-
-.monthSummaryMain {
-  margin-top: 4px;
-  display: flex;
-  align-items: baseline;
-  gap: 7px;
-  min-width: 0;
-  font-size: 24px;
-  line-height: 1.05;
-  font-weight: 610;
-  letter-spacing: -.04em;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.monthSummaryMain span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-#monthSummaryMeta {
-  margin-top: 5px;
-  font-size: 13px;
-  font-weight: 650;
-  color: #3c4043;
-}
-
-.monthSummaryArrow {
-  width: 24px;
-  height: 24px;
-  fill: var(--muted-ink);
 }
 
 @media (max-width:430px) {
@@ -2668,7 +2596,7 @@ body.fab-open .wrap, body.fab-open .monthStrip, body.fab-open .appHeader {
 
 }
 
-html, body, .wrap, body.view-month, body.view-day, body.view-stats {
+html, body, .wrap, body.view-month, body.view-day {
   background: var(--bg);
 }
 
@@ -3096,72 +3024,34 @@ dialog.entryPanel .bulkFormActions {
   border-top: 1px solid var(--outline);
 }
 
-.statsPage {
-  width: 100%;
-  padding: 12px 10px calc(20px + env(safe-area-inset-bottom));
-}
-
-.statsPageShell {
+.calendarStats {
   width: 100%;
   max-width: 760px;
   margin: 0 auto;
+  padding: 12px 10px calc(20px + env(safe-area-inset-bottom));
 }
 
-.statsFullCard {
-  display: flex;
-  flex-direction: column;
-  padding: 0 0 14px;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  animation: surfaceIn var(--motion-slow) var(--motion-ease);
-}
-
-.statsFullHeader {
+.statsHeader {
   padding: 4px 4px 14px;
 }
 
-.statsFullHeader p {
-  margin: 7px 0 0;
-  font-size: 14px;
-  line-height: 1.35;
-  color: var(--muted-ink);
+.statsHeader h2 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 650;
 }
 
-.statsPageContent {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.statsPageContent .modalBody {
-  padding: 0;
-}
-
-.statsPage .statsRangeTabs {
+.calendarStats .statsRangeTabs {
   margin: 0 0 14px;
 }
 
-.statsPage .statsHero {
+.calendarStats .statsHero {
   margin-bottom: 12px;
 }
 
-.statsPage .statSoftBox {
+.calendarStats .statSoftBox {
   border-radius: var(--radius-list);
-}
-
-.statsPage .statsActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 0 0 12px;
-}
-
-.statsPage .statsActions button {
-  min-height: 42px;
-  height: 42px;
-  padding: 0 18px;
-  border-radius: var(--radius-pill);
 }
 
 @media (max-width:430px) {
@@ -3183,11 +3073,6 @@ dialog.entryPanel .bulkFormActions {
   dialog#bulkDialog .modalBody, dialog#dayDialog .modalBody, dialog#vacDialog .modalBody {
     padding-left: 20px;
     padding-right: 20px;
-  }
-
-  .statsPage {
-    padding-left: 10px;
-    padding-right: 10px;
   }
 
 }
@@ -3242,25 +3127,74 @@ dialog.entryPanel .bulkFormActions {
       </div>
     </div>
 
-    <button class="card monthSummaryCard" id="monthSummaryCard" type="button" aria-label="Otwórz statystyki miesiąca">
-      <div class="monthSummaryIcon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" focusable="false">
-          <path d="M5 19V9h3v10H5Zm5.5 0V5h3v14h-3ZM16 19v-7h3v7h-3Z"/>
-        </svg>
+    <section id="calendarStats" class="calendarStats" aria-labelledby="statsHeading">
+      <header class="statsHeader"><h2 id="statsHeading">Statystyki</h2></header>
+          <div class="rangeModeTabs statsRangeTabs" role="tablist" aria-label="Zakres statystyk">
+            <button class="rangeModeTab active" id="statsTabMonth" type="button" role="tab" aria-selected="true" aria-controls="monthStatsView">Miesiąc</button>
+            <button class="rangeModeTab" id="statsTabYear" type="button" role="tab" aria-selected="false" aria-controls="yearStatsView">Rok</button>
+          </div>
+
+          <section class="statsView active" id="monthStatsView" role="tabpanel" aria-labelledby="statsTabMonth">
+            <div class="statsMonthLabel">
+              <strong id="monthStatsCurrent">—</strong>
+            </div>
+
+            <div class="statsHero heroCard">
+              <div>
+                <span>Miesiąc</span>
+                <strong id="monthStatsHours">0:00</strong>
+                <small id="monthStatsPay">0,00 zł</small>
+              </div>
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M5 19V9h3v10H5Zm5.5 0V5h3v14h-3ZM16 19v-7h3v7h-3Z"/>
+              </svg>
+            </div>
+
+            <div class="statsGrid">
+              <div class="statSoftBox"><strong id="monthStatsWorkDays">0</strong><span>Dni pracujące</span></div>
+              <div class="statSoftBox"><strong id="monthStatsAbsences">0</strong><span>Nieobecności razem</span></div>
+              <div class="statSoftBox"><strong id="monthStatsPaid">0 dni</strong><span>Urlop płatny</span></div>
+              <div class="statSoftBox"><strong id="monthStatsUnpaid">0 dni</strong><span>Urlop bezpłatny</span></div>
+              <div class="statSoftBox"><strong id="monthStatsSick">0 dni</strong><span>Zwolnienie L4</span></div>
+              <div class="statSoftBox"><strong id="monthStatsNotes">0</strong><span>Dni z notatką</span></div>
+            </div>
+
+          </section>
+
+          <section class="statsView" id="yearStatsView" role="tabpanel" aria-labelledby="statsTabYear">
+            <div class="statsPeriodBar">
+              <button class="dateNavBtn" id="yearStatsPrev" type="button" aria-label="Poprzedni rok"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+              <strong id="yearStatsCurrent">2026</strong>
+              <button class="dateNavBtn" id="yearStatsNext" type="button" aria-label="Następny rok"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
+            </div>
+
+            <div class="statsHero heroCard">
+              <div>
+                <span>Rok</span>
+                <strong id="yearStatsHours">0:00</strong>
+                <small id="yearStatsPay">0,00 zł</small>
+              </div>
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 19h16v2H4v-2Zm1-2V9h3v8H5Zm5.5 0V3h3v14h-3ZM16 17v-6h3v6h-3Z"/>
+              </svg>
+            </div>
+
+            <div class="statsGrid">
+              <div class="statSoftBox"><strong id="yearStatsWorkDays">0</strong><span>Dni pracujące</span></div>
+              <div class="statSoftBox"><strong id="yearStatsAbsences">0</strong><span>Nieobecności razem</span></div>
+              <div class="statSoftBox"><strong id="yearStatsPaidUsed">0 dni</strong><span>Urlop wykorzystany</span></div>
+              <div class="statSoftBox"><strong id="yearStatsPaidLeft">0 dni</strong><span>Pozostało urlopu</span></div>
+              <div class="statSoftBox"><strong id="yearStatsUnpaid">0 dni</strong><span>Urlop bezpłatny</span></div>
+              <div class="statSoftBox"><strong id="yearStatsSick">0 dni</strong><span>Zwolnienie L4</span></div>
+            </div>
+
+          </section>
+      <div class="statsActions">
+        <button class="tonal" id="monthStatsPdf" type="button">Raport PDF</button>
+        <span class="muted" id="reportMonthLabel"></span>
       </div>
-      <div class="monthSummaryText">
-        <div class="monthSummaryKicker">Statystyki miesiąca</div>
-        <div class="monthSummaryMain">
-          <span id="sumHours">0:00</span>
-          <span aria-hidden="true">·</span>
-          <span id="sumPay">0,00 zł</span>
-        </div>
-        <div class="muted" id="monthSummaryMeta">0 dni pracy · 0 nieobecności</div>
-      </div>
-      <svg class="monthSummaryArrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M9.29 6.71a1 1 0 0 1 1.42 0L15.99 12l-5.28 5.29a1 1 0 0 1-1.42-1.42L13.17 12 9.29 8.12a1 1 0 0 1 0-1.41Z"/>
-      </svg>
-    </button>
+    </section>
+
     <div class="muted statusLine" id="status"></div>
 
     <section class="dayViewPage monthViewHidden" id="dayViewPage" aria-label="Widok dnia">
@@ -3306,86 +3240,6 @@ dialog.entryPanel .bulkFormActions {
       </div>
     </section>
 
-        <section id="statsPage" class="statsPage monthViewHidden" aria-label="Statystyki">
-      <div class="statsPageShell">
-        <article class="statsFullCard">
-          <header class="statsFullHeader">
-            <p>Podsumowanie godzin, wypłat i nieobecności.</p>
-          </header>
-
-          <div class="statsPageContent">
-        <div class="modalBody statsBody">
-          <div class="rangeModeTabs statsRangeTabs" role="tablist" aria-label="Zakres statystyk">
-            <button class="rangeModeTab active" id="statsTabMonth" type="button">Miesiąc</button>
-            <button class="rangeModeTab" id="statsTabYear" type="button">Rok</button>
-          </div>
-
-          <section class="statsView active" id="monthStatsView">
-            <div class="statsPeriodBar">
-              <button class="dateNavBtn" id="monthStatsPrev" type="button" aria-label="Poprzedni miesiąc"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
-              <strong id="monthStatsCurrent">—</strong>
-              <button class="dateNavBtn" id="monthStatsNext" type="button" aria-label="Następny miesiąc"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
-            </div>
-
-            <div class="statsHero heroCard">
-              <div>
-                <span>Miesiąc</span>
-                <strong id="monthStatsHours">0:00</strong>
-                <small id="monthStatsPay">0,00 zł</small>
-              </div>
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M5 19V9h3v10H5Zm5.5 0V5h3v14h-3ZM16 19v-7h3v7h-3Z"/>
-              </svg>
-            </div>
-
-            <div class="statsGrid">
-              <div class="statSoftBox"><strong id="monthStatsWorkDays">0</strong><span>Dni pracujące</span></div>
-              <div class="statSoftBox"><strong id="monthStatsAbsences">0</strong><span>Nieobecności razem</span></div>
-              <div class="statSoftBox"><strong id="monthStatsPaid">0 dni</strong><span>Urlop płatny</span></div>
-              <div class="statSoftBox"><strong id="monthStatsUnpaid">0 dni</strong><span>Urlop bezpłatny</span></div>
-              <div class="statSoftBox"><strong id="monthStatsSick">0 dni</strong><span>Zwolnienie L4</span></div>
-              <div class="statSoftBox"><strong id="monthStatsNotes">0</strong><span>Dni z notatką</span></div>
-            </div>
-
-            <div class="statsActions">
-              <button class="tonal" id="monthStatsPdf" type="button">Raport PDF</button>
-            </div>
-          </section>
-
-          <section class="statsView" id="yearStatsView">
-            <div class="statsPeriodBar">
-              <button class="dateNavBtn" id="yearStatsPrev" type="button" aria-label="Poprzedni rok"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
-              <strong id="yearStatsCurrent">2026</strong>
-              <button class="dateNavBtn" id="yearStatsNext" type="button" aria-label="Następny rok"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
-            </div>
-
-            <div class="statsHero heroCard">
-              <div>
-                <span>Rok</span>
-                <strong id="yearStatsHours">0:00</strong>
-                <small id="yearStatsPay">0,00 zł</small>
-              </div>
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M4 19h16v2H4v-2Zm1-2V9h3v8H5Zm5.5 0V3h3v14h-3ZM16 17v-6h3v6h-3Z"/>
-              </svg>
-            </div>
-
-            <div class="statsGrid">
-              <div class="statSoftBox"><strong id="yearStatsWorkDays">0</strong><span>Dni pracujące</span></div>
-              <div class="statSoftBox"><strong id="yearStatsAbsences">0</strong><span>Nieobecności razem</span></div>
-              <div class="statSoftBox"><strong id="yearStatsPaidUsed">0 dni</strong><span>Urlop wykorzystany</span></div>
-              <div class="statSoftBox"><strong id="yearStatsPaidLeft">0 dni</strong><span>Pozostało urlopu</span></div>
-              <div class="statSoftBox"><strong id="yearStatsUnpaid">0 dni</strong><span>Urlop bezpłatny</span></div>
-              <div class="statSoftBox"><strong id="yearStatsSick">0 dni</strong><span>Zwolnienie L4</span></div>
-            </div>
-
-          </section>
-        </div>
-          </div>
-
-        </article>
-      </div>
-    </section>
 
   </div>
 
@@ -3785,7 +3639,7 @@ dialog.entryPanel .bulkFormActions {
   const dayPay = minutes => round2(minutes / 60 * (db.settings.rate || 0));
   const ui = {
     view:"month", date:todayISO(),
-    stats:{mode:"month", month:"", year:null},
+    stats:{mode:"month", year:null},
     form:{date:null, mode:"", index:-1, originalNote:"", closing:false},
     drawer:"main", bulkMode:"hours", fabOpen:false, stripOpen:false,
     history:{ready:false, applying:false, current:null, pending:false, resume:null, states:new Map()},
@@ -4257,10 +4111,10 @@ dialog.entryPanel .bulkFormActions {
     if (note) pills.push(buildPillHTML("note","Notatka"));
     if (!label && !note && !shifts.length && isMissingWorkday(day?.date,day)) pills.push(buildPillHTML("missing","Brak wpisu"));
     for (const shift of shifts) pills.push(buildPillHTML("work",`${shift?.start || "—"}–${shift?.end || "—"}`));
-    const visible = pills.length > MAX_CALENDAR_PILLS ? pills.slice(0,MAX_CALENDAR_PILLS - 1) : pills;
+    const visible = pills.slice(0,MAX_CALENDAR_PILLS);
     const extra = pills.length - visible.length;
-    if (extra > 0) visible.push(buildPillHTML("more",`+${extra}`));
-    return `<div class="pillStack">${visible.join("")}</div>`;
+    const counter = extra > 0 ? `<div class="pillCount" aria-label="Pozostałe wpisy: ${extra}">+${extra}</div>` : "";
+    return `<div class="pillStack">${visible.join("")}${counter}</div>`;
   }
   function buildCalendarHTML(month) {
     const key = `${month}|${todayISO()}|${cache.revision}`;
@@ -4306,8 +4160,8 @@ dialog.entryPanel .bulkFormActions {
     ui.geometryKey = key;
     const values = {
       "day-height":height,"day-num-size":num,
-      "day-num-box":clampNumber(height*.235,narrow ? 18 : 19,narrow ? 23 : 24),
-      "today-badge-h":clampNumber(height*.215,narrow ? 18 : 19,narrow ? 21 : 22),
+      "day-num-box":clampNumber(height*.235,narrow ? 18 : 19,narrow ? 23 : 24) - 1,
+      "today-badge-h":clampNumber(height*.215,narrow ? 18 : 19,narrow ? 21 : 22) - 1,
       "today-badge-w":clampNumber(height*.325,narrow ? 26 : 27,narrow ? 32 : 33),
       "pill-height":pill,"pill-size":clampNumber(height*.082,narrow ? 6.6 : 7.5,narrow ? 8.1 : 9.4)
     };
@@ -4321,13 +4175,6 @@ dialog.entryPanel .bulkFormActions {
     text("monthLabelText",fmtMonthPL(month));
     renderDowInto($("dowRow"),month);
     setHTML($("calGrid"),buildCalendarHTML(month));
-    renderTotals(month);
-  }
-  function renderTotals(month) {
-    const totals = countEntries(monthEntries(month),false);
-    text("sumHours",fmtHM(totals.min));
-    text("sumPay",pln(dayPay(totals.min)));
-    text("monthSummaryMeta",`${totals.workDays} dni pracy · ${totals.paid + totals.unpaid + totals.sick} nieobecności · ${totals.notes} notatki`);
   }
   function renderMonthStrip(month) {
     setHTML($("monthStripScroller"),Array.from({length:12},(_,i) => addMonths(month,i - 5)).map(value => {
@@ -4374,11 +4221,20 @@ dialog.entryPanel .bulkFormActions {
     setHTML($("dayViewEvents"),events.html);
   }
   function renderStatsPanel() {
-    if (ui.view !== "stats") return;
-    const annual = ui.stats.mode === "year";
-    const totals = annual ? computeYearStats(ui.stats.year).totals : computeMonthStats(ui.stats.month).totals;
+    if (ui.view !== "month") return;
+    const month = getCurrentMonthYM(), annual = ui.stats.mode === "year";
+    ui.stats.year ||= yearFromMonthYM(month);
+    for (const [suffix,active] of [["Month",!annual],["Year",annual]]) {
+      const tab = $("statsTab" + suffix);
+      tab.classList.toggle("active",active);
+      tab.setAttribute("aria-selected",String(active));
+      $(suffix.toLowerCase() + "StatsView").classList.toggle("active",active);
+    }
+    text("reportMonthLabel","Raport: " + fmtMonthPL(month));
+    $("monthStatsPdf").setAttribute("aria-label","Raport PDF: " + fmtMonthPL(month));
+    const totals = annual ? computeYearStats(ui.stats.year).totals : computeMonthStats(month).totals;
     const prefix = annual ? "yearStats" : "monthStats";
-    const values = {Current:annual ? String(ui.stats.year) : fmtMonthPL(ui.stats.month),
+    const values = {Current:annual ? String(ui.stats.year) : fmtMonthPL(month),
       Hours:fmtHM(totals.min),Pay:pln(totals.money),WorkDays:String(totals.workDays),
       Absences:String(totals.paid + totals.unpaid + totals.sick),Unpaid:`${totals.unpaid} dni`,Sick:`${totals.sick} dni`};
     if (annual) {
@@ -4388,15 +4244,15 @@ dialog.entryPanel .bulkFormActions {
     for (const [suffix,value] of Object.entries(values)) text(prefix + suffix,value);
   }
   function applyActiveView() {
-    const day = ui.view === "day", stats = ui.view === "stats", month = !day && !stats;
-    for (const [name,active] of [["day",day],["stats",stats],["month",month]]) document.body.classList.toggle("view-" + name,active);
+    const day = ui.view === "day", month = !day;
+    for (const [name,active] of [["day",day],["month",month]]) document.body.classList.toggle("view-" + name,active);
     $("appBackBtn").hidden = month;
     $("monthNavToggle").hidden = !month;
     $("monthPick").disabled = !month;
     $("appViewTitle").hidden = month;
-    text("appViewTitle",day ? "Dzień" : stats ? "Statystyki" : "");
+    text("appViewTitle",day ? "Dzień" : "");
     document.querySelector(".topActions").hidden = !month;
-    for (const [element,visible] of [[document.querySelector(".calCard"),month],[$("monthSummaryCard"),month],[$("dayViewPage"),day],[$("statsPage"),stats]])
+    for (const [element,visible] of [[document.querySelector(".calCard"),month],[$("calendarStats"),month],[$("dayViewPage"),day]])
       element?.classList.toggle("monthViewHidden",!visible);
     $("monthStrip").hidden = !month || !ui.stripOpen;
     syncFabActions();
@@ -4445,11 +4301,11 @@ dialog.entryPanel .bulkFormActions {
   function getAppHistoryState(overlay = "") {
     return {cpApp:true,view:ui.view,date:ui.date,month:getCurrentMonthYM(),overlay,
       drawerView:overlay === "drawer" ? ui.drawer : "",statsMode:ui.stats.mode,
-      statsMonth:ui.stats.month || getCurrentMonthYM(),statsYear:ui.stats.year || yearFromMonthYM(getCurrentMonthYM())};
+      statsYear:ui.stats.year || yearFromMonthYM(getCurrentMonthYM())};
   }
   function isSameAppHistoryState(a,b) {
     if (!a?.cpApp || !b?.cpApp) return false;
-    return ["view","date","month","overlay","drawerView","statsMode","statsMonth"].every(key => (a[key] || "") === (b[key] || ""))
+    return ["view","date","month","overlay","drawerView","statsMode"].every(key => (a[key] || "") === (b[key] || ""))
       && Number(a.statsYear || 0) === Number(b.statsYear || 0);
   }
   function writeAppHistory(mode = "push", extra = {}) {
@@ -4482,7 +4338,7 @@ dialog.entryPanel .bulkFormActions {
     const state = history.state, delta = options.historyDelta || -1;
     const previous = ui.history.states.get((state?.cpIndex || 0) + delta);
     if (options.history !== false && state?.cpApp && state.overlay === name && previous?.cpApp
-      && ["month","day","stats"].includes(previous.view) && typeof history.back === "function") {
+      && ["month","day"].includes(previous.view) && typeof history.back === "function") {
       if (!ui.history.pending) { ui.history.pending = true; history.go(delta); }
       return true;
     }
@@ -4540,14 +4396,17 @@ dialog.entryPanel .bulkFormActions {
   }
   function applyAppHistoryState(input) {
     let state = input;
-    const legacyWeek = state?.cpApp && state.view === "week";
-    if (legacyWeek) {
+    const legacyView = state?.cpApp && ["week","stats"].includes(state.view);
+    if (legacyView) {
       const date = isValidDateISO(state.date) ? state.date
         : /^\d{4}-(0[1-9]|1[0-2])$/.test(String(state.month || "")) ? state.month + "-01" : todayISO();
-      state = {...state,view:"month",date,month:ym(date),overlay:"",drawerView:""};
+      // Starszy wpis historii wskazuje usunięty ekran; wracamy do kalendarza.
+      const month = state.view === "stats" && /^\d{4}-(0[1-9]|1[0-2])$/.test(String(state.statsMonth || ""))
+        ? state.statsMonth : ym(date);
+      state = {...state,view:"month",date,month,overlay:"",drawerView:""};
     }
-    if (!state?.cpApp || !["month","day","stats"].includes(state.view)) return false;
-    if (legacyWeek || state.overlay && !overlayVisible(state.overlay)) {
+    if (!state?.cpApp || !["month","day"].includes(state.view)) return false;
+    if (legacyView || state.overlay && !overlayVisible(state.overlay)) {
       state = {...state,overlay:"",drawerView:""};
       history.replaceState(state,document.title);
       ui.history.current = state;
@@ -4559,11 +4418,8 @@ dialog.entryPanel .bulkFormActions {
       if (isValidDateISO(state.date)) ui.date = state.date;
       const month = /^\d{4}-\d{2}$/.test(String(state.month || "")) ? state.month : ym(ui.date);
       $("monthPick").value = month;
-      if (state.view === "stats") {
-        ui.stats.mode = state.statsMode === "year" ? "year" : "month";
-        ui.stats.month = /^\d{4}-\d{2}$/.test(String(state.statsMonth || "")) ? state.statsMonth : month;
-        ui.stats.year = Number(state.statsYear || yearFromMonthYM(ui.stats.month)) || yearFromMonthYM(ui.stats.month);
-      }
+      ui.stats.mode = state.statsMode === "year" ? "year" : "month";
+      ui.stats.year = Number(state.statsYear || yearFromMonthYM(month)) || yearFromMonthYM(month);
       closeAppOverlays(state.overlay || "");
       if (state.overlay === "drawer") showDrawerView(state.drawerView || "main",{history:false});
       renderAll();
@@ -4597,13 +4453,9 @@ dialog.entryPanel .bulkFormActions {
   }
   function setActiveView(view, date = "", options = {}) {
     if (options.historyMode !== "none" && !history.state?.overlay) writeAppHistory("replace");
-    ui.view = ["day","stats"].includes(view) ? view : "month";
+    ui.view = view === "day" ? "day" : "month";
     closeFabMenu({history:false,haptic:false});
     if (ui.view !== "month") setMonthStripOpen(false,{history:false});
-    if (ui.view === "stats") {
-      ui.stats.month ||= getCurrentMonthYM();
-      ui.stats.year ||= yearFromMonthYM(ui.stats.month);
-    }
     if (date) ui.date = date;
     if (ui.view === "day") $("monthPick").value = ym(ui.date);
     renderAll();
@@ -4613,7 +4465,7 @@ dialog.entryPanel .bulkFormActions {
   function goBackOrSetActiveView(view = "month", date = "") {
     const nav = ui.history, previous = nav.states.get((history.state?.cpIndex || 0) - 1);
     if (nav.pending || nav.resume) return;
-    if (history.state?.cpApp && previous?.cpApp && !previous.overlay && ["month","day","stats"].includes(previous.view) && typeof history.back === "function") {
+    if (history.state?.cpApp && previous?.cpApp && !previous.overlay && ["month","day"].includes(previous.view) && typeof history.back === "function") {
       nav.pending = true;
       history.back();
     } else setActiveView(view,date,{historyMode:"replace"});
@@ -4632,22 +4484,8 @@ dialog.entryPanel .bulkFormActions {
   }
   function setStatsMode(mode) {
     ui.stats.mode = mode === "year" ? "year" : "month";
-    for (const [suffix,active] of [["Month",ui.stats.mode === "month"],["Year",ui.stats.mode === "year"]]) {
-      $("statsTab" + suffix).classList.toggle("active",active);
-      $(suffix.toLowerCase() + "StatsView").classList.toggle("active",active);
-    }
     renderStatsPanel();
-    if (ui.view === "stats") writeAppHistory("replace");
-  }
-  function openStatsPanel(mode = "month") {
-    ui.stats.month = getCurrentMonthYM();
-    ui.stats.year = yearFromMonthYM(ui.stats.month);
-    ui.stats.mode = mode === "year" ? "year" : "month";
-    setActiveView("stats","",{historyMode:"push",haptic:false});
-    setStatsMode(ui.stats.mode);
-    setSystemBars();
-    window.scrollTo({top:0,behavior:"smooth"});
-    haptic.tap();
+    writeAppHistory("replace");
   }
 
   // 9. Formularze dnia i zakresu. Szkic notatki jest oddzielony od bazy.
@@ -4891,7 +4729,7 @@ dialog.entryPanel .bulkFormActions {
     info:{title:"Informacje",sub:"Wersja aplikacji i status błędów",footer:false}
   };
   function refreshAppInfo() {
-    text("appVersionLabel","5.0.4");
+    text("appVersionLabel","5.0.5");
     const errors = window.__appErrors;
     text("appErrorState",errors.length ? errors.length === 1 ? "1 błąd" : `${errors.length} błędów` : "Brak błędów");
     $("clearAppErrors").hidden = $("appErrorBox").hidden = !errors.length;
@@ -5368,7 +5206,6 @@ dialog.entryPanel .bulkFormActions {
   const clickActions = {
     monthNavToggle:() => { haptic.tap(); setMonthStripOpen(!ui.stripOpen); },
     todayBtn:() => setActiveView("day",todayISO()),
-    monthSummaryCard:() => openStatsPanel("month"),
     appBackBtn:() => goBackOrSetActiveView(),
     mainMenuBtn:openDrawer,drawerBack:() => closeDrawer(),
     openEmployerSettings:() => { showDrawerView("settings"); haptic.tap(); },
@@ -5394,11 +5231,9 @@ dialog.entryPanel .bulkFormActions {
     dayViewPrev:() => animateDayChange(-1),dayViewNext:() => animateDayChange(1),
     statsTabMonth:() => { haptic.tap(); setStatsMode("month"); },
     statsTabYear:() => { haptic.tap(); setStatsMode("year"); },
-    monthStatsPrev:() => changeStatsPeriod(-1,false),
-    monthStatsNext:() => changeStatsPeriod(1,false),
-    yearStatsPrev:() => changeStatsPeriod(-1,true),
-    yearStatsNext:() => changeStatsPeriod(1,true),
-    monthStatsPdf:() => openReportPdf(ui.stats.month),
+    yearStatsPrev:() => changeStatsYear(-1),
+    yearStatsNext:() => changeStatsYear(1),
+    monthStatsPdf:() => openReportPdf(getCurrentMonthYM()),
     backupJson:exportBackup,restoreBtn:() => { haptic.tap(); $("restoreJson").click(); },
     checkUpdateBtn:checkForAppUpdate,
     appConfirmOk:() => chooseConfirmation(true),appConfirmCancel:() => chooseConfirmation(false),
@@ -5419,9 +5254,8 @@ dialog.entryPanel .bulkFormActions {
     },
     clearAppErrors:() => { window.__appErrors = []; refreshAppInfo(); showToast("Lista błędów została wyczyszczona."); haptic.success(); }
   };
-  function changeStatsPeriod(delta, annual) {
-    if (annual) ui.stats.year = (ui.stats.year || yearFromMonthYM(getCurrentMonthYM())) + delta;
-    else ui.stats.month = addMonths(ui.stats.month || getCurrentMonthYM(),delta);
+  function changeStatsYear(delta) {
+    ui.stats.year = (ui.stats.year || yearFromMonthYM(getCurrentMonthYM())) + delta;
     haptic.tap();
     renderStatsPanel();
     writeAppHistory("replace");
@@ -5888,8 +5722,8 @@ dialog.entryPanel .bulkFormActions {
     setupKeyboardFriendlyModals();
     renderAll();
     writeAppHistory("replace");
-    text("appVersionFooter","Wersja 5.0.4");
-    text("appVersionLabel","5.0.4");
+    text("appVersionFooter","Wersja 5.0.5");
+    text("appVersionLabel","5.0.5");
     setupPWA();
     if (pendingStorageWarning) { setStatus(pendingStorageWarning); pendingStorageWarning = ""; }
     const last = getLastBackupISO(), elapsed = daysSince(last);
