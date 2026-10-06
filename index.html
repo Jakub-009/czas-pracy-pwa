@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 5.0.5</title>
+  <title>Czas pracy 5.0.6</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -213,7 +213,7 @@ label {
   margin: 0;
 }
 
-.surfaceCard, .statSoftBox {
+.surfaceCard {
   background: var(--surface);
   border: 1px solid #e4e8f1;
   border-radius: var(--radius-list);
@@ -497,16 +497,16 @@ dialog:focus, dialog:focus-visible {
   gap: 6px;
 }
 
-.shiftItem.googleEvent .eventContent {
+.shiftItem.dayEventCard .eventContent {
   min-width: 0;
   flex: 1;
 }
 
-.shiftItem.googleEvent.workEvent {
+.shiftItem.dayEventCard.workEvent {
   background: #eaf6ee;
 }
 
-.shiftItem.googleEvent .eventEditIcon {
+.shiftItem.dayEventCard .eventEditIcon {
   width: 20px;
   height: 20px;
   flex: 0 0 20px;
@@ -515,55 +515,55 @@ dialog:focus, dialog:focus-visible {
   margin-right: 4px;
 }
 
-.shiftItem.googleEvent.noteEvent .eventEditIcon {
+.shiftItem.dayEventCard.noteEvent .eventEditIcon {
   color: #8d6500;
 }
 
-.shiftItem.googleEvent.leaveEvent.vac .eventEditIcon {
+.shiftItem.dayEventCard.leaveEvent.vac .eventEditIcon {
   color: #174ea6;
 }
 
-.shiftItem.googleEvent.leaveEvent.unpaid .eventEditIcon {
+.shiftItem.dayEventCard.leaveEvent.unpaid .eventEditIcon {
   color: #6741a5;
 }
 
-.shiftItem.googleEvent.leaveEvent.sick .eventEditIcon {
+.shiftItem.dayEventCard.leaveEvent.sick .eventEditIcon {
   color: #a50e0e;
 }
 
-.shiftItem.googleEvent.workEvent .eventStripe {
+.shiftItem.dayEventCard.workEvent .eventStripe {
   background: #34a853;
 }
 
-.shiftItem.googleEvent.leaveEvent {
+.shiftItem.dayEventCard.leaveEvent {
   min-height: 50px;
 }
 
-.shiftItem.googleEvent.leaveEvent.vac {
+.shiftItem.dayEventCard.leaveEvent.vac {
   background: #e8f0fe;
 }
 
-.shiftItem.googleEvent.leaveEvent.vac .eventStripe {
+.shiftItem.dayEventCard.leaveEvent.vac .eventStripe {
   background: #8ab4f8;
 }
 
-.shiftItem.googleEvent.leaveEvent.unpaid {
+.shiftItem.dayEventCard.leaveEvent.unpaid {
   background: #f3eefe;
 }
 
-.shiftItem.googleEvent.leaveEvent.unpaid .eventStripe {
+.shiftItem.dayEventCard.leaveEvent.unpaid .eventStripe {
   background: #7e57c2;
 }
 
-.shiftItem.googleEvent.leaveEvent.sick {
+.shiftItem.dayEventCard.leaveEvent.sick {
   background: var(--red-soft);
 }
 
-.shiftItem.googleEvent.leaveEvent.sick .eventStripe {
+.shiftItem.dayEventCard.leaveEvent.sick .eventStripe {
   background: #ea4335;
 }
 
-.shiftItem.googleEvent.leaveEvent .mins {
+.shiftItem.dayEventCard.leaveEvent .mins {
   color: var(--muted-ink);
   font-weight: 500;
 }
@@ -651,38 +651,38 @@ textarea {
   border-bottom: none;
 }
 
-.shiftItem.googleEvent.noteEvent {
+.shiftItem.dayEventCard.noteEvent {
   background: #fff8e1;
 }
 
-.shiftItem.googleEvent.noteEvent .eventStripe {
+.shiftItem.dayEventCard.noteEvent .eventStripe {
   background: var(--yellow);
 }
 
-.shiftItem.googleEvent.noteEvent .times {
+.shiftItem.dayEventCard.noteEvent .times {
   color: var(--ink);
 }
 
-.shiftItem.googleEvent.noteEvent .mins {
+.shiftItem.dayEventCard.noteEvent .mins {
   white-space: normal;
   overflow: visible;
   text-overflow: initial;
   line-height: 1.35;
 }
 
-.shiftItem.googleEvent.holidayEvent {
+.shiftItem.dayEventCard.holidayEvent {
   background: var(--red-soft);
 }
 
-.shiftItem.googleEvent.holidayEvent .eventStripe {
+.shiftItem.dayEventCard.holidayEvent .eventStripe {
   background: #ea4335;
 }
 
-.shiftItem.googleEvent.holidayEvent .times {
+.shiftItem.dayEventCard.holidayEvent .times {
   color: var(--ink);
 }
 
-.shiftItem.googleEvent.holidayEvent .mins {
+.shiftItem.dayEventCard.holidayEvent .mins {
   color: var(--muted-ink);
 }
 
@@ -1447,14 +1447,6 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
   color: #a50e0e;
 }
 
-.statsView {
-  display: none;
-}
-
-.statsView.active {
-  display: block;
-}
-
 .statsPeriodBar {
   display: grid;
   grid-template-columns: 44px minmax(0,1fr) 44px;
@@ -1463,12 +1455,7 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
   margin: 0 0 10px;
 }
 
-.statsMonthLabel {
-  margin: 0 0 10px;
-  text-align: center;
-}
-
-.statsPeriodBar strong, .statsMonthLabel strong {
+.statsPeriodBar strong {
   min-width: 0;
   text-align: center;
   font-size: 21px;
@@ -1482,7 +1469,7 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   padding: 15px 16px;
 }
 
@@ -1529,10 +1516,10 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
 
 .statSoftBox {
   min-width: 0;
-  padding: 10px 11px;
-  border-radius: 20px;
+  padding: 10px 12px;
+  border-radius: var(--radius-small);
   background: var(--surface);
-  border: 1px solid #e4e8f1;
+  border: 1px solid var(--outline-soft);
 }
 
 .statSoftBox strong {
@@ -1568,20 +1555,7 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
   border-radius: var(--radius-pill);
 }
 
-@keyframes googlePanelIn {
-  from {
-    transform: translateY(10px);
-    opacity: .98;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
-}
-
-dialog.googlePanel[open], .appConfirmDialog[open] {
+dialog.entryPanel[open], .appConfirmDialog[open] {
   animation: surfaceIn var(--motion-slow) var(--motion-ease);
 }
 
@@ -1784,7 +1758,7 @@ dialog.googlePanel[open], .appConfirmDialog[open] {
   background: #f8fafd;
 }
 
-.shiftItem.googleEvent {
+.shiftItem.dayEventCard {
   position: relative;
   display: flex;
   align-items: center;
@@ -1799,7 +1773,7 @@ dialog.googlePanel[open], .appConfirmDialog[open] {
   border: 1px solid rgba(60,64,67,.05);
 }
 
-.shiftItem.googleEvent .eventStripe {
+.shiftItem.dayEventCard .eventStripe {
   align-self: stretch;
   background: #34a853;
   flex: 0 0 auto;
@@ -1807,7 +1781,7 @@ dialog.googlePanel[open], .appConfirmDialog[open] {
   border-radius: 0 999px 999px 0;
 }
 
-.shiftItem.googleEvent .times {
+.shiftItem.dayEventCard .times {
   line-height: 1.1;
   font-weight: 650;
   color: var(--ink);
@@ -1815,24 +1789,24 @@ dialog.googlePanel[open], .appConfirmDialog[open] {
   font-size: 16px;
 }
 
-.shiftItem.googleEvent .mins {
+.shiftItem.dayEventCard .mins {
   margin-top: 4px;
   line-height: 1.2;
   color: var(--muted-ink);
   font-size: 12.5px;
 }
 
-button.shiftItem.googleEvent {
+button.shiftItem.dayEventCard {
   appearance: none;
   text-align: left;
   color: inherit;
 }
 
-button.shiftItem.googleEvent:hover {
+button.shiftItem.dayEventCard:hover {
   box-shadow: 0 1px 4px rgba(60,64,67,.12);
 }
 
-button.shiftItem.googleEvent:focus-visible {
+button.shiftItem.dayEventCard:focus-visible {
   outline: 3px solid #8ab4f8;
   outline-offset: 2px;
 }
@@ -2077,10 +2051,6 @@ button.dateNavBtn:focus-visible {
 
   .statsGrid {
     gap: 8px;
-  }
-
-  .statSoftBox {
-    border-radius: 18px;
   }
 
   .dayViewPage {
@@ -2422,7 +2392,7 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   display: none;
 }
 
-.fab-container.fabGoogle {
+.fab-container.fabMenu {
   position: fixed;
   right: 24px;
   bottom: calc(32px + env(safe-area-inset-bottom));
@@ -2512,7 +2482,7 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   background: #c8d7fb;
 }
 
-.fabGoogle .fab {
+.fabMenu .fab {
   width: 56px;
   height: 56px;
   min-height: 56px;
@@ -2527,11 +2497,11 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   overflow: hidden;
 }
 
-.fabGoogle .fab svg {
+.fabMenu .fab svg {
   display: none;
 }
 
-.fabGoogle .fab::before, .fabGoogle .fab::after {
+.fabMenu .fab::before, .fabMenu .fab::after {
   content: "";
   position: absolute;
   left: 50%;
@@ -2544,20 +2514,20 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   transition: transform .18s cubic-bezier(.2,0,0,1), width .18s cubic-bezier(.2,0,0,1);
 }
 
-.fabGoogle .fab::before {
+.fabMenu .fab::before {
   transform: translate(-50%,-50%) rotate(0deg);
 }
 
-.fabGoogle .fab::after {
+.fabMenu .fab::after {
   transform: translate(-50%,-50%) rotate(90deg);
 }
 
-.fabGoogle.is-open .fab::before {
+.fabMenu.is-open .fab::before {
   width: 19px;
   transform: translate(-50%,-50%) rotate(45deg);
 }
 
-.fabGoogle.is-open .fab::after {
+.fabMenu.is-open .fab::after {
   width: 19px;
   transform: translate(-50%,-50%) rotate(-45deg);
 }
@@ -2572,24 +2542,24 @@ body.fab-open .wrap, body.fab-open .monthStrip, body.fab-open .appHeader {
 }
 
 @media (max-width:430px) {
-  .fab-container.fabGoogle {
+  .fab-container.fabMenu {
     right: 20px;
     bottom: calc(32px + env(safe-area-inset-bottom));
   }
 
-  .fabGoogle .fab {
+  .fabMenu .fab {
     width: 54px;
     height: 54px;
     min-height: 54px;
     border-radius: 18px;
   }
 
-  .fabGoogle .fab::before, .fabGoogle .fab::after {
+  .fabMenu .fab::before, .fabMenu .fab::after {
     width: 19px;
     height: 2.8px;
   }
 
-  .fabGoogle.is-open .fab::before, .fabGoogle.is-open .fab::after {
+  .fabMenu.is-open .fab::before, .fabMenu.is-open .fab::after {
     width: 18px;
     height: 2.8px;
   }
@@ -3025,33 +2995,22 @@ dialog.entryPanel .bulkFormActions {
 }
 
 .calendarStats {
-  width: 100%;
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 12px 10px calc(20px + env(safe-area-inset-bottom));
+  width: calc(100% - 20px);
+  max-width: 740px;
+  margin: 16px auto 0;
+  padding: 16px 0 calc(20px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--field-outline);
 }
 
 .statsHeader {
-  padding: 4px 4px 14px;
+  padding: 0 4px 12px;
 }
 
 .statsHeader h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.2;
   font-weight: 650;
-}
-
-.calendarStats .statsRangeTabs {
-  margin: 0 0 14px;
-}
-
-.calendarStats .statsHero {
-  margin-bottom: 12px;
-}
-
-.calendarStats .statSoftBox {
-  border-radius: var(--radius-list);
 }
 
 @media (max-width:430px) {
@@ -3128,70 +3087,28 @@ dialog.entryPanel .bulkFormActions {
     </div>
 
     <section id="calendarStats" class="calendarStats" aria-labelledby="statsHeading">
-      <header class="statsHeader"><h2 id="statsHeading">Statystyki</h2></header>
-          <div class="rangeModeTabs statsRangeTabs" role="tablist" aria-label="Zakres statystyk">
-            <button class="rangeModeTab active" id="statsTabMonth" type="button" role="tab" aria-selected="true" aria-controls="monthStatsView">Miesiąc</button>
-            <button class="rangeModeTab" id="statsTabYear" type="button" role="tab" aria-selected="false" aria-controls="yearStatsView">Rok</button>
-          </div>
+      <header class="statsHeader"><h2 id="statsHeading">Podsumowanie miesiąca</h2></header>
+      <div class="statsHero heroCard">
+        <div>
+          <span id="monthStatsCurrent">—</span>
+          <strong id="monthStatsHours">0:00</strong>
+          <small id="monthStatsPay">0,00 zł</small>
+        </div>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M5 19V9h3v10H5Zm5.5 0V5h3v14h-3ZM16 19v-7h3v7h-3Z"/>
+        </svg>
+      </div>
 
-          <section class="statsView active" id="monthStatsView" role="tabpanel" aria-labelledby="statsTabMonth">
-            <div class="statsMonthLabel">
-              <strong id="monthStatsCurrent">—</strong>
-            </div>
-
-            <div class="statsHero heroCard">
-              <div>
-                <span>Miesiąc</span>
-                <strong id="monthStatsHours">0:00</strong>
-                <small id="monthStatsPay">0,00 zł</small>
-              </div>
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M5 19V9h3v10H5Zm5.5 0V5h3v14h-3ZM16 19v-7h3v7h-3Z"/>
-              </svg>
-            </div>
-
-            <div class="statsGrid">
-              <div class="statSoftBox"><strong id="monthStatsWorkDays">0</strong><span>Dni pracujące</span></div>
-              <div class="statSoftBox"><strong id="monthStatsAbsences">0</strong><span>Nieobecności razem</span></div>
-              <div class="statSoftBox"><strong id="monthStatsPaid">0 dni</strong><span>Urlop płatny</span></div>
-              <div class="statSoftBox"><strong id="monthStatsUnpaid">0 dni</strong><span>Urlop bezpłatny</span></div>
-              <div class="statSoftBox"><strong id="monthStatsSick">0 dni</strong><span>Zwolnienie L4</span></div>
-              <div class="statSoftBox"><strong id="monthStatsNotes">0</strong><span>Dni z notatką</span></div>
-            </div>
-
-          </section>
-
-          <section class="statsView" id="yearStatsView" role="tabpanel" aria-labelledby="statsTabYear">
-            <div class="statsPeriodBar">
-              <button class="dateNavBtn" id="yearStatsPrev" type="button" aria-label="Poprzedni rok"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
-              <strong id="yearStatsCurrent">2026</strong>
-              <button class="dateNavBtn" id="yearStatsNext" type="button" aria-label="Następny rok"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
-            </div>
-
-            <div class="statsHero heroCard">
-              <div>
-                <span>Rok</span>
-                <strong id="yearStatsHours">0:00</strong>
-                <small id="yearStatsPay">0,00 zł</small>
-              </div>
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M4 19h16v2H4v-2Zm1-2V9h3v8H5Zm5.5 0V3h3v14h-3ZM16 17v-6h3v6h-3Z"/>
-              </svg>
-            </div>
-
-            <div class="statsGrid">
-              <div class="statSoftBox"><strong id="yearStatsWorkDays">0</strong><span>Dni pracujące</span></div>
-              <div class="statSoftBox"><strong id="yearStatsAbsences">0</strong><span>Nieobecności razem</span></div>
-              <div class="statSoftBox"><strong id="yearStatsPaidUsed">0 dni</strong><span>Urlop wykorzystany</span></div>
-              <div class="statSoftBox"><strong id="yearStatsPaidLeft">0 dni</strong><span>Pozostało urlopu</span></div>
-              <div class="statSoftBox"><strong id="yearStatsUnpaid">0 dni</strong><span>Urlop bezpłatny</span></div>
-              <div class="statSoftBox"><strong id="yearStatsSick">0 dni</strong><span>Zwolnienie L4</span></div>
-            </div>
-
-          </section>
+      <div class="statsGrid">
+        <div class="statSoftBox"><strong id="monthStatsWorkDays">0</strong><span>Dni pracujące</span></div>
+        <div class="statSoftBox"><strong id="monthStatsAbsences">0</strong><span>Nieobecności razem</span></div>
+        <div class="statSoftBox"><strong id="monthStatsPaid">0 dni</strong><span>Urlop płatny</span></div>
+        <div class="statSoftBox"><strong id="monthStatsUnpaid">0 dni</strong><span>Urlop bezpłatny</span></div>
+        <div class="statSoftBox"><strong id="monthStatsSick">0 dni</strong><span>Zwolnienie L4</span></div>
+        <div class="statSoftBox"><strong id="monthStatsNotes">0</strong><span>Dni z notatką</span></div>
+      </div>
       <div class="statsActions">
         <button class="tonal" id="monthStatsPdf" type="button">Raport PDF</button>
-        <span class="muted" id="reportMonthLabel"></span>
       </div>
     </section>
 
@@ -3249,7 +3166,7 @@ dialog.entryPanel .bulkFormActions {
 
   <div class="fabScrim" id="fabScrim" hidden></div>
 
-  <div class="fab-container fabGoogle" id="fabContainer" hidden>
+  <div class="fab-container fabMenu" id="fabContainer" hidden>
     <div class="fabActions" id="fabActions" hidden>
       <button class="fabActionPill" id="fabDayHoursAction" type="button" data-fab-view="day" data-fab-order="1" hidden>
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
@@ -3293,6 +3210,10 @@ dialog.entryPanel .bulkFormActions {
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V8h14v11ZM7 10h5v5H7v-5Zm7 0h3v2h-3v-2Zm0 4h3v2h-3v-2Z"/></svg>
               <span>Wpisy zbiorcze</span>
             </button>
+            <button class="drawerItem" id="openAnnualStats" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19h16v2H4v-2Zm1-2V9h3v8H5Zm5.5 0V3h3v14h-3ZM16 17v-6h3v6h-3Z"/></svg>
+              <span>Statystyki roczne</span>
+            </button>
             <button class="drawerItem" id="openEmployerSettings" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.02-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.37-.31-.6-.22l-2.49 1a7.28 7.28 0 0 0-1.69-.98L14.5 2.42A.49.49 0 0 0 14 2h-4c-.25 0-.46.18-.5.42L9.12 5.07c-.61.24-1.18.56-1.69.98l-2.49-1a.5.5 0 0 0-.6.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.08.65-.08.98s.03.66.08.98l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.12.22.37.31.6.22l2.49-1c.51.4 1.08.73 1.69.98l.38 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.61-.24 1.18-.56 1.69-.98l2.49 1c.23.08.48 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.64l-2.11-1.65ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/></svg>
               <span>Ustawienia</span>
@@ -3310,6 +3231,34 @@ dialog.entryPanel .bulkFormActions {
               <span>Informacje</span>
             </button>
           </div>
+        </div>
+
+        <div class="drawerView" id="drawerViewAnnual">
+      <div class="statsPeriodBar">
+        <button class="dateNavBtn" id="yearStatsPrev" type="button" aria-label="Poprzedni rok"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+        <strong id="yearStatsCurrent">2026</strong>
+        <button class="dateNavBtn" id="yearStatsNext" type="button" aria-label="Następny rok"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
+      </div>
+
+      <div class="statsHero heroCard">
+        <div>
+          <span>Rok</span>
+          <strong id="yearStatsHours">0:00</strong>
+          <small id="yearStatsPay">0,00 zł</small>
+        </div>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 19h16v2H4v-2Zm1-2V9h3v8H5Zm5.5 0V3h3v14h-3ZM16 17v-6h3v6h-3Z"/>
+        </svg>
+      </div>
+
+      <div class="statsGrid">
+        <div class="statSoftBox"><strong id="yearStatsWorkDays">0</strong><span>Dni pracujące</span></div>
+        <div class="statSoftBox"><strong id="yearStatsAbsences">0</strong><span>Nieobecności razem</span></div>
+        <div class="statSoftBox"><strong id="yearStatsPaidUsed">0 dni</strong><span>Urlop wykorzystany</span></div>
+        <div class="statSoftBox"><strong id="yearStatsPaidLeft">0 dni</strong><span>Pozostało urlopu</span></div>
+        <div class="statSoftBox"><strong id="yearStatsUnpaid">0 dni</strong><span>Urlop bezpłatny</span></div>
+        <div class="statSoftBox"><strong id="yearStatsSick">0 dni</strong><span>Zwolnienie L4</span></div>
+      </div>
         </div>
 
         <div class="drawerView" id="drawerViewSettings">
@@ -3408,13 +3357,13 @@ dialog.entryPanel .bulkFormActions {
     </div>
   </dialog>
 
-  <dialog id="vacDialog" class="googlePanel workPanel entryPanel leavePanel" aria-labelledby="vacDialogTitle">
-    <div class="googlePanelShell workPanelShell">
-      <div class="googlePanelBar workPanelBar">
+  <dialog id="vacDialog" class="workPanel entryPanel leavePanel" aria-labelledby="vacDialogTitle">
+    <div class="workPanelShell">
+      <div class="workPanelBar">
         <button class="formBackBtn" id="vacPanelClose" type="button" aria-label="Wstecz"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button>
         <h3 id="vacDialogTitle">Dodaj urlop / L4</h3>
       </div>
-      <div class="googlePanelContent workPanelContent">
+      <div class="workPanelContent">
 
     <div class="modalBody">
       <div style="margin-bottom:16px;">
@@ -3467,13 +3416,13 @@ dialog.entryPanel .bulkFormActions {
   </dialog>
 
   <!-- FORMULARZ WPISÓW ZBIORCZYCH -->
-  <dialog id="bulkDialog" class="googlePanel workPanel entryPanel bulkPanel" aria-labelledby="bulkTitle">
-    <div class="googlePanelShell workPanelShell">
-      <div class="googlePanelBar workPanelBar">
+  <dialog id="bulkDialog" class="workPanel entryPanel bulkPanel" aria-labelledby="bulkTitle">
+    <div class="workPanelShell">
+      <div class="workPanelBar">
         <button class="formBackBtn" id="bulkPanelClose" type="button" aria-label="Wstecz"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button>
         <h3 id="bulkTitle">Wpisy zbiorcze</h3>
       </div>
-      <div class="googlePanelContent workPanelContent">
+      <div class="workPanelContent">
     <div class="modalBody">
       <div class="rangeModeTabs" role="group" aria-label="Tryb zakresu dni">
         <button class="rangeModeTab active" id="bulkModeHours" type="button" aria-pressed="true">Godziny pracy</button>
@@ -3550,13 +3499,13 @@ dialog.entryPanel .bulkFormActions {
   </dialog>
 
   <!-- FORMULARZ POJEDYNCZEGO WYDARZENIA DNIA -->
-  <dialog id="dayDialog" class="googlePanel workPanel entryPanel dayPanel" aria-labelledby="dlgTitle" aria-describedby="dlgMeta">
-    <div class="googlePanelShell workPanelShell">
-      <div class="googlePanelBar workPanelBar">
+  <dialog id="dayDialog" class="workPanel entryPanel dayPanel" aria-labelledby="dlgTitle" aria-describedby="dlgMeta">
+    <div class="workPanelShell">
+      <div class="workPanelBar">
         <button class="formBackBtn" id="dayPanelClose" type="button" aria-label="Wstecz"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button>
         <h3 id="dlgTitle">Dodaj godziny</h3>
       </div>
-      <div class="googlePanelContent workPanelContent">
+      <div class="workPanelContent">
 
     <div class="modalHead">
       <div class="modalHeadInner">
@@ -3639,7 +3588,7 @@ dialog.entryPanel .bulkFormActions {
   const dayPay = minutes => round2(minutes / 60 * (db.settings.rate || 0));
   const ui = {
     view:"month", date:todayISO(),
-    stats:{mode:"month", year:null},
+    stats:{year:null},
     form:{date:null, mode:"", index:-1, originalNote:"", closing:false},
     drawer:"main", bulkMode:"hours", fabOpen:false, stripOpen:false,
     history:{ready:false, applying:false, current:null, pending:false, resume:null, states:new Map()},
@@ -4187,7 +4136,7 @@ dialog.entryPanel .bulkFormActions {
   function eventHTML(kind, title, detail, attributes = "", variant = "") {
     const editable = kind !== "holiday";
     const tag = editable ? "button" : "div";
-    return `<${tag} class="shiftItem googleEvent ${kind === "shift" ? "work" : kind}Event${variant ? " " + variant : ""}" ${editable ? 'type="button" ' + attributes : ""}>
+    return `<${tag} class="shiftItem dayEventCard ${kind === "shift" ? "work" : kind}Event${variant ? " " + variant : ""}" ${editable ? 'type="button" ' + attributes : ""}>
       <div class="eventStripe" aria-hidden="true"></div>
       <div class="eventContent"><div class="times">${escapeHtml(title)}</div><div class="mins">${escapeHtml(detail)}</div></div>
       ${editable ? eventEditIcon : ""}
@@ -4220,28 +4169,27 @@ dialog.entryPanel .bulkFormActions {
     text("dayViewEventsCount",events.count ? `${events.count} ${pluralPL(events.count,"wpis","wpisy","wpisów")}` : "brak wpisów");
     setHTML($("dayViewEvents"),events.html);
   }
-  function renderStatsPanel() {
-    if (ui.view !== "month") return;
-    const month = getCurrentMonthYM(), annual = ui.stats.mode === "year";
-    ui.stats.year ||= yearFromMonthYM(month);
-    for (const [suffix,active] of [["Month",!annual],["Year",annual]]) {
-      const tab = $("statsTab" + suffix);
-      tab.classList.toggle("active",active);
-      tab.setAttribute("aria-selected",String(active));
-      $(suffix.toLowerCase() + "StatsView").classList.toggle("active",active);
-    }
-    text("reportMonthLabel","Raport: " + fmtMonthPL(month));
-    $("monthStatsPdf").setAttribute("aria-label","Raport PDF: " + fmtMonthPL(month));
-    const totals = annual ? computeYearStats(ui.stats.year).totals : computeMonthStats(month).totals;
-    const prefix = annual ? "yearStats" : "monthStats";
-    const values = {Current:annual ? String(ui.stats.year) : fmtMonthPL(month),
-      Hours:fmtHM(totals.min),Pay:pln(totals.money),WorkDays:String(totals.workDays),
+  function renderStatsTotals(prefix, totals) {
+    const values = {Hours:fmtHM(totals.min),Pay:pln(totals.money),WorkDays:String(totals.workDays),
       Absences:String(totals.paid + totals.unpaid + totals.sick),Unpaid:`${totals.unpaid} dni`,Sick:`${totals.sick} dni`};
-    if (annual) {
-      values.PaidUsed = `${totals.paid} dni`;
-      values.PaidLeft = `${Math.max(0,Math.max(0,Number(db.settings.leaveQuota || 0)) - totals.paid)} dni`;
-    } else { values.Paid = `${totals.paid} dni`; values.Notes = String(totals.notes); }
     for (const [suffix,value] of Object.entries(values)) text(prefix + suffix,value);
+  }
+  function renderMonthStats() {
+    if (ui.view !== "month") return;
+    const month = getCurrentMonthYM(), totals = computeMonthStats(month).totals;
+    renderStatsTotals("monthStats",totals);
+    text("monthStatsCurrent",fmtMonthPL(month));
+    text("monthStatsPaid",`${totals.paid} dni`);
+    text("monthStatsNotes",String(totals.notes));
+    $("monthStatsPdf").setAttribute("aria-label","Raport PDF: " + fmtMonthPL(month));
+  }
+  function renderYearStats() {
+    ui.stats.year ||= yearFromMonthYM(getCurrentMonthYM());
+    const totals = computeYearStats(ui.stats.year).totals;
+    renderStatsTotals("yearStats",totals);
+    text("yearStatsCurrent",String(ui.stats.year));
+    text("yearStatsPaidUsed",`${totals.paid} dni`);
+    text("yearStatsPaidLeft",`${Math.max(0,Math.max(0,Number(db.settings.leaveQuota || 0)) - totals.paid)} dni`);
   }
   function applyActiveView() {
     const day = ui.view === "day", month = !day;
@@ -4264,7 +4212,8 @@ dialog.entryPanel .bulkFormActions {
     renderQuickTemplatesUI();
     if (ui.stripOpen) renderMonthStrip(getCurrentMonthYM());
     if (ui.view === "day") renderDayView();
-    renderStatsPanel();
+    renderMonthStats();
+    if ($("mainMenuDialog").open && ui.drawer === "annual") renderYearStats();
     text("todayIconNum",String(new Date().getDate()));
   }
 
@@ -4300,12 +4249,12 @@ dialog.entryPanel .bulkFormActions {
   }
   function getAppHistoryState(overlay = "") {
     return {cpApp:true,view:ui.view,date:ui.date,month:getCurrentMonthYM(),overlay,
-      drawerView:overlay === "drawer" ? ui.drawer : "",statsMode:ui.stats.mode,
+      drawerView:overlay === "drawer" ? ui.drawer : "",
       statsYear:ui.stats.year || yearFromMonthYM(getCurrentMonthYM())};
   }
   function isSameAppHistoryState(a,b) {
     if (!a?.cpApp || !b?.cpApp) return false;
-    return ["view","date","month","overlay","drawerView","statsMode"].every(key => (a[key] || "") === (b[key] || ""))
+    return ["view","date","month","overlay","drawerView"].every(key => (a[key] || "") === (b[key] || ""))
       && Number(a.statsYear || 0) === Number(b.statsYear || 0);
   }
   function writeAppHistory(mode = "push", extra = {}) {
@@ -4418,7 +4367,6 @@ dialog.entryPanel .bulkFormActions {
       if (isValidDateISO(state.date)) ui.date = state.date;
       const month = /^\d{4}-\d{2}$/.test(String(state.month || "")) ? state.month : ym(ui.date);
       $("monthPick").value = month;
-      ui.stats.mode = state.statsMode === "year" ? "year" : "month";
       ui.stats.year = Number(state.statsYear || yearFromMonthYM(month)) || yearFromMonthYM(month);
       closeAppOverlays(state.overlay || "");
       if (state.overlay === "drawer") showDrawerView(state.drawerView || "main",{history:false});
@@ -4453,9 +4401,11 @@ dialog.entryPanel .bulkFormActions {
   }
   function setActiveView(view, date = "", options = {}) {
     if (options.historyMode !== "none" && !history.state?.overlay) writeAppHistory("replace");
-    ui.view = view === "day" ? "day" : "month";
+    const nextView = view === "day" ? "day" : "month";
+    // Zamknięcie nakładek zapisuje stan wyjściowy, zanim zmienimy widok i datę.
     closeFabMenu({history:false,haptic:false});
-    if (ui.view !== "month") setMonthStripOpen(false,{history:false});
+    if (nextView !== "month") setMonthStripOpen(false,{history:false});
+    ui.view = nextView;
     if (date) ui.date = date;
     if (ui.view === "day") $("monthPick").value = ym(ui.date);
     renderAll();
@@ -4482,12 +4432,6 @@ dialog.entryPanel .bulkFormActions {
     if (ui.view === "day" && ym(ui.date) !== month) ui.date = ym(todayISO()) === month ? todayISO() : month + "-01";
     renderAll();
   }
-  function setStatsMode(mode) {
-    ui.stats.mode = mode === "year" ? "year" : "month";
-    renderStatsPanel();
-    writeAppHistory("replace");
-  }
-
   // 9. Formularze dnia i zakresu. Szkic notatki jest oddzielony od bazy.
   function openForm(id) {
     setSystemBars();
@@ -4526,7 +4470,7 @@ dialog.entryPanel .bulkFormActions {
       text("dlgAddShift",edit ? "Zapisz zmiany" : "Dodaj godziny");
       $("dlgDeleteShift").hidden = !edit;
     }
-    $("dayDialog").querySelector(".googlePanelContent").scrollTop = 0;
+    $("dayDialog").querySelector(".workPanelContent").scrollTop = 0;
     openForm("dayDialog");
     setTimeout(() => { if ($("dayDialog").open && ui.form.date === date) $(note ? "dlgNote" : "dlgStart").focus({preventScroll:true}); },80);
   }
@@ -4723,13 +4667,14 @@ dialog.entryPanel .bulkFormActions {
   const askConfirm = (message,title = "Potwierdź") => openAppDialog({title,message,okText:"Tak",cancelText:"Anuluj",tone:"default"});
   const drawerMeta = {
     main:{title:"Czas pracy",sub:"Kalendarz godzin i urlopów",footer:true},
+    annual:{title:"Statystyki roczne",sub:"Godziny, wypłaty i urlop w wybranym roku",footer:false},
     settings:{title:"Ustawienia",sub:"Stawka, zakresy i szablony pracy",footer:false},
     backup:{title:"Kopia i przywracanie",sub:"Pobieranie i wczytywanie danych JSON",footer:false},
     tools:{title:"Narzędzia",sub:"Aktualizacja aplikacji i czyszczenie miesiąca",footer:false},
     info:{title:"Informacje",sub:"Wersja aplikacji i status błędów",footer:false}
   };
   function refreshAppInfo() {
-    text("appVersionLabel","5.0.5");
+    text("appVersionLabel","5.0.6");
     const errors = window.__appErrors;
     text("appErrorState",errors.length ? errors.length === 1 ? "1 błąd" : `${errors.length} błędów` : "Brak błędów");
     $("clearAppErrors").hidden = $("appErrorBox").hidden = !errors.length;
@@ -4744,6 +4689,7 @@ dialog.entryPanel .bulkFormActions {
     $("drawerBack").hidden = false;
     $("drawerBack").setAttribute("aria-label",ui.drawer === "main" ? "Zamknij menu" : "Wróć do menu");
     $("drawerFooter").hidden = !meta.footer;
+    if (ui.drawer === "annual") renderYearStats();
     if (name === "info") refreshAppInfo();
     if ($("mainMenuDialog").open && options.history !== false) writeAppHistory("push",{overlay:"drawer"});
   }
@@ -4859,7 +4805,7 @@ dialog.entryPanel .bulkFormActions {
     setLastBackupNow();
     setStatus("Kopia JSON została pobrana.");
     haptic.success();
-    notify("Kopia zapisana 👍 Polecam wysłać plik na Google Drive lub maila do siebie.");
+    notify("Kopia zapisana 👍 Przechowuj ją również poza telefonem.");
   }
   async function importBackup(event) {
     const file = event.target.files?.[0];
@@ -5208,6 +5154,7 @@ dialog.entryPanel .bulkFormActions {
     todayBtn:() => setActiveView("day",todayISO()),
     appBackBtn:() => goBackOrSetActiveView(),
     mainMenuBtn:openDrawer,drawerBack:() => closeDrawer(),
+    openAnnualStats:() => { showDrawerView("annual"); haptic.tap(); },
     openEmployerSettings:() => { showDrawerView("settings"); haptic.tap(); },
     openBackupTools:() => { showDrawerView("backup"); haptic.tap(); },
     openSystemTools:() => { showDrawerView("tools"); haptic.tap(); },
@@ -5229,8 +5176,6 @@ dialog.entryPanel .bulkFormActions {
     bulkModeHours:() => { haptic.tap(); setBulkMode("hours"); },
     bulkModeLeave:() => { haptic.tap(); setBulkMode("leave"); },
     dayViewPrev:() => animateDayChange(-1),dayViewNext:() => animateDayChange(1),
-    statsTabMonth:() => { haptic.tap(); setStatsMode("month"); },
-    statsTabYear:() => { haptic.tap(); setStatsMode("year"); },
     yearStatsPrev:() => changeStatsYear(-1),
     yearStatsNext:() => changeStatsYear(1),
     monthStatsPdf:() => openReportPdf(getCurrentMonthYM()),
@@ -5257,8 +5202,8 @@ dialog.entryPanel .bulkFormActions {
   function changeStatsYear(delta) {
     ui.stats.year = (ui.stats.year || yearFromMonthYM(getCurrentMonthYM())) + delta;
     haptic.tap();
-    renderStatsPanel();
-    writeAppHistory("replace");
+    renderYearStats();
+    writeAppHistory("replace",{overlay:"drawer"});
   }
   function handleClick(event) {
     const target = event.target.closest?.("[data-remove-template],[data-template-index],[data-month-chip],[data-day-event],.dayCell[data-date],button,#fabScrim");
@@ -5722,8 +5667,8 @@ dialog.entryPanel .bulkFormActions {
     setupKeyboardFriendlyModals();
     renderAll();
     writeAppHistory("replace");
-    text("appVersionFooter","Wersja 5.0.5");
-    text("appVersionLabel","5.0.5");
+    text("appVersionFooter","Wersja 5.0.6");
+    text("appVersionLabel","5.0.6");
     setupPWA();
     if (pendingStorageWarning) { setStatus(pendingStorageWarning); pendingStorageWarning = ""; }
     const last = getLastBackupISO(), elapsed = daysSince(last);
