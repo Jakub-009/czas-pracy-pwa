@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 5.0.6</title>
+  <title>Czas pracy 5.0.7</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2161,7 +2161,7 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   max-height: var(--day-height);
   border-radius: 8px;
   background: #f8f9fa;
-  border: var(--day-cell-border) solid rgba(60,64,67,.035);
+  border: var(--day-cell-border) solid var(--outline-soft);
   box-shadow: none;
   overflow: hidden;
 }
@@ -2187,7 +2187,6 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
 
 .dayCell:hover {
   background: var(--surface);
-  border-color: rgba(60,64,67,.07);
 }
 
 .dayCell:active {
@@ -2317,12 +2316,6 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
 .pill.note {
   background: var(--yellow-soft);
   color: #5f4200;
-}
-
-.pill.missing {
-  background: #f1f3f4;
-  color: var(--text-3);
-  border: 1px dashed var(--outline);
 }
 
 .pillCount {
@@ -4058,7 +4051,6 @@ dialog.entryPanel .bulkFormActions {
     const pills = [];
     if (label) pills.push(buildPillHTML(leavePillClass(day.leaveType),label));
     if (note) pills.push(buildPillHTML("note","Notatka"));
-    if (!label && !note && !shifts.length && isMissingWorkday(day?.date,day)) pills.push(buildPillHTML("missing","Brak wpisu"));
     for (const shift of shifts) pills.push(buildPillHTML("work",`${shift?.start || "—"}–${shift?.end || "—"}`));
     const visible = pills.slice(0,MAX_CALENDAR_PILLS);
     const extra = pills.length - visible.length;
@@ -4674,7 +4666,7 @@ dialog.entryPanel .bulkFormActions {
     info:{title:"Informacje",sub:"Wersja aplikacji i status błędów",footer:false}
   };
   function refreshAppInfo() {
-    text("appVersionLabel","5.0.6");
+    text("appVersionLabel","5.0.7");
     const errors = window.__appErrors;
     text("appErrorState",errors.length ? errors.length === 1 ? "1 błąd" : `${errors.length} błędów` : "Brak błędów");
     $("clearAppErrors").hidden = $("appErrorBox").hidden = !errors.length;
@@ -5667,8 +5659,8 @@ dialog.entryPanel .bulkFormActions {
     setupKeyboardFriendlyModals();
     renderAll();
     writeAppHistory("replace");
-    text("appVersionFooter","Wersja 5.0.6");
-    text("appVersionLabel","5.0.6");
+    text("appVersionFooter","Wersja 5.0.7");
+    text("appVersionLabel","5.0.7");
     setupPWA();
     if (pendingStorageWarning) { setStatus(pendingStorageWarning); pendingStorageWarning = ""; }
     const last = getLastBackupISO(), elapsed = daysSince(last);
