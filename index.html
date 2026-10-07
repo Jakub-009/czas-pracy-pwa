@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 5.0.8</title>
+  <title>Czas pracy 5.0.9</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -29,13 +29,14 @@
   --outline: #c4cad4;
   --outline-soft: #e2e6ed;
   --grid: #e0e0e0;
-  --primary: #1a73e8;
+  --primary: #377aff;
+  --primary-rgb: 55,122,255;
   --primary-soft: #d3e3fd;
   --on-primary: #ffffff;
   --on-primary-soft: #041e49;
   --green: #137333;
   --green-soft: #d7f2dd;
-  --blue: #1a73e8;
+  --blue: var(--primary);
   --blue-soft: #d3e3fd;
   --yellow: #fbbc04;
   --yellow-soft: #feefc3;
@@ -47,7 +48,7 @@
   --holiday: #d93025;
   --bar-work: #137333;
   --bar-work-soft: #d7f2dd;
-  --bar-vac: #1a73e8;
+  --bar-vac: var(--primary);
   --bar-vac-soft: #d3e3fd;
   --bar-note: #fbbc04;
   --radius-sheet: 32px;
@@ -84,12 +85,15 @@
   --day-num-size: clamp(10.5px, 2.75vw, 13px);
   --day-num-box: clamp(17px, 4.55vw, 21px);
   --today-badge-h: clamp(17px, 4.25vw, 20px);
-  --today-badge-w: calc(var(--today-badge-h) * 1.45);
+  --today-badge-w: calc(var(--today-badge-h) * 1.32);
   --pill-size: clamp(7.4px, 2vw, 9.4px);
   --pill-height: clamp(12px, 3.12vw, 15px);
   --ink: #202124;
   --muted-ink: #5f6368;
   --field-outline: #dfe3eb;
+  --field-radius: 20px;
+  --field-shadow: 0 1px 2px rgba(60,64,67,.035);
+  --time-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%23202124' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 html {
@@ -689,7 +693,7 @@ textarea {
 .checkRow input[type="checkbox"] {
   position: absolute;
   top: calc(50% - 22px);
-  left: 0;
+  right: 0;
   width: 44px;
   min-width: 44px;
   height: 44px;
@@ -745,6 +749,7 @@ textarea {
 
 .checkRow span:not(.switchTrack) {
   min-width: 0;
+  flex: 1 1 auto;
   line-height: 1.2;
 }
 
@@ -1102,7 +1107,7 @@ dialog#mainMenuDialog.drawerDialog[open] {
 .drawerPanel {
   width: min(342px, 90vw);
   height: 100dvh;
-  background: var(--surface);
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   animation: drawerFromLeft404 var(--motion-slow) var(--motion-ease);
@@ -1220,16 +1225,15 @@ dialog#mainMenuDialog.drawerDialog[open] {
 }
 
 .settingsAccordion {
-  border-top: 1px solid var(--outline-soft);
-  margin: 0 8px;
-}
-
-.settingsAccordion:last-of-type {
-  border-bottom: 1px solid var(--outline-soft);
+  margin: 0 0 12px;
+  padding: 0 12px;
+  border: 1px solid var(--outline-soft);
+  border-radius: var(--radius-list);
+  background: var(--surface);
 }
 
 .settingsAccordion summary {
-  min-height: 56px;
+  min-height: 52px;
   padding: 0;
   display: flex;
   align-items: center;
@@ -1278,13 +1282,30 @@ dialog#mainMenuDialog.drawerDialog[open] {
 }
 
 .settingsAccordionBody {
-  padding: 0 0 16px;
+  padding: 0 0 12px;
   animation: settingsAccordionIn .18s cubic-bezier(.2,0,0,1);
+}
+
+.settingsAccordionBody input:not([type="checkbox"]), .settingsAccordionBody select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid var(--field-outline);
+  border-radius: var(--field-radius);
+  background: var(--surface);
+  box-shadow: var(--field-shadow);
+  font-size: 15px;
+}
+
+.settingsAccordionBody input:not([type="checkbox"]):focus-visible, .settingsAccordionBody select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .templateChip {
   border-radius: var(--radius-pill);
   background: #e8f0fe;
+
   color: #174ea6;
   box-shadow: none;
   min-height: 29px;
@@ -1390,7 +1411,8 @@ dialog#mainMenuDialog.drawerDialog .drawerFooter {
 }
 
 dialog#mainMenuDialog.drawerDialog .drawerContent {
-  padding-bottom: calc(112px + env(safe-area-inset-bottom));
+  margin-bottom: calc(148px + env(safe-area-inset-bottom));
+  padding-bottom: 16px;
 }
 
 dialog#mainMenuDialog.drawerDialog .drawerBack {
@@ -1402,7 +1424,7 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
   min-height: 54px;
   padding: 0;
   border-radius: 18px;
-  background: #4285f4;
+  background: var(--primary);
   color: var(--surface);
   box-shadow: 0 8px 20px rgba(60,64,67,.24),0 2px 6px rgba(60,64,67,.16);
   display: grid;
@@ -1481,7 +1503,7 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
 }
 
 .appConfirmActions .dialogPrimary {
-  background: #4285f4;
+  background: var(--primary);
   color: var(--surface);
 }
 
@@ -2243,7 +2265,7 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
 
 .dayCell.today {
   background: #f8f9fa;
-  border-color: rgba(66,133,244,.22);
+  border-color: rgba(var(--primary-rgb),.22);
 }
 
 .dayTop {
@@ -2277,10 +2299,10 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   height: var(--today-badge-h);
   padding: 0 4px;
   border-radius: var(--radius-pill);
-  background: #4285f4;
+  background: var(--primary);
   color: var(--surface);
   font-weight: 600;
-  box-shadow: 0 1px 4px rgba(66,133,244,.22);
+  box-shadow: 0 1px 4px rgba(var(--primary-rgb),.22);
 }
 
 .dayNum.saturday {
@@ -2528,7 +2550,7 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   min-height: 56px;
   padding: 0;
   border-radius: 19px;
-  background: #4285f4;
+  background: var(--primary);
   color: var(--surface);
   box-shadow: 0 8px 20px rgba(60,64,67,.28),0 2px 6px rgba(60,64,67,.18);
   display: grid;
@@ -2781,10 +2803,10 @@ dialog#bulkDialog input:not([type="checkbox"]), dialog#bulkDialog select, dialog
   padding: 0 18px;
   box-sizing: border-box;
   border: 1px solid var(--field-outline);
-  border-radius: 20px;
+  border-radius: var(--field-radius);
   background: var(--surface);
   color: var(--ink);
-  box-shadow: 0 1px 2px rgba(60,64,67,.035);
+  box-shadow: var(--field-shadow);
   font-size: 16px;
 }
 
@@ -2792,8 +2814,16 @@ dialog#bulkDialog input[type="date"], dialog#bulkDialog input[type="time"], dial
   padding-right: 52px;
 }
 
-dialog#bulkDialog input[type="date"]::-webkit-calendar-picker-indicator, dialog#bulkDialog input[type="time"]::-webkit-calendar-picker-indicator, dialog#dayDialog input[type="date"]::-webkit-calendar-picker-indicator, dialog#dayDialog input[type="time"]::-webkit-calendar-picker-indicator, dialog#vacDialog input[type="date"]::-webkit-calendar-picker-indicator, dialog#vacDialog input[type="time"]::-webkit-calendar-picker-indicator {
+dialog#bulkDialog input[type="date"]::-webkit-calendar-picker-indicator, dialog#dayDialog input[type="date"]::-webkit-calendar-picker-indicator, dialog#vacDialog input[type="date"]::-webkit-calendar-picker-indicator {
   margin-right: 12px;
+  opacity: .78;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+  background: var(--time-chevron) center / 18px 18px no-repeat;
   opacity: .78;
 }
 
@@ -2993,7 +3023,7 @@ dialog.entryPanel .entryFormActions button {
 dialog.entryPanel .formPrimary {
   background: var(--primary);
   color: var(--surface);
-  box-shadow: 0 2px 5px rgba(26,115,232,.18);
+  box-shadow: 0 2px 5px rgba(var(--primary-rgb),.18);
 }
 
 dialog.entryPanel .formDelete {
@@ -3307,19 +3337,19 @@ dialog.entryPanel .bulkFormActions {
             <div class="settingsAccordionBody">
               <div class="muted settingsHint">Te opcje ustawiają domyślne zaznaczenie w panelach „Zakres dni” oraz „Urlop / L4”. W samym panelu nadal można zmienić je jednorazowo.</div>
               <label class="checkRow">
+                <span>Domyślnie uwzględniaj soboty</span>
                 <input id="defaultIncludeSat" type="checkbox" role="switch" />
                 <span class="switchTrack" aria-hidden="true"></span>
-                <span>Domyślnie uwzględniaj soboty</span>
               </label>
               <label class="checkRow">
+                <span>Domyślnie uwzględniaj niedziele</span>
                 <input id="defaultIncludeSun" type="checkbox" role="switch" />
                 <span class="switchTrack" aria-hidden="true"></span>
-                <span>Domyślnie uwzględniaj niedziele</span>
               </label>
               <label class="checkRow">
+                <span>Domyślnie uwzględniaj święta</span>
                 <input id="defaultIncludeHolidays" type="checkbox" role="switch" />
                 <span class="switchTrack" aria-hidden="true"></span>
-                <span>Domyślnie uwzględniaj święta</span>
               </label>
             </div>
           </details>
@@ -3417,19 +3447,19 @@ dialog.entryPanel .bulkFormActions {
       <div class="bulkOptions leaveOptions">
         <div class="bulkOptionsTitle">Uwzględnij</div>
         <label class="checkRow">
+          <span>Soboty</span>
           <input id="vacIncludeSat" type="checkbox" role="switch" />
           <span class="switchTrack" aria-hidden="true"></span>
-          <span>Soboty</span>
         </label>
         <label class="checkRow">
+          <span>Niedziele</span>
           <input id="vacIncludeSun" type="checkbox" role="switch" />
           <span class="switchTrack" aria-hidden="true"></span>
-          <span>Niedziele</span>
         </label>
         <label class="checkRow">
+          <span>Święta</span>
           <input id="vacIncludeHolidays" type="checkbox" role="switch" />
           <span class="switchTrack" aria-hidden="true"></span>
-          <span>Święta</span>
         </label>
       </div>
 
@@ -3503,19 +3533,19 @@ dialog.entryPanel .bulkFormActions {
       <div class="bulkOptions" role="group" aria-labelledby="bulkOptionsTitle">
         <div class="bulkOptionsTitle" id="bulkOptionsTitle">Uwzględnij</div>
         <label class="checkRow">
+          <span>Soboty</span>
           <input id="bulkIncludeSat" type="checkbox" role="switch" />
           <span class="switchTrack" aria-hidden="true"></span>
-          <span>Soboty</span>
         </label>
         <label class="checkRow">
+          <span>Niedziele</span>
           <input id="bulkIncludeSun" type="checkbox" role="switch" />
           <span class="switchTrack" aria-hidden="true"></span>
-          <span>Niedziele</span>
         </label>
         <label class="checkRow">
+          <span>Święta</span>
           <input id="bulkIncludeHolidays" type="checkbox" role="switch" />
           <span class="switchTrack" aria-hidden="true"></span>
-          <span>Święta</span>
         </label>
       </div>
 
@@ -4706,7 +4736,7 @@ dialog.entryPanel .bulkFormActions {
     info:{title:"Informacje",sub:"Wersja aplikacji i status błędów",footer:false}
   };
   function refreshAppInfo() {
-    text("appVersionLabel","5.0.8");
+    text("appVersionLabel","5.0.9");
     const errors = window.__appErrors;
     text("appErrorState",errors.length ? errors.length === 1 ? "1 błąd" : `${errors.length} błędów` : "Brak błędów");
     $("clearAppErrors").hidden = $("appErrorBox").hidden = !errors.length;
@@ -5699,8 +5729,8 @@ dialog.entryPanel .bulkFormActions {
     setupKeyboardFriendlyModals();
     renderAll();
     writeAppHistory("replace");
-    text("appVersionFooter","Wersja 5.0.8");
-    text("appVersionLabel","5.0.8");
+    text("appVersionFooter","Wersja 5.0.9");
+    text("appVersionLabel","5.0.9");
     setupPWA();
     if (pendingStorageWarning) { setStatus(pendingStorageWarning); pendingStorageWarning = ""; }
     const last = getLastBackupISO(), elapsed = daysSince(last);
