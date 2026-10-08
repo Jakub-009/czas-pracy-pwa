@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 5.0.11</title>
+  <title>Czas pracy 5.1.0</title>
   <meta name="theme-color" content="#e6eaf0" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -2768,7 +2768,7 @@ dialog.rangePanel label, dialog#dayDialog label, dialog.rangePanel .quickTemplat
   color: #3c4043;
   font-size: 15px;
   line-height: 1.2;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 dialog.rangePanel .fieldGrid, dialog#dayDialog .fieldGrid, dialog#dayDialog .timeGrid {
@@ -3290,13 +3290,13 @@ dialog.rangePanel .rangeFormActions {
             <summary><span>Praca i rozliczenia</span><i class="settingsChevron" aria-hidden="true"></i></summary>
             <div class="settingsAccordionBody">
               <div style="margin-bottom:16px;">
-                <label>Stawka godzinowa (PLN)</label>
-                <input id="rate" type="number" step="0.01" min="0" placeholder="Wpisz stawkę" />
+                <label for="rate">Stawka godzinowa (PLN)</label>
+                <input id="rate" type="number" required step="0.01" min="0" placeholder="Wpisz stawkę" />
               </div>
 
               <div>
-                <label>Limit urlopu płatnego (dni / rok)</label>
-                <input id="leaveQuota" type="number" step="1" min="0" placeholder="np. 26" />
+                <label for="leaveQuota">Limit urlopu płatnego (dni / rok)</label>
+                <input id="leaveQuota" type="number" required step="1" min="0" placeholder="np. 26" />
               </div>
             </div>
           </details>
@@ -3304,19 +3304,19 @@ dialog.rangePanel .rangeFormActions {
           <details class="settingsAccordion">
             <summary><span>Zakresy dni</span><i class="settingsChevron" aria-hidden="true"></i></summary>
             <div class="settingsAccordionBody">
-              <div class="muted settingsHint">Te opcje ustawiają domyślne zaznaczenie w panelach „Zakres dni” oraz „Urlop / L4”. W samym panelu nadal można zmienić je jednorazowo.</div>
+              <div class="muted settingsHint">Domyślnie uwzględniaj wybrane dni we „Wpisach zbiorczych” i „Dodaj urlop / L4”. W formularzu możesz zmienić wybór jednorazowo.</div>
               <label class="checkRow">
-                <span>Domyślnie uwzględniaj soboty</span>
+                <span>Soboty</span>
                 <input id="defaultIncludeSat" type="checkbox" role="switch" />
                 <span class="switchTrack" aria-hidden="true"></span>
               </label>
               <label class="checkRow">
-                <span>Domyślnie uwzględniaj niedziele</span>
+                <span>Niedziele</span>
                 <input id="defaultIncludeSun" type="checkbox" role="switch" />
                 <span class="switchTrack" aria-hidden="true"></span>
               </label>
               <label class="checkRow">
-                <span>Domyślnie uwzględniaj święta</span>
+                <span>Święta</span>
                 <input id="defaultIncludeHolidays" type="checkbox" role="switch" />
                 <span class="switchTrack" aria-hidden="true"></span>
               </label>
@@ -3326,8 +3326,8 @@ dialog.rangePanel .rangeFormActions {
           <details class="settingsAccordion">
             <summary><span>Kopia zapasowa</span><i class="settingsChevron" aria-hidden="true"></i></summary>
             <div class="settingsAccordionBody">
-              <label>Przypomnienie o kopii co ile dni?</label>
-              <input id="backupReminderDays" type="number" step="1" min="1" max="60" placeholder="np. 5" />
+              <label for="backupReminderDays">Przypomnienie o kopii co ile dni?</label>
+              <input id="backupReminderDays" type="number" required step="1" min="1" max="60" placeholder="np. 5" />
               <div class="muted settingsHint">Dane nadal zapisują się lokalnie w telefonie. To ustawienie dotyczy tylko przypomnienia o ręcznym pobraniu kopii JSON.</div>
             </div>
           </details>
@@ -3339,11 +3339,11 @@ dialog.rangePanel .rangeFormActions {
               <div class="templateList" id="templateList"></div>
               <div class="fieldGrid templateAddGrid">
                 <div>
-                  <label>Wejście</label>
+                  <label for="tplStart">Wejście</label>
                   <input id="tplStart" type="time" />
                 </div>
                 <div>
-                  <label>Wyjście</label>
+                  <label for="tplEnd">Wyjście</label>
                   <input id="tplEnd" type="time" />
                 </div>
               </div>
@@ -3631,7 +3631,9 @@ dialog.rangePanel .rangeFormActions {
   const cache = {calendar:new Map(), holidays:new Map(), revision:0};
   let pendingStorageWarning = "";
   let storageWriteWarningShown = false;
+  let storageWarningTimer = 0;
   let db;
+  let savedDatabase = "";
 
   function parseISODate(value) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return null;
@@ -3790,27 +3792,39 @@ dialog.rangePanel .rangeFormActions {
   }
   function save() {
     try {
-      localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
+      const serialized = JSON.stringify(db);
+      localStorage.setItem(STORAGE_KEY,serialized);
+      savedDatabase = serialized;
+      clearTimeout(storageWarningTimer);
+      storageWarningTimer = 0;
+      storageWriteWarningShown = false;
       invalidateDataViews();
       return true;
     } catch (error) {
       console.error("Nie udało się zapisać danych:",error);
+      // Cofamy całą operację, również lastShift, ustawienia i zmiany zakresowe.
+      db = JSON.parse(savedDatabase);
+      invalidateDataViews();
+      hydrateSettingsUI();
+      renderAll();
+      const message = "Nie udało się zapisać zmian. Przywrócono ostatni zapisany stan. Zwolnij miejsce w telefonie i spróbuj ponownie.";
+      setStatus(message);
       if (!storageWriteWarningShown) {
         storageWriteWarningShown = true;
-        const message = "KRYTYCZNY BŁĄD: Nie udało się zapisać danych. Zrób kopię zapasową JSON i zwolnij miejsce w telefonie.";
-        setStatus(message);
-        setTimeout(() => { try { notify(message,"Błąd zapisu danych"); } catch { alert(message); } },80);
+        storageWarningTimer = setTimeout(() => {
+          storageWarningTimer = 0;
+          try { notify(message,"Błąd zapisu danych"); } catch { alert(message); }
+        },80);
       }
       return false;
     }
   }
   function commit(message = "") {
     normalize();
-    readSettingsFromUI();
-    const result = save();
+    if (!save()) return false;
     renderAll();
     if (message) setStatus(message);
-    return result;
+    return true;
   }
   const getLastBackupISO = () => localStorage.getItem(LAST_BACKUP_KEY) || "";
   const setLastBackupNow = () => localStorage.setItem(LAST_BACKUP_KEY,new Date().toISOString());
@@ -3979,7 +3993,7 @@ dialog.rangePanel .rangeFormActions {
       count++;
     });
     const suffix = skippedDays ? ` Pominięto ${skippedDays} dni wolnych.` : "";
-    commit(remove ? `Usunięto status w ${count} dniach.${suffix}` : `Ustawiono status: ${leaveLabel(type)} (${count} dni).${suffix}`);
+    if (!commit(remove ? `Usunięto status w ${count} dniach.${suffix}` : `Ustawiono status: ${leaveLabel(type)} (${count} dni).${suffix}`)) return {ok:false};
     return {ok:true,count,skippedDays};
   }
   const applyLeaveRange = (from,to,type,options = {}) => changeLeaveRange(from,to,type,options,false);
@@ -4009,8 +4023,8 @@ dialog.rangePanel .rangeFormActions {
     });
     const skipped = skippedDays ? ` Pominięto ${skippedDays} dni wolnych.` : "";
     const conflicts = conflictDays ? ` Pominięto ${conflictDays} dni z konfliktem godzin.` : "";
-    commit(mode === "add" ? `Dodano godziny (zakres) w ${changedDays} dniach.${skipped}${conflicts}`
-      : `Usunięto godziny (zakres) w ${changedDays} dniach.${skipped}`);
+    if (!commit(mode === "add" ? `Dodano godziny (zakres) w ${changedDays} dniach.${skipped}${conflicts}`
+      : `Usunięto godziny (zakres) w ${changedDays} dniach.${skipped}`)) return {ok:false};
     return {ok:true,changedDays,skippedDays,conflictDays};
   }
   const getShiftTemplates = () => db.settings.shiftTemplates;
@@ -4022,15 +4036,16 @@ dialog.rangePanel .rangeFormActions {
     if (templates.some(t => t.start === start && t.end === end)) return {ok:false,message:"Taki szablon już istnieje."};
     if (templates.length >= 8) return {ok:false,message:"Maksymalnie możesz dodać 8 szablonów."};
     db.settings.shiftTemplates = [...templates,{start,end}];
-    save();
+    if (!save()) return {ok:false,storageError:true};
     renderTemplates();
     return {ok:true};
   }
   function removeShiftTemplate(index) {
-    if (index < 0 || index >= getShiftTemplates().length) return;
+    if (index < 0 || index >= getShiftTemplates().length) return false;
     db.settings.shiftTemplates = getShiftTemplates().filter((_,i) => i !== index);
-    save();
+    if (!save()) return false;
     renderTemplates();
+    return true;
   }
   function addShiftTemplateToDate(date, start, end) {
     if (!date) return false;
@@ -4043,7 +4058,7 @@ dialog.rangePanel .rangeFormActions {
     sortShifts(day);
     upsertDay(date,day);
     db.settings.lastShift = {start,end};
-    commit(`Dodano zakres: ${start}–${end}.`);
+    if (!commit(`Dodano zakres: ${start}–${end}.`)) return false;
     haptic.success();
     return true;
   }
@@ -4069,13 +4084,6 @@ dialog.rangePanel .rangeFormActions {
   }
   const numericSettings = ["rate","leaveQuota","backupReminderDays"];
   const booleanSettings = ["defaultIncludeSat","defaultIncludeSun","defaultIncludeHolidays"];
-  function readSettingsFromUI() {
-    for (const id of numericSettings) {
-      if (!$(id)) continue;
-      db.settings[id] = id === "backupReminderDays" ? Math.max(1,Number($(id).value || 5)) : Number($(id).value || 0);
-    }
-    for (const id of booleanSettings) if ($(id)) db.settings[id] = !!$(id).checked;
-  }
   function hydrateSettingsUI() {
     for (const id of numericSettings) if ($(id)) $(id).value = id === "backupReminderDays" ? getBackupReminderDays() : db.settings[id];
     for (const id of booleanSettings) if ($(id)) $(id).checked = !!db.settings[id];
@@ -4086,7 +4094,7 @@ dialog.rangePanel .rangeFormActions {
   }
   function buildPillsHTML(day) {
     const shifts = (day?.shifts || []).slice().sort((a,b) => (a.start || "").localeCompare(b.start || ""));
-    const label = leaveLabel(day?.leaveType);
+    const label = ({paid:"Urlop",unpaid:"Bezpł.",sick:"L4"})[day?.leaveType] || "";
     const note = !!(day?.note && day.note.trim());
     const pills = [];
     if (label) pills.push(buildPillHTML(leavePillClass(day.leaveType),label));
@@ -4530,14 +4538,7 @@ dialog.rangePanel .rangeFormActions {
     const note = String(value || "").trim(), existing = getDay(date);
     if ((!existing && !note) || (existing?.note || "") === note) return true;
     upsertDay(date,{...(existing || {date,shifts:[],vacation:false,leaveType:""}),note});
-    if (!save()) {
-      if (existing) db.entries[db.entries.findIndex(day => day.date === date)] = existing;
-      else db.entries = db.entries.filter(day => day.date !== date);
-      return false;
-    }
-    normalize();
-    readSettingsFromUI();
-    renderAll();
+    if (!commit()) return false;
     if (showStatus) setStatus("Zapisano notatkę.");
     return true;
   }
@@ -4556,7 +4557,7 @@ dialog.rangePanel .rangeFormActions {
     } else { day.shifts.push({start,end}); db.settings.lastShift = {start,end}; }
     sortShifts(day);
     upsertDay(form.date,day);
-    commit(edit ? "Zapisano zmiany zakresu." : "Dodano zakres.");
+    if (!commit(edit ? "Zapisano zmiany zakresu." : "Dodano zakres.")) return;
     haptic.success();
     closeDay({haptic:false});
   }
@@ -4566,7 +4567,7 @@ dialog.rangePanel .rangeFormActions {
     const day = getDay(ui.form.date);
     if (!day?.shifts?.[ui.form.index]) return;
     day.shifts.splice(ui.form.index,1);
-    commit("Usunięto zakres.");
+    if (!commit("Usunięto zakres.")) return;
     haptic.danger();
     closeDay({haptic:false});
   }
@@ -4705,7 +4706,7 @@ dialog.rangePanel .rangeFormActions {
     info:{title:"Informacje",sub:"Wersja aplikacji i status błędów",footer:false}
   };
   function refreshAppInfo() {
-    text("appVersionLabel","5.0.11");
+    text("appVersionLabel","5.1.0");
     const errors = window.__appErrors;
     text("appErrorState",errors.length ? errors.length === 1 ? "1 błąd" : `${errors.length} błędów` : "Brak błędów");
     $("clearAppErrors").hidden = $("appErrorBox").hidden = !errors.length;
@@ -4816,8 +4817,6 @@ dialog.rangePanel .rangeFormActions {
       }
       sortShifts(current);
     }
-    normalize();
-    save();
     return result;
   }
   function downloadFile(filename, content, mime = "text/plain;charset=utf-8", options = {}) {
@@ -4833,10 +4832,14 @@ dialog.rangePanel .rangeFormActions {
   function exportBackup() {
     haptic.tap();
     downloadJsonFile(`czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`,db);
-    setLastBackupNow();
-    setStatus("Kopia JSON została pobrana.");
+    try { setLastBackupNow(); }
+    catch (error) {
+      console.warn("Nie udało się zapisać znacznika kopii:",error);
+      setStatus("Rozpoczęto pobieranie kopii JSON, ale nie zapisano daty przypomnienia. Przechowuj plik również poza telefonem.");
+      return;
+    }
+    setStatus("Rozpoczęto pobieranie kopii JSON. Przechowuj ją również poza telefonem.");
     haptic.success();
-    notify("Kopia zapisana 👍 Przechowuj ją również poza telefonem.");
   }
   async function importBackup(event) {
     const file = event.target.files?.[0];
@@ -4848,14 +4851,13 @@ dialog.rangePanel .rangeFormActions {
         okText:"Scal",cancelText:"Zastąp wszystko"});
       if (merge) {
         const result = mergeImportedDb(incoming);
+        if (!commit(`Scalono import: ${result.addedDays} dni, ${result.addedShifts} zakresów.`)) return;
         hydrateSettingsUI();
-        commit(`Scalono import: ${result.addedDays} dni, ${result.addedShifts} zakresów.`);
       } else {
         if (!await askConfirm("Zastąpić całą obecną bazę danymi z pliku? Tej operacji nie da się cofnąć poza wcześniejszą kopią JSON.","Zastąp dane")) return;
         db = normalize(incoming);
-        save();
+        if (!commit("Przywrócono dane z pliku JSON.")) return;
         hydrateSettingsUI();
-        commit("Przywrócono dane z pliku JSON.");
       }
       haptic.success();
     } catch { notify("Nie udało się wczytać pliku JSON."); }
@@ -5215,7 +5217,7 @@ dialog.rangePanel .rangeFormActions {
     appConfirmOk:() => chooseConfirmation(true),appConfirmCancel:() => chooseConfirmation(false),
     tplAdd:() => {
       const result = addShiftTemplate($("tplStart").value,$("tplEnd").value);
-      if (!result.ok) { haptic.warning(); notify(result.message); return; }
+      if (!result.ok) { if (!result.storageError) { haptic.warning(); notify(result.message); } return; }
       $("tplStart").value = $("tplEnd").value = "";
       haptic.success();
       setStatus("Dodano szablon godzin pracy.");
@@ -5225,7 +5227,7 @@ dialog.rangePanel .rangeFormActions {
       const month = getCurrentMonthYM();
       if (!await askConfirm("Usunąć wszystkie wpisy z tego miesiąca?","Wyczyść miesiąc")) return;
       db.entries = db.entries.filter(day => ym(day.date) !== month);
-      commit("Wyczyszczono miesiąc.");
+      if (!commit("Wyczyszczono miesiąc.")) return;
       haptic.danger();
     },
     clearAppErrors:() => { window.__appErrors = []; refreshAppInfo(); showToast("Lista błędów została wyczyszczona."); haptic.success(); }
@@ -5242,7 +5244,7 @@ dialog.rangePanel .rangeFormActions {
       if (event.target === $("mainMenuDialog")) closeDrawer();
       return;
     }
-    if (target.dataset.removeTemplate != null) { removeShiftTemplate(Number(target.dataset.removeTemplate)); haptic.warning(); return; }
+    if (target.dataset.removeTemplate != null) { if (removeShiftTemplate(Number(target.dataset.removeTemplate))) haptic.warning(); return; }
     if (target.dataset.templateIndex != null) {
       const template = getShiftTemplates()[Number(target.dataset.templateIndex)];
       if (!template) return;
@@ -5261,14 +5263,19 @@ dialog.rangePanel .rangeFormActions {
     clickActions[target.id]?.();
   }
   function handleSettings(event) {
-    const id = event.target.id;
+    const field = event.target, id = field.id;
     if (!numericSettings.includes(id) && !booleanSettings.includes(id)) return;
     if (booleanSettings.includes(id) && event.type !== "change") return;
-    // Zachowujemy zapis na input/change, ale eliminujemy zapis tego samego stanu.
-    const before = JSON.stringify(db.settings);
-    normalize();
-    readSettingsFromUI();
-    if (JSON.stringify(db.settings) !== before) save();
+    // Nie zapisujemy pustej, pośredniej ani niepoprawnej wartości podczas pisania.
+    // Każde pole zmienia tylko własne ustawienie; inne szkice nie trafiają do bazy.
+    if (numericSettings.includes(id) && (!field.validity.valid || !Number.isFinite(field.valueAsNumber))) {
+      if (event.type === "change") field.reportValidity();
+      return;
+    }
+    const value = booleanSettings.includes(id) ? field.checked : field.valueAsNumber;
+    if (db.settings[id] === value) return;
+    db.settings[id] = value;
+    if (!save()) return;
     if (id === "rate" || id === "leaveQuota") renderAll();
     else setStatus("Zapisano ustawienia.");
   }
@@ -5278,6 +5285,8 @@ dialog.rangePanel .rangeFormActions {
       const incoming = JSON.parse(event.newValue);
       if (!validateDbShape(incoming)) throw Error("Nieprawidłowa struktura danych z innej karty.");
       db = normalize(incoming);
+      savedDatabase = JSON.stringify(db);
+      hydrateSettingsUI();
       invalidateDataViews();
       renderAll();
       setStatus("Dane odświeżone z innej karty.");
@@ -5687,8 +5696,8 @@ dialog.rangePanel .rangeFormActions {
     db = load() || createEmptyDB();
     normalize();
     migrateIfNeeded();
+    savedDatabase = JSON.stringify(db);
     hydrateSettingsUI();
-    readSettingsFromUI();
     $("monthPick").value = ym(todayISO());
     for (const id of ["vacFrom","vacTo","bulkFrom","bulkTo"]) if (!$(id).value) $(id).value = todayISO();
     setSystemBars();
@@ -5698,8 +5707,8 @@ dialog.rangePanel .rangeFormActions {
     setupKeyboardFriendlyModals();
     renderAll();
     writeAppHistory("replace");
-    text("appVersionFooter","Wersja 5.0.11");
-    text("appVersionLabel","5.0.11");
+    text("appVersionFooter","Wersja 5.1.0");
+    text("appVersionLabel","5.1.0");
     setupPWA();
     if (pendingStorageWarning) { setStatus(pendingStorageWarning); pendingStorageWarning = ""; }
     const last = getLastBackupISO(), elapsed = daysSince(last);
