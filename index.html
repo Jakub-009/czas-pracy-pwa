@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 5.0.10</title>
+  <title>Czas pracy 5.0.11</title>
   <meta name="theme-color" content="#e6eaf0" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -20,6 +20,8 @@
   font-family: system-ui,-apple-system,BlinkMacSystemFont,"Roboto","Segoe UI",Arial,sans-serif;
   --bg: #e6eaf0;
   --surface: #ffffff;
+  --calendar-saturday: #f5f6f8;
+  --calendar-sunday: #fff4f4;
   --surface-low: #f6f8fb;
   --surface-mid: #edf0f4;
   --surface-high: #e1e7f0;
@@ -1808,21 +1810,12 @@ dialog.entryPanel[open], .appConfirmDialog[open] {
   border: 1px solid #e4e8f1;
 }
 
-.quickTemplatesTitle, .bulkOptionsTitle {
+.quickTemplatesTitle {
   margin-bottom: 8px;
   font-size: 13px;
   line-height: 1.2;
   font-weight: 750;
   color: #3c4043;
-}
-
-.bulkOptions {
-  border-top: 1px solid var(--outline-soft);
-  border-bottom: 1px solid var(--outline-soft);
-  margin-top: 0;
-  padding: 13px 14px 9px;
-  border: 1px solid #e4e8f1;
-  background: #f8fafd;
 }
 
 .shiftItem.dayEventCard {
@@ -2227,7 +2220,7 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
   min-height: var(--day-height);
   max-height: var(--day-height);
   border-radius: 8px;
-  background: var(--surface);
+  background: var(--day-cell-bg, var(--surface));
   border: var(--day-cell-border) solid var(--outline-soft);
   box-shadow: none;
   overflow: hidden;
@@ -2259,6 +2252,14 @@ html, body, .appHeader, .appHeader.navTopBar, .monthStrip {
 
 .dayCell.today {
   border-color: rgba(var(--primary-rgb),.22);
+}
+
+.dayCell.is-saturday {
+  --day-cell-bg: var(--calendar-saturday);
+}
+
+.dayCell.is-sunday {
+  --day-cell-bg: var(--calendar-sunday);
 }
 
 .dayTop {
@@ -2754,18 +2755,14 @@ dialog#dayDialog .modalHead {
   border: 0;
 }
 
-dialog#bulkDialog .modalBody, dialog#dayDialog .modalBody, dialog#vacDialog .modalBody {
+dialog.rangePanel .modalBody, dialog#dayDialog .modalBody {
   max-height: none;
   overflow: visible;
   padding: 0 24px 24px;
   background: var(--bg);
 }
 
-dialog#vacDialog .modalBody {
-  padding-top: 12px;
-}
-
-dialog#bulkDialog label, dialog#dayDialog label, dialog#vacDialog label, dialog#bulkDialog .quickTemplatesTitle, dialog#dayDialog .quickTemplatesTitle, dialog#vacDialog .quickTemplatesTitle {
+dialog.rangePanel label, dialog#dayDialog label, dialog.rangePanel .quickTemplatesTitle, dialog#dayDialog .quickTemplatesTitle {
   display: block;
   margin: 0 0 8px;
   color: #3c4043;
@@ -2774,14 +2771,14 @@ dialog#bulkDialog label, dialog#dayDialog label, dialog#vacDialog label, dialog#
   font-weight: 750;
 }
 
-dialog#bulkDialog .fieldGrid, dialog#dayDialog .fieldGrid, dialog#vacDialog .fieldGrid, dialog#dayDialog .timeGrid {
+dialog.rangePanel .fieldGrid, dialog#dayDialog .fieldGrid, dialog#dayDialog .timeGrid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
   margin-bottom: 18px;
 }
 
-dialog#bulkDialog input:not([type="checkbox"]), dialog#bulkDialog select, dialog#bulkDialog textarea, dialog#dayDialog input:not([type="checkbox"]), dialog#dayDialog select, dialog#dayDialog textarea, dialog#vacDialog input:not([type="checkbox"]), dialog#vacDialog select, dialog#vacDialog textarea {
+dialog.rangePanel input:not([type="checkbox"]), dialog.rangePanel select, dialog.rangePanel textarea, dialog#dayDialog input:not([type="checkbox"]), dialog#dayDialog select, dialog#dayDialog textarea {
   width: 100%;
   max-width: 100%;
   min-height: 58px;
@@ -2795,11 +2792,11 @@ dialog#bulkDialog input:not([type="checkbox"]), dialog#bulkDialog select, dialog
   font-size: 16px;
 }
 
-dialog#bulkDialog input[type="date"], dialog#bulkDialog input[type="time"], dialog#dayDialog input[type="date"], dialog#dayDialog input[type="time"], dialog#vacDialog input[type="date"], dialog#vacDialog input[type="time"] {
+dialog.rangePanel input[type="date"], dialog.rangePanel input[type="time"], dialog#dayDialog input[type="date"], dialog#dayDialog input[type="time"] {
   padding-right: 52px;
 }
 
-dialog#bulkDialog input[type="date"]::-webkit-calendar-picker-indicator, dialog#dayDialog input[type="date"]::-webkit-calendar-picker-indicator, dialog#vacDialog input[type="date"]::-webkit-calendar-picker-indicator {
+dialog.rangePanel input[type="date"]::-webkit-calendar-picker-indicator, dialog#dayDialog input[type="date"]::-webkit-calendar-picker-indicator {
   margin-right: 12px;
   opacity: .78;
 }
@@ -2812,7 +2809,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   opacity: .78;
 }
 
-dialog#bulkDialog select, dialog#dayDialog select, dialog#vacDialog select {
+dialog.rangePanel select, dialog#dayDialog select {
   appearance: none;
   -webkit-appearance: none;
   padding-right: 58px;
@@ -2822,7 +2819,7 @@ dialog#bulkDialog select, dialog#dayDialog select, dialog#vacDialog select {
   background-size: 18px 18px;
 }
 
-dialog#bulkDialog textarea, dialog#dayDialog textarea, dialog#vacDialog textarea {
+dialog.rangePanel textarea, dialog#dayDialog textarea {
   min-height: 112px;
   padding-top: 16px;
   padding-bottom: 16px;
@@ -2892,47 +2889,41 @@ button.rangeModeTab {
   display: none;
 }
 
-dialog#bulkDialog .quickTemplatesBlock, dialog#bulkDialog .bulkOptions {
+dialog.rangePanel .quickTemplatesBlock, dialog.rangePanel .rangeOptions {
   background: var(--surface);
   border: 1px solid #e4e8f1;
   border-radius: 22px;
   box-shadow: 0 1px 2px rgba(60,64,67,.045);
 }
 
-dialog#bulkDialog .quickTemplatesBlock {
+dialog.rangePanel .quickTemplatesBlock {
   margin: 0 0 18px;
   padding: 16px 18px;
 }
 
-dialog#bulkDialog .bulkOptions {
+dialog.rangePanel .rangeOptions {
   margin: 20px 0 0;
   padding: 18px;
   border-top: 0;
   border-bottom: 0;
 }
 
-dialog#vacDialog .leaveOptions {
-  margin: 18px 0 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-dialog#vacDialog .leaveOptions .checkRow {
-  display: flex;
-  min-height: 48px;
-  margin: 0;
-  font-weight: 500;
-}
-
-.bulkOptionsTitle {
-  margin-bottom: 4px;
+.rangeOptionsTitle {
   margin: 0 0 10px;
   font-size: 15px;
+  line-height: 1.2;
   font-weight: 780;
   color: #3c4043;
 }
+
+.rangeTypeField {
+  margin-bottom: 16px;
+}
+
+.rangeHint {
+  margin-top: 10px;
+}
+
 
 .checkRow {
   position: relative;
@@ -2947,7 +2938,7 @@ dialog#vacDialog .leaveOptions .checkRow {
   color: #3c4043;
 }
 
-dialog#bulkDialog .checkRow {
+dialog.rangePanel .checkRow {
   display: flex;
   min-height: 48px;
   margin: 0;
@@ -2957,14 +2948,7 @@ dialog#bulkDialog .checkRow {
   line-height: 1.2;
 }
 
-dialog#vacDialog .checkRow {
-  min-height: 44px;
-  align-items: center;
-  gap: 12px;
-  line-height: 1.2;
-}
-
-dialog#bulkDialog .checkRow span, dialog#vacDialog .checkRow span {
+dialog.rangePanel .checkRow span {
   display: inline-flex;
   align-items: center;
   min-height: 19px;
@@ -3022,11 +3006,11 @@ dialog.entryPanel .formDelete:hover {
   background: var(--red-soft);
 }
 
-dialog#bulkDialog .workPanelContent {
+dialog.rangePanel .workPanelContent {
   padding-bottom: 0;
 }
 
-dialog.entryPanel .bulkFormActions {
+dialog.rangePanel .rangeFormActions {
   gap: 8px;
   margin: 0;
   padding: 12px 24px calc(12px + env(safe-area-inset-bottom));
@@ -3064,12 +3048,12 @@ dialog.entryPanel .bulkFormActions {
     padding-right: 20px;
   }
 
-  dialog.entryPanel .bulkFormActions {
+  dialog.rangePanel .rangeFormActions {
     padding-left: 20px;
     padding-right: 20px;
   }
 
-  dialog#bulkDialog .modalBody, dialog#dayDialog .modalBody, dialog#vacDialog .modalBody {
+  dialog.rangePanel .modalBody, dialog#dayDialog .modalBody {
     padding-left: 20px;
     padding-right: 20px;
   }
@@ -3400,7 +3384,7 @@ dialog.entryPanel .bulkFormActions {
     </div>
   </dialog>
 
-  <dialog id="vacDialog" class="workPanel entryPanel leavePanel" aria-labelledby="vacDialogTitle">
+  <dialog id="vacDialog" class="workPanel entryPanel rangePanel" aria-labelledby="vacDialogTitle">
     <div class="workPanelShell">
       <div class="workPanelBar">
         <button class="formBackBtn" id="vacPanelClose" type="button" aria-label="Wstecz"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button>
@@ -3409,15 +3393,6 @@ dialog.entryPanel .bulkFormActions {
       <div class="workPanelContent">
 
     <div class="modalBody">
-      <div style="margin-bottom:16px;">
-        <label for="vacType">Rodzaj absencji</label>
-        <select id="vacType">
-          <option value="paid">Urlop płatny</option>
-          <option value="unpaid">Urlop bezpłatny</option>
-          <option value="sick">Zwolnienie lekarskie (L4)</option>
-        </select>
-      </div>
-
       <div class="fieldGrid">
         <div>
           <label for="vacFrom">Od</label>
@@ -3429,8 +3404,17 @@ dialog.entryPanel .bulkFormActions {
         </div>
       </div>
 
-      <div class="bulkOptions leaveOptions">
-        <div class="bulkOptionsTitle">Uwzględnij</div>
+      <div class="rangeTypeField">
+        <label for="vacType">Rodzaj absencji</label>
+        <select id="vacType">
+          <option value="paid">Urlop płatny</option>
+          <option value="unpaid">Urlop bezpłatny</option>
+          <option value="sick">Zwolnienie lekarskie (L4)</option>
+        </select>
+      </div>
+
+      <div class="rangeOptions" role="group" aria-labelledby="vacOptionsTitle">
+        <div class="rangeOptionsTitle" id="vacOptionsTitle">Uwzględnij</div>
         <label class="checkRow">
           <span>Soboty</span>
           <input id="vacIncludeSat" type="checkbox" role="switch" />
@@ -3448,21 +3432,21 @@ dialog.entryPanel .bulkFormActions {
         </label>
       </div>
 
-      <div class="muted" style="margin-top:10px;">
+      <div class="muted rangeHint">
         Opcje dotyczą zapisu i usuwania statusu. Godziny pracy pozostają bez zmian.
       </div>
 
-      <div class="entryFormActions">
+    </div>
+        <div class="entryFormActions rangeFormActions">
         <button class="filled formPrimary" id="setVacationRange" type="button">Zapisz</button>
         <button class="formDelete" id="clearVacationRange" type="button">Usuń status</button>
-      </div>
-    </div>
+        </div>
       </div>
     </div>
   </dialog>
 
   <!-- FORMULARZ WPISÓW ZBIORCZYCH -->
-  <dialog id="bulkDialog" class="workPanel entryPanel bulkPanel" aria-labelledby="bulkTitle">
+  <dialog id="bulkDialog" class="workPanel entryPanel rangePanel" aria-labelledby="bulkTitle">
     <div class="workPanelShell">
       <div class="workPanelBar">
         <button class="formBackBtn" id="bulkPanelClose" type="button" aria-label="Wstecz"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2Z"/></svg></button>
@@ -3505,7 +3489,7 @@ dialog.entryPanel .bulkFormActions {
       </div>
 
       <div class="bulkModePane bulkLeaveFields" id="bulkLeaveFields" hidden>
-        <div style="margin-bottom:16px;">
+        <div class="rangeTypeField">
           <label for="bulkLeaveType">Rodzaj absencji</label>
           <select id="bulkLeaveType">
             <option value="paid">Urlop płatny</option>
@@ -3515,8 +3499,8 @@ dialog.entryPanel .bulkFormActions {
         </div>
       </div>
 
-      <div class="bulkOptions" role="group" aria-labelledby="bulkOptionsTitle">
-        <div class="bulkOptionsTitle" id="bulkOptionsTitle">Uwzględnij</div>
+      <div class="rangeOptions" role="group" aria-labelledby="bulkOptionsTitle">
+        <div class="rangeOptionsTitle" id="bulkOptionsTitle">Uwzględnij</div>
         <label class="checkRow">
           <span>Soboty</span>
           <input id="bulkIncludeSat" type="checkbox" role="switch" />
@@ -3534,12 +3518,12 @@ dialog.entryPanel .bulkFormActions {
         </label>
       </div>
 
-      <div class="muted" style="margin-top:10px;">
+      <div class="muted rangeHint">
         Opcje dotyczą dodawania i usuwania godzin oraz statusów. Początkowy wybór wynika z ustawień aplikacji.
       </div>
 
     </div>
-        <div class="entryFormActions bulkFormActions">
+        <div class="entryFormActions rangeFormActions">
           <button class="filled formPrimary" id="bulkApply" type="button">Dodaj godziny</button>
           <button class="formDelete" id="bulkRemove" type="button">Usuń godziny</button>
         </div>
@@ -4721,7 +4705,7 @@ dialog.entryPanel .bulkFormActions {
     info:{title:"Informacje",sub:"Wersja aplikacji i status błędów",footer:false}
   };
   function refreshAppInfo() {
-    text("appVersionLabel","5.0.10");
+    text("appVersionLabel","5.0.11");
     const errors = window.__appErrors;
     text("appErrorState",errors.length ? errors.length === 1 ? "1 błąd" : `${errors.length} błędów` : "Brak błędów");
     $("clearAppErrors").hidden = $("appErrorBox").hidden = !errors.length;
@@ -5714,8 +5698,8 @@ dialog.entryPanel .bulkFormActions {
     setupKeyboardFriendlyModals();
     renderAll();
     writeAppHistory("replace");
-    text("appVersionFooter","Wersja 5.0.10");
-    text("appVersionLabel","5.0.10");
+    text("appVersionFooter","Wersja 5.0.11");
+    text("appVersionLabel","5.0.11");
     setupPWA();
     if (pendingStorageWarning) { setStatus(pendingStorageWarning); pendingStorageWarning = ""; }
     const last = getLastBackupISO(), elapsed = daysSince(last);
