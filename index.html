@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 5.2.0</title>
+  <title>Czas pracy 5.2.1</title>
   <meta name="theme-color" content="#e6eaf0" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -1514,6 +1514,11 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
 .appConfirmActions .dialogDanger {
   background: var(--red-soft);
   color: #a50e0e;
+}
+
+/* 5.2.1: atrybut hidden musi wygrywać z button { display:inline-flex } */
+button[hidden] {
+  display: none !important;
 }
 
 .appConfirmActions .dialogAlt {
@@ -4801,7 +4806,8 @@ dialog.rangePanel .rangeFormActions {
     });
   }
   const notify = (message,title = "Informacja") => { setStatus(message); return openAppDialog({title,message,okText:"OK"}); };
-  const askConfirm = (message,title = "Potwierdź") => openAppDialog({title,message,okText:"Tak",cancelText:"Anuluj",tone:"default"});
+  // Tylko jawne "Tak" (true) jest zgodą; każda inna wartość oznacza rezygnację.
+  const askConfirm = (message,title = "Potwierdź") => openAppDialog({title,message,okText:"Tak",cancelText:"Anuluj",tone:"default"}).then(result => result === true);
   const drawerMeta = {
     main:{title:"Czas pracy",sub:"Kalendarz godzin i urlopów",footer:true},
     annual:{title:"Statystyki roczne",sub:"Godziny, wypłaty i urlop w wybranym roku",footer:false},
@@ -4811,7 +4817,7 @@ dialog.rangePanel .rangeFormActions {
     info:{title:"Informacje",sub:"Wersja aplikacji i status błędów",footer:false}
   };
   function refreshAppInfo() {
-    text("appVersionLabel","5.2.0");
+    text("appVersionLabel","5.2.1");
     const errors = window.__appErrors;
     text("appErrorState",errors.length ? errors.length === 1 ? "1 błąd" : `${errors.length} błędów` : "Brak błędów");
     $("clearAppErrors").hidden = $("appErrorBox").hidden = !errors.length;
@@ -5353,7 +5359,7 @@ dialog.rangePanel .rangeFormActions {
     yearStatsNext:() => changeStatsYear(1),
     monthStatsPdf:() => openReportPdf(getCurrentMonthYM()),
     backupJson:exportBackup,shareBackup:shareBackup,rateAdd:addRateChange,
-    appConfirmAlt:() => chooseConfirmation("alt"),
+    appConfirmAlt:() => { if (!$("appConfirmAlt").hidden) chooseConfirmation("alt"); },
     restoreBtn:() => { haptic.tap(); $("restoreJson").click(); },
     checkUpdateBtn:checkForAppUpdate,
     appConfirmOk:() => chooseConfirmation(true),appConfirmCancel:() => chooseConfirmation(false),
@@ -5852,8 +5858,8 @@ dialog.rangePanel .rangeFormActions {
     setupKeyboardFriendlyModals();
     renderAll();
     writeAppHistory("replace");
-    text("appVersionFooter","Wersja 5.2.0");
-    text("appVersionLabel","5.2.0");
+    text("appVersionFooter","Wersja 5.2.1");
+    text("appVersionLabel","5.2.1");
     setupPWA();
     $("shareBackup").hidden = !canShareBackup();
     // 5.2: prośba, by system nie czyścił danych przy braku miejsca (Android zwykle zgadza się po cichu).
