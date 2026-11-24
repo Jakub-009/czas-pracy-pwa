@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Czas pracy 5.1.0</title>
+  <title>Czas pracy 5.2.0</title>
   <meta name="theme-color" content="#e6eaf0" id="themeColorMeta" />
   <meta name="color-scheme" content="light">
   <link rel="manifest" href="/czas-pracy-pwa/manifest.webmanifest">
@@ -1514,6 +1514,24 @@ dialog#mainMenuDialog.drawerDialog .drawerBack {
 .appConfirmActions .dialogDanger {
   background: var(--red-soft);
   color: #a50e0e;
+}
+
+.appConfirmActions .dialogAlt {
+  margin-right: auto;
+  background: var(--red-soft);
+  color: #a50e0e;
+}
+
+.rateRow small {
+  color: var(--muted-ink);
+  font-size: 13px;
+  font-weight: 500;
+  margin-left: 6px;
+}
+
+.rateAddGrid {
+  margin-top: 4px;
+  margin-bottom: 10px;
 }
 
 .statsPeriodBar {
@@ -3290,8 +3308,20 @@ dialog.rangePanel .rangeFormActions {
             <summary><span>Praca i rozliczenia</span><i class="settingsChevron" aria-hidden="true"></i></summary>
             <div class="settingsAccordionBody">
               <div style="margin-bottom:16px;">
-                <label for="rate">Stawka godzinowa (PLN)</label>
-                <input id="rate" type="number" required step="0.01" min="0" placeholder="Wpisz stawkę" />
+                <label>Stawka godzinowa (PLN)</label>
+                <div class="muted settingsHint">Każda stawka obowiązuje od wskazanego dnia. Wcześniejsze miesiące liczą się starą stawką.</div>
+                <div class="templateList" id="rateList"></div>
+                <div class="fieldGrid rateAddGrid">
+                  <div>
+                    <label for="rateNewValue">Nowa stawka</label>
+                    <input id="rateNewValue" type="number" step="0.01" min="0" placeholder="np. 35,00" />
+                  </div>
+                  <div>
+                    <label for="rateNewFrom">Obowiązuje od</label>
+                    <input id="rateNewFrom" type="date" />
+                  </div>
+                </div>
+                <button class="tonal templateAddBtn" id="rateAdd" type="button">Dodaj zmianę stawki</button>
               </div>
 
               <div>
@@ -3304,7 +3334,7 @@ dialog.rangePanel .rangeFormActions {
           <details class="settingsAccordion">
             <summary><span>Zakresy dni</span><i class="settingsChevron" aria-hidden="true"></i></summary>
             <div class="settingsAccordionBody">
-              <div class="muted settingsHint">Domyślnie uwzględniaj wybrane dni we „Wpisach zbiorczych” i „Dodaj urlop / L4”. W formularzu możesz zmienić wybór jednorazowo.</div>
+              <div class="muted settingsHint">Domyślnie uwzględniaj wybrane dni we „Wpisach zbiorczych” i „Dodaj urlop / L4”. W formularzu możesz zmienić wybór jednorazowo. Zwolnienie L4 domyślnie obejmuje wszystkie dni (dni kalendarzowe).</div>
               <label class="checkRow">
                 <span>Soboty</span>
                 <input id="defaultIncludeSat" type="checkbox" role="switch" />
@@ -3354,8 +3384,9 @@ dialog.rangePanel .rangeFormActions {
 
         <div class="drawerView" id="drawerViewBackup">
           <div class="drawerToolGrid">
-            <button class="tonal" id="backupJson" type="button">Pobierz kopię JSON</button>
-            <input id="restoreJson" type="file" accept="application/json" style="display:none" />
+            <button class="tonal" id="shareBackup" type="button" hidden>Udostępnij kopię (Dysk, e-mail, komunikator)</button>
+            <button class="tonal" id="backupJson" type="button">Pobierz kopię JSON do telefonu</button>
+            <input id="restoreJson" type="file" accept="application/json,.json,text/plain,.txt" style="display:none" />
             <button class="tonal" id="restoreBtn" type="button">Wczytaj dane z kopii JSON</button>
           </div>
         </div>
@@ -3585,6 +3616,7 @@ dialog.rangePanel .rangeFormActions {
       <h3 id="appConfirmTitle">Komunikat</h3>
       <p id="appConfirmMessage">—</p>
       <div class="appConfirmActions">
+        <button class="dialogAlt" id="appConfirmAlt" type="button" hidden>—</button>
         <button class="dialogCancel" id="appConfirmCancel" type="button">Anuluj</button>
         <button class="dialogPrimary" id="appConfirmOk" type="button">OK</button>
       </div>
@@ -3618,7 +3650,18 @@ dialog.rangePanel .rangeFormActions {
   const fmtHM = minutes => `${Math.floor(minutes / 60)}:${pad2(minutes % 60)}`;
   const pln = value => value.toLocaleString("pl-PL", {style:"currency", currency:"PLN"});
   const sortShifts = day => day.shifts.sort((a,b) => (a.start || "").localeCompare(b.start || ""));
-  const dayPay = minutes => round2(minutes / 60 * (db.settings.rate || 0));
+  // 5.2: stawka zależy od daty. Pierwszy wpis historii "od początku" ma datę RATE_START.
+  const RATE_START = "2000-01-01";
+  function rateFor(date) {
+    const history = db.settings.rateHistory;
+    if (!Array.isArray(history) || !history.length) return Number(db.settings.rate) || 0;
+    let rate = history[0].rate;
+    for (const entry of history) { if (entry.from <= date) rate = entry.rate; else break; }
+    return Number(rate) || 0;
+  }
+  // Kwoty sumujemy bez zaokrągleń i zaokrąglamy raz na końcu (dzień / miesiąc).
+  const payRaw = (date, minutes) => minutes / 60 * rateFor(date);
+  const dayPay = (date, minutes) => round2(payRaw(date, minutes));
   const ui = {
     view:"month", date:todayISO(),
     stats:{year:null},
@@ -3705,6 +3748,18 @@ dialog.rangePanel .rangeFormActions {
     settings.leaveQuota = Number(settings.leaveQuota ?? 26);
     for (const key of ["defaultIncludeSat","defaultIncludeSun","defaultIncludeHolidays"]) settings[key] = !!settings[key];
     settings.backupReminderDays = Math.max(1, Number(settings.backupReminderDays ?? 5) || 5);
+    // 5.2: historia stawek. Brak historii = jedna stawka od początku (wyniki bez zmian).
+    const history = (Array.isArray(settings.rateHistory) ? settings.rateHistory : [])
+      .filter(r => r && isValidDateISO(r.from) && Number.isFinite(Number(r.rate)) && Number(r.rate) >= 0)
+      .map(r => ({from:r.from, rate:round2(Number(r.rate))}))
+      .sort((a,b) => a.from.localeCompare(b.from))
+      .filter((r,i,list) => i === list.length - 1 || list[i + 1].from !== r.from);
+    if (!history.length) history.push({from:RATE_START, rate:Number.isFinite(settings.rate) ? settings.rate : 0});
+    // Najstarsza stawka zawsze obejmuje wszystko przed kolejnymi zmianami.
+    history[0] = {...history[0], from:RATE_START};
+    settings.rateHistory = history;
+    // Pole rate zostaje jako bieżąca stawka dla zgodności ze starszymi kopiami.
+    settings.rate = history[history.length - 1].rate;
     if (!Array.isArray(settings.shiftTemplates)) settings.shiftTemplates = cloneDay(DEFAULT_TEMPLATES);
     settings.shiftTemplates = settings.shiftTemplates.filter(t => t && /^\d{2}:\d{2}$/.test(t.start || "") && /^\d{2}:\d{2}$/.test(t.end || "")).slice(0,8);
     delete model.trash;
@@ -3715,6 +3770,8 @@ dialog.rangePanel .rangeFormActions {
       day.note = day.note || "";
       day.vacation = !!day.vacation;
       day.leaveType = LEAVE_TYPES.includes(day.leaveType) ? day.leaveType : "";
+      // 5.2: stary format (vacation:true bez leaveType) = urlop płatny, wszędzie jednakowo.
+      if (day.vacation && !day.leaveType) day.leaveType = "paid";
     }
     return model;
   }
@@ -3888,17 +3945,20 @@ dialog.rangePanel .rangeFormActions {
   const emptyTotals = () => ({min:0,money:0,workDays:0,paid:0,unpaid:0,sick:0,notes:0});
   function countEntries(entries, legacyVacation) {
     const totals = emptyTotals();
+    let moneyRaw = 0;
     for (const day of entries) {
       const minutes = computeDayMinutes(day);
       const leave = day.leaveType || (legacyVacation && day.vacation ? "paid" : "");
       totals.min += minutes;
-      totals.money += dayPay(minutes);
+      moneyRaw += payRaw(day.date,minutes);
       totals.workDays += minutes > 0 ? 1 : 0;
       totals.notes += day.note && day.note.trim() ? 1 : 0;
       if (["paid","unpaid","sick"].includes(leave)) totals[leave]++;
     }
+    totals.money = round2(moneyRaw);
     return totals;
   }
+  const monthMoney = month => countEntries(monthEntries(month),true).money;
   function computeMonthStats(monthYM) {
     const entries = monthEntries(monthYM).sort((a,b) => a.date.localeCompare(b.date));
     return {monthYM,totals:countEntries(entries,true)};
@@ -3906,11 +3966,11 @@ dialog.rangePanel .rangeFormActions {
   function computeYearStats(year) {
     const totals = emptyTotals();
     for (let month = 1; month <= 12; month++) {
-      const monthly = countEntries(monthEntries(`${year}-${pad2(month)}`),false);
       // Roczna kwota jest sumą zaokrąglonych miesięcy, nie dniówek.
-      monthly.money = dayPay(monthly.min);
+      const monthly = countEntries(monthEntries(`${year}-${pad2(month)}`),false);
       for (const key of Object.keys(totals)) totals[key] += monthly[key];
     }
+    totals.money = round2(totals.money);
     return {year,totals};
   }
   const leaveLabel = type => ({paid:"Urlop płatny",unpaid:"Urlop bezpłatny",sick:"Zwolnienie L4"})[type] || "";
@@ -4082,13 +4142,53 @@ dialog.rangePanel .rangeFormActions {
         </button>`).join("") : '<span class="templateMuted">Brak szablonów</span>');
     }
   }
-  const numericSettings = ["rate","leaveQuota","backupReminderDays"];
+  const numericSettings = ["leaveQuota","backupReminderDays"];
   const booleanSettings = ["defaultIncludeSat","defaultIncludeSun","defaultIncludeHolidays"];
   function hydrateSettingsUI() {
     for (const id of numericSettings) if ($(id)) $(id).value = id === "backupReminderDays" ? getBackupReminderDays() : db.settings[id];
     for (const id of booleanSettings) if ($(id)) $(id).checked = !!db.settings[id];
     renderTemplates();
+    renderRates();
   }
+  // 5.2: historia stawek w ustawieniach.
+  const fmtRateFrom = from => from <= RATE_START ? "od początku" : "od " + fmtDMYText(from);
+  function renderRates() {
+    const list = db.settings.rateHistory || [];
+    setHTML($("rateList"),list.map((r,index) => `
+      <div class="templateRow rateRow">
+        <span>${escapeHtml(pln(r.rate))}<small>${escapeHtml(fmtRateFrom(r.from))}</small></span>
+        ${list.length > 1 ? `<button class="templateRemove" type="button" data-remove-rate="${index}" aria-label="Usuń stawkę ${escapeHtml(fmtRateFrom(r.from))}"></button>` : ""}
+      </div>`).join(""));
+    if (!$("rateNewFrom").value) $("rateNewFrom").value = ym(todayISO()) + "-01";
+  }
+  async function addRateChange() {
+    const field = $("rateNewValue"), value = field.valueAsNumber, from = $("rateNewFrom").value;
+    if (!Number.isFinite(value) || value < 0) { haptic.warning(); notify("Wpisz poprawną stawkę."); return; }
+    if (!isValidDateISO(from)) { haptic.warning(); notify("Wybierz datę, od której obowiązuje stawka."); return; }
+    const rate = round2(value), list = db.settings.rateHistory;
+    const next = list.find(r => r.from > from);
+    const affected = db.entries.filter(day => day.date >= from && (!next || day.date < next.from) && computeDayMinutes(day) > 0).length;
+    const same = list.some(r => r.from === from);
+    const message = `${pln(rate)} od ${fmtDMYText(from)}${next ? ` do ${fmtDMYText(addDaysISO(next.from,-1))}` : ""}.`
+      + (same ? "\nZastąpi stawkę ustawioną na ten dzień." : "")
+      + (affected ? `\nZmieni wyliczenia dla ${affected} ${pluralPL(affected,"dnia","dni","dni")} już wpisanych.` : "");
+    if (!await askConfirm(message,"Zmiana stawki")) return;
+    db.settings.rateHistory = [...list.filter(r => r.from !== from),{from,rate}];
+    if (!commit("Zapisano zmianę stawki.")) return;
+    hydrateSettingsUI();
+    field.value = "";
+    haptic.success();
+  }
+  async function removeRate(index) {
+    const list = db.settings.rateHistory, entry = list[index];
+    if (!entry || list.length < 2) return;
+    if (!await askConfirm(`Usunąć stawkę ${pln(entry.rate)} (${fmtRateFrom(entry.from)})? Dni z tego okresu przeliczą się według sąsiedniej stawki.`,"Usuń stawkę")) return;
+    db.settings.rateHistory = list.filter((_,i) => i !== index);
+    if (!commit("Usunięto stawkę.")) return;
+    hydrateSettingsUI();
+    haptic.warning();
+  }
+  function addDaysISO(date, delta) { return isoFromDate(addDays(parseISODate(date),delta)); }
   function buildPillHTML(type, label) {
     return `<div class="pill ${type}"><span class="pillText">${escapeHtml(label)}</span></div>`;
   }
@@ -4204,7 +4304,7 @@ dialog.rangePanel .rangeFormActions {
     text("dayViewDate",fmtDateLongPL(date));
     text("dayViewMeta",capFirst(fmtWeekdayLongPL(date)) + (holiday ? " · " + holiday : ""));
     text("dayViewHours",fmtHM(minutes));
-    text("dayViewPay",pln(dayPay(minutes)));
+    text("dayViewPay",pln(dayPay(date,minutes)));
     text("dayViewEventsCount",events.count ? `${events.count} ${pluralPL(events.count,"wpis","wpisy","wpisów")}` : "brak wpisów");
     setHTML($("dayViewEvents"),events.html);
   }
@@ -4587,8 +4687,10 @@ dialog.rangePanel .rangeFormActions {
     haptic.warning();
     closeDay({haptic:false});
   }
-  function hydrateRangeOptions(prefix) {
-    for (const suffix of ["Sat","Sun","Holidays"]) $(prefix + "Include" + suffix).checked = !!db.settings["defaultInclude" + suffix];
+  // 5.2: L4 liczy się w dniach kalendarzowych, więc domyślnie obejmuje weekendy i święta.
+  function hydrateRangeOptions(prefix, leaveType = "") {
+    for (const suffix of ["Sat","Sun","Holidays"])
+      $(prefix + "Include" + suffix).checked = leaveType === "sick" || !!db.settings["defaultInclude" + suffix];
   }
   function readRangeOptions(prefix) {
     return Object.fromEntries(["Sat","Sun","Holidays"].map(suffix => ["include" + suffix,$(prefix + "Include" + suffix).checked]));
@@ -4600,7 +4702,7 @@ dialog.rangePanel .rangeFormActions {
     text("vacDialogTitle",leave ? "Edytuj urlop / L4" : "Dodaj urlop / L4");
     $("vacType").value = ["paid","unpaid","sick"].includes(leave) ? leave : "paid";
     $("vacFrom").value = $("vacTo").value = date;
-    hydrateRangeOptions("vac");
+    hydrateRangeOptions("vac",$("vacType").value);
     openForm("vacDialog");
   }
   async function openVacationForDate(date = ui.date) {
@@ -4618,6 +4720,7 @@ dialog.rangePanel .rangeFormActions {
     $("bulkLeaveFields").hidden = !leave;
     text("bulkApply",leave ? "Ustaw urlop / L4" : "Dodaj godziny");
     text("bulkRemove",leave ? "Usuń status" : "Usuń godziny");
+    hydrateRangeOptions("bulk",leave ? $("bulkLeaveType").value : "");
   }
   function openBulk(mode = "hours") {
     haptic.open();
@@ -4681,12 +4784,14 @@ dialog.rangePanel .rangeFormActions {
     ui.confirm.closing = true;
     if (!closeOverlay("confirmDialog")) finishConfirmation();
   }
-  function openAppDialog({title = "Komunikat",message = "",okText = "OK",cancelText = "",tone = ""} = {}) {
+  function openAppDialog({title = "Komunikat",message = "",okText = "OK",cancelText = "",altText = "",tone = ""} = {}) {
     text("appConfirmTitle",title);
     text("appConfirmMessage",message);
     text("appConfirmOk",okText || "OK");
     text("appConfirmCancel",cancelText || "Anuluj");
     $("appConfirmCancel").hidden = !cancelText;
+    text("appConfirmAlt",altText || "—");
+    $("appConfirmAlt").hidden = !altText;
     $("appConfirmOk").classList.remove("dialogPrimary","dialogDanger");
     $("appConfirmOk").classList.add(tone === "danger" ? "dialogDanger" : "dialogPrimary");
     return new Promise(resolve => {
@@ -4706,7 +4811,7 @@ dialog.rangePanel .rangeFormActions {
     info:{title:"Informacje",sub:"Wersja aplikacji i status błędów",footer:false}
   };
   function refreshAppInfo() {
-    text("appVersionLabel","5.1.0");
+    text("appVersionLabel","5.2.0");
     const errors = window.__appErrors;
     text("appErrorState",errors.length ? errors.length === 1 ? "1 błąd" : `${errors.length} błędów` : "Brak błędów");
     $("clearAppErrors").hidden = $("appErrorBox").hidden = !errors.length;
@@ -4793,17 +4898,18 @@ dialog.rangePanel .rangeFormActions {
     }
     return {count:importDb.entries.length,from:dates[0] || "brak",to:dates[dates.length - 1] || "brak",duplicateDates,conflicts};
   }
+  // 5.2: dane w telefonie mają pierwszeństwo. Zakres z pliku, który nachodzi na
+  // istniejące godziny (także nocką z sąsiedniego dnia), jest pomijany, a nie dublowany.
   function mergeImportedDb(importDb) {
     const byDate = new Map(db.entries.map(day => [day.date,day]));
-    const result = {addedDays:0,addedShifts:0,skipped:0};
-    for (const day of importDb.entries) {
-      const current = byDate.get(day.date);
-      if (!current) {
-        const added = cloneDay(day);
-        db.entries.push(added);
-        byDate.set(day.date,added);
-        result.addedDays++;
-        continue;
+    const result = {addedDays:0,addedShifts:0,skipped:0,conflicts:0};
+    for (const day of [...importDb.entries].sort((a,b) => a.date.localeCompare(b.date))) {
+      let current = byDate.get(day.date);
+      const isNew = !current;
+      if (isNew) {
+        current = {...emptyDay(day.date)};
+        db.entries.push(current);
+        byDate.set(day.date,current);
       }
       if (!current.note && day.note) current.note = day.note;
       if (!(current.leaveType || current.vacation) && (day.leaveType || day.vacation)) {
@@ -4813,10 +4919,15 @@ dialog.rangePanel .rangeFormActions {
       if (!Array.isArray(current.shifts)) current.shifts = [];
       for (const shift of day.shifts || []) {
         if (current.shifts.some(s => normalizeTimeHHMM(s.start) === shift.start && normalizeTimeHHMM(s.end) === shift.end)) result.skipped++;
+        else if (!validateShiftNoOverlap(day.date,shift.start,shift.end).ok) result.conflicts++;
         else { current.shifts.push({start:shift.start,end:shift.end}); result.addedShifts++; }
       }
       sortShifts(current);
+      const hasContent = current.shifts.length || current.note || current.leaveType || current.vacation;
+      if (isNew && !hasContent) { db.entries.splice(db.entries.indexOf(current),1); byDate.delete(day.date); }
+      else if (isNew) result.addedDays++;
     }
+    db.entries.sort((a,b) => a.date.localeCompare(b.date));
     return result;
   }
   function downloadFile(filename, content, mime = "text/plain;charset=utf-8", options = {}) {
@@ -4829,6 +4940,30 @@ dialog.rangePanel .rangeFormActions {
   }
   const downloadTextFile = (filename,content,mime = "text/plain;charset=utf-8") => downloadFile(filename,content,mime);
   const downloadJsonFile = (filename,value) => downloadFile(filename,JSON.stringify(value,null,2),"application/json;charset=utf-8",{bom:false});
+  // 5.2: udostępnianie kopii (Android: Dysk, Gmail, Messenger…). Chrome nie pozwala
+  // udostępniać .json, więc plik ma typ tekstowy i rozszerzenie .json.txt; import przyjmuje oba.
+  function backupShareFile() {
+    if (typeof File !== "function") return null;
+    const file = new File([JSON.stringify(db,null,2)],`czas-pracy-kopia_${todayISO()}.json.txt`,{type:"text/plain"});
+    try { return navigator.canShare?.({files:[file]}) ? file : null; } catch { return null; }
+  }
+  const canShareBackup = () => !!backupShareFile();
+  async function shareBackup() {
+    haptic.tap();
+    const file = backupShareFile();
+    if (!file) { exportBackup(); return; }
+    try {
+      await navigator.share({files:[file],title:"Kopia – Czas pracy"});
+    } catch (error) {
+      if (error?.name === "AbortError") { setStatus("Anulowano udostępnianie kopii."); return; }
+      console.warn("Udostępnianie kopii nie powiodło się:",error);
+      exportBackup();
+      return;
+    }
+    try { setLastBackupNow(); } catch (error) { console.warn("Nie udało się zapisać znacznika kopii:",error); }
+    setStatus("Kopia udostępniona.");
+    haptic.success();
+  }
   function exportBackup() {
     haptic.tap();
     downloadJsonFile(`czas-pracy-backup_${new Date().toISOString().slice(0,10)}.json`,db);
@@ -4846,12 +4981,17 @@ dialog.rangePanel .rangeFormActions {
     if (!file) { event.target.value = ""; return; }
     try {
       const incoming = prepareImportedDb(JSON.parse(await file.text())), info = analyzeImportDb(incoming);
-      const merge = await openAppDialog({title:"Podgląd importu JSON",
-        message:`Plik zawiera ${info.count} ${pluralPL(info.count,"wpis","wpisy","wpisów")}.\nZakres dat: ${info.from} – ${info.to}.\nDaty już obecne: ${info.duplicateDates}.\nKonflikty z obecną bazą: ${info.conflicts}.\n\nWybrać scalanie bez duplikatów?`,
-        okText:"Scal",cancelText:"Zastąp wszystko"});
-      if (merge) {
+      const choice = await openAppDialog({title:"Podgląd importu",
+        message:`Plik zawiera ${info.count} ${pluralPL(info.count,"wpis","wpisy","wpisów")}.\nZakres dat: ${info.from} – ${info.to}.\nDaty już obecne: ${info.duplicateDates}.\nRóżnice z obecnymi danymi: ${info.conflicts}.\n\nScal – dopisuje brakujące dane, a przy różnicach zostawia to, co jest w telefonie.\nZastąp – usuwa obecne dane i wczytuje plik.`,
+        okText:"Scal",altText:"Zastąp",cancelText:"Anuluj"});
+      if (!choice) return;
+      if (choice === true) {
         const result = mergeImportedDb(incoming);
-        if (!commit(`Scalono import: ${result.addedDays} dni, ${result.addedShifts} zakresów.`)) return;
+        const n = result.conflicts;
+        const conflicts = n ? ` Pominięto ${n} ${pluralPL(n,"zakres nachodzący","zakresy nachodzące","zakresów nachodzących")} na godziny w telefonie.` : "";
+        const days = `${result.addedDays} ${pluralPL(result.addedDays,"dzień","dni","dni")}`;
+        const shifts = `${result.addedShifts} ${pluralPL(result.addedShifts,"zakres","zakresy","zakresów")}`;
+        if (!commit(`Scalono import: dodano ${days}, ${shifts}.${conflicts}`)) return;
         hydrateSettingsUI();
       } else {
         if (!await askConfirm("Zastąpić całą obecną bazę danymi z pliku? Tej operacji nie da się cofnąć poza wcześniejszą kopią JSON.","Zastąp dane")) return;
@@ -4868,7 +5008,7 @@ dialog.rangePanel .rangeFormActions {
     month ||= getCurrentMonthYM();
     const audit = buildReportPreflight(month), minutes = computeMonthMinutes(month);
     if (!await openAppDialog({title:"Sprawdź przed eksportem",
-      message:`${fmtMonthPL(month)}\nGodziny: ${fmtHM(minutes)}\nWypłata: ${pln(dayPay(minutes))}\nBraki dni roboczych: ${audit.missing}\nDni z notatką: ${audit.notes}\nUrlop/L4: ${audit.leaves}`,
+      message:`${fmtMonthPL(month)}\nGodziny: ${fmtHM(minutes)}\nWypłata: ${pln(monthMoney(month))}\nBraki dni roboczych: ${audit.missing}\nDni z notatką: ${audit.notes}\nUrlop/L4: ${audit.leaves}`,
       okText:"Generuj PDF",cancelText:"Anuluj"})) return;
     let html;
     try { html = buildReportHTML(month); }
@@ -5018,7 +5158,7 @@ dialog.rangePanel .rangeFormActions {
     root.innerHTML = surface.innerHTML;
     const minutes = computeDayMinutes(getDay(date) || emptyDay(date)), events = buildDayEventsHTML(date);
     root.querySelector("#dayViewHours").textContent = fmtHM(minutes);
-    root.querySelector("#dayViewPay").textContent = pln(dayPay(minutes));
+    root.querySelector("#dayViewPay").textContent = pln(dayPay(date,minutes));
     root.querySelector("#dayViewEvents").innerHTML = events.html;
     root.querySelector("#dayViewEventsCount").textContent = events.count ? `${events.count} ${pluralPL(events.count,"wpis","wpisy","wpisów")}` : "brak wpisów";
     return root.innerHTML;
@@ -5212,7 +5352,9 @@ dialog.rangePanel .rangeFormActions {
     yearStatsPrev:() => changeStatsYear(-1),
     yearStatsNext:() => changeStatsYear(1),
     monthStatsPdf:() => openReportPdf(getCurrentMonthYM()),
-    backupJson:exportBackup,restoreBtn:() => { haptic.tap(); $("restoreJson").click(); },
+    backupJson:exportBackup,shareBackup:shareBackup,rateAdd:addRateChange,
+    appConfirmAlt:() => chooseConfirmation("alt"),
+    restoreBtn:() => { haptic.tap(); $("restoreJson").click(); },
     checkUpdateBtn:checkForAppUpdate,
     appConfirmOk:() => chooseConfirmation(true),appConfirmCancel:() => chooseConfirmation(false),
     tplAdd:() => {
@@ -5239,11 +5381,12 @@ dialog.rangePanel .rangeFormActions {
     writeAppHistory("replace",{overlay:"drawer"});
   }
   function handleClick(event) {
-    const target = event.target.closest?.("[data-remove-template],[data-template-index],[data-month-chip],[data-day-event],.dayCell[data-date],button,#fabScrim");
+    const target = event.target.closest?.("[data-remove-rate],[data-remove-template],[data-template-index],[data-month-chip],[data-day-event],.dayCell[data-date],button,#fabScrim");
     if (!target) {
       if (event.target === $("mainMenuDialog")) closeDrawer();
       return;
     }
+    if (target.dataset.removeRate != null) { removeRate(Number(target.dataset.removeRate)); return; }
     if (target.dataset.removeTemplate != null) { if (removeShiftTemplate(Number(target.dataset.removeTemplate))) haptic.warning(); return; }
     if (target.dataset.templateIndex != null) {
       const template = getShiftTemplates()[Number(target.dataset.templateIndex)];
@@ -5276,7 +5419,7 @@ dialog.rangePanel .rangeFormActions {
     if (db.settings[id] === value) return;
     db.settings[id] = value;
     if (!save()) return;
-    if (id === "rate" || id === "leaveQuota") renderAll();
+    if (id === "leaveQuota") renderAll();
     else setStatus("Zapisano ustawienia.");
   }
   function handleStorage(event) {
@@ -5298,6 +5441,8 @@ dialog.rangePanel .rangeFormActions {
     document.addEventListener("change",handleSettings);
     $("monthPick").addEventListener("change",() => { haptic.tap(); renderAll(); });
     $("restoreJson").addEventListener("change",importBackup);
+    $("vacType").addEventListener("change",() => hydrateRangeOptions("vac",$("vacType").value));
+    $("bulkLeaveType").addEventListener("change",() => hydrateRangeOptions("bulk",$("bulkLeaveType").value));
     $("appConfirmDialog").addEventListener("cancel",event => { event.preventDefault(); chooseConfirmation(false); });
     for (const id of ["dayDialog","vacDialog","bulkDialog","mainMenuDialog"]) {
       $(id).addEventListener("cancel",event => {
@@ -5338,7 +5483,7 @@ dialog.rangePanel .rangeFormActions {
 
     const monthLabelReminder = fmtMonthPL(monthYM);
     const sumMin = computeMonthMinutes(monthYM);
-    const money = round2((sumMin / 60) * (db.settings.rate || 0));
+    const money = monthMoney(monthYM);
 
     const leaveStats = { paid:0, unpaid:0, sick:0 };
     let workDays = 0;
@@ -5707,14 +5852,17 @@ dialog.rangePanel .rangeFormActions {
     setupKeyboardFriendlyModals();
     renderAll();
     writeAppHistory("replace");
-    text("appVersionFooter","Wersja 5.1.0");
-    text("appVersionLabel","5.1.0");
+    text("appVersionFooter","Wersja 5.2.0");
+    text("appVersionLabel","5.2.0");
     setupPWA();
+    $("shareBackup").hidden = !canShareBackup();
+    // 5.2: prośba, by system nie czyścił danych przy braku miejsca (Android zwykle zgadza się po cichu).
+    try { navigator.storage?.persist?.().catch(() => {}); } catch {}
     if (pendingStorageWarning) { setStatus(pendingStorageWarning); pendingStorageWarning = ""; }
     const last = getLastBackupISO(), elapsed = daysSince(last);
     if (elapsed >= getBackupReminderDays()) setTimeout(async () => {
       const message = last ? `Ostatni backup: ${elapsed} dni temu.\nZrób kopię zapasową teraz?` : "Nie wykryto żadnego backupu.\nZrób kopię zapasową teraz?";
-      if (await askConfirm(message,"Kopia zapasowa")) exportBackup();
+      if (await askConfirm(message,"Kopia zapasowa")) { if (canShareBackup()) shareBackup(); else exportBackup(); }
     },600);
   }
   /* TEST_HOOK */
